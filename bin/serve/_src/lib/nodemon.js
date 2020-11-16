@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 
-module.exports.start = async (logger, onitRunFile, events) => {
+module.exports.start = async (logger, onitRunFile) => {
 
     return new Promise((resolve,reject)=> {
         
@@ -12,7 +12,7 @@ module.exports.start = async (logger, onitRunFile, events) => {
             delay = null;
 
             // serve: devo calcolare la config di nodemon prima di lanciarlo a partire dal file di config onitrun.config.[js,json]
-            const nodemonConfig = JSON.parse(fs.readFileSync(path.join(__dirname, '../configFiles/nodemon.json')).toString());
+            const nodemonConfig = JSON.parse(fs.readFileSync(path.join(__dirname, '../../../../configFiles/serve/nodemon.json')).toString());
             // 1) aggiungo watch su moduli caricati così cambiamenti in quelle cartelle rilanciano nodemon!
             const enabledModulesPaths = (onitRunFile.json.loadComponents || []).filter(c => c.enabled).map(c => c.path);
             nodemonConfig.watch = [process.cwd(), ...(nodemonConfig.watch || []), ...enabledModulesPaths];
@@ -40,7 +40,7 @@ module.exports.start = async (logger, onitRunFile, events) => {
         }, 5000);
         
         
-        events.on('SIGINT',() =>{
+        process.on('SIGINT',() =>{
             logger.warn("Stop/reset nodemon...");
             if (delay){
                 clearTimeout(delay);

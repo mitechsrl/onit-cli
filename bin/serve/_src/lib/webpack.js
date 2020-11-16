@@ -89,10 +89,10 @@ module.exports.stop = function() {
    
 }
 
-module.exports.start = async (logger, onitRunFile, mainOnitBuildFile, events) => {
+module.exports.start = async (logger, onitRunFile, mainOnitBuildFile) => {
 
     // load the default config
-    let  webpackConfig = require('../configFiles/webpack.config');
+    let  webpackConfig = require('../../../../configFiles/serve/webpack.config');
 
     // add dynamic entry points to the webpack config
     webpackConfig.entry = searchEntryPoints(onitRunFile);
@@ -135,7 +135,7 @@ module.exports.start = async (logger, onitRunFile, mainOnitBuildFile, events) =>
         }, watcherCallback);
 
 
-        events.on('SIGINT',() =>{
+        process.on('SIGINT',() =>{
             logger.warn("Stop webpack watcher...");
             watcher.close(() => {
                 logger.warn("Webpack watch stopped");

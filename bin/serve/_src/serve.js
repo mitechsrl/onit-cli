@@ -1,5 +1,4 @@
 const EventEmitter = require('events');
-const events = new EventEmitter();
 const pm2Dev = require('./lib/pm2');
 const nodemon = require('./lib/nodemon');
 const webpack = require('./lib/webpack');
@@ -14,12 +13,6 @@ module.exports.serve = async function (logger) {
         { cmd: 'nodemon' + ext + ' --config ./dev-utils/nodemon-dyn.json', stdio: ['inherit', 'inherit', 'inherit'] },
         { cmd: 'node ./dev-utils/frontend-webpack.js --live' }
     ];*/
-
-    // intercetta CTRL+C dato alla finestra della console e lo inoltra ai processi interni
-    process.on('SIGINT', function () {
-        console.warn('Intercettato SIGINT. Inoltro ai processi interni...');
-        events.emit('SIGINT');
-    });
 
     // avvia processo di start
 
@@ -36,8 +29,8 @@ module.exports.serve = async function (logger) {
         // tempo di lanciare il serve effettivo
         logger.log("Lancio nodemon & webpack...")
         await Promise.all([
-            webpack.start(logger, onitRunFile, onitBuildFile, events),
-            nodemon.start(logger, onitRunFile, events)
+            webpack.start(logger, onitRunFile, onitBuildFile),
+            nodemon.start(logger, onitRunFile)
         ]);
 
         // lancio tutto quello che c'è in parallelo. Passare il filename di nodemon

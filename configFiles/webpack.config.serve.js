@@ -1,4 +1,4 @@
-const babelRcJs = require('./babel.config');
+const babelRcJs = require('./serve/babel.config');
 
 
 /**
@@ -15,17 +15,17 @@ module.exports = {
             {
                 test: /\.css$/i,
                 use: [{
-                    loader: require.resolve('style-loader'),
+                    loader: 'style-loader',
                     options: { injectType: 'singletonStyleTag' }
                 },
                 {
-                    loader: require.resolve('css-loader')
+                    loader: 'css-loader'
                 }]
             },
             {
                 test: /\.jsx$/,
                 use: {
-                    loader: require.resolve('babel-loader'),
+                    loader: 'babel-loader',
                     options: babelRcJs
                 }
             }
