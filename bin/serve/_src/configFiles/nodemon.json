@@ -1,0 +1,15 @@
+{
+    "verbose": true,
+    "ext": "js,mjs,json",
+    "ignore": [
+        "node_modules/*",
+        "*/node_modules/*",
+        "extras/*",
+        "*/react/*",
+        "dev-utils/*",
+        "git.json",
+        "*/static/*"
+    ],
+    "nodeArgs":[],
+    "env":{}
+}

@@ -1,0 +1,1 @@
+console.log("Hello world 2 "+process.env.ciao);
