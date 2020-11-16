@@ -36,8 +36,8 @@ module.exports.serve = async function (logger) {
         // tempo di lanciare il serve effettivo
         logger.log("Lancio nodemon & webpack...")
         await Promise.all([
-            nodemon.start(logger, onitRunFile, events),
-            webpack.start(logger, onitRunFile, onitBuildFile, events)
+            webpack.start(logger, onitRunFile, onitBuildFile, events),
+            nodemon.start(logger, onitRunFile, events)
         ]);
 
         // lancio tutto quello che c'è in parallelo. Passare il filename di nodemon
