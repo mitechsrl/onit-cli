@@ -2,6 +2,7 @@ const path = require('path');
 const loadIgnore = require('./lib/loadIgnore');
 const copy = require('./lib/copy');
 const webpack = require('./lib/webpack');
+const clean = require('./lib/clean');
 
 module.exports.build = async function (logger, buildTarget, onitBuildFile) {
 
@@ -12,7 +13,14 @@ module.exports.build = async function (logger, buildTarget, onitBuildFile) {
     const ig = loadIgnore();
 
     
-    await copy(logger, ig, targetDir);
-    await webpack(logger, targetDir, onitBuildFile)
-
+    await copy(logger, targetDir, ig);
+    await webpack(logger, targetDir, onitBuildFile, buildMode);
+    await clean(logger, targetDir, buildMode);
+    
+    logger.info("Build completato!")
+    
+    return {
+        targetDir: targetDir
+    }
+    
 }

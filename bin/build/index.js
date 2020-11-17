@@ -13,8 +13,11 @@
  */
 
 const onitFileLoader = require('../../lib/onitFileLoader');
-var inquirer = require('inquirer');
+const inquirer = require('inquirer');
 const build = require('./_src/build');
+const extraStepRunner = require('./_src/lib/extraStepRunner');
+const os = require('os');
+
 
 module.exports.info = 'Onit build utility';
 module.exports.help = [];
@@ -55,17 +58,20 @@ module.exports.cmd = async function (basepath, params, logger) {
     answers = await  inquirer.prompt(list);
     extraSteps = extraSteps.filter((step, index) => answers['step_'+index]);
 
-    
-
-    // This is needed for webpack. For some reasons it looks like something don't work if we don't pass this flag but use the config value from the config json
-    if ((buildTarget.mode === 'production')){
-        process.argv.push('--mode=production')
-    }
-
     // we have all the needed data.
     // launch the build process
     try{
-        await build.build(logger, buildTarget, onitBuildFile);
+        let { targetDir } = await build.build(logger, buildTarget, onitBuildFile);
+        
+        const vars = {
+            $_PROJECT_DIR: process.cwd(),
+            $_BUILD_DIR: targetDir,
+            $_WIN_CMD: os.platform() === "win32" ? ".cmd":""
+        }
+
+        logger.log("Avvio esecuzione steps post-build")
+        for(step of extraSteps) await extraStepRunner(logger, step, vars);
+
     } catch (e) {
         logger.error(e.message);
         logger.error("Build interrotto");

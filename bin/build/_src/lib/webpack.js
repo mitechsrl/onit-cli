@@ -4,7 +4,7 @@ const _ = require('lodash');
 const webpack = require('webpack');
 const webpackUtils = require('../../../../lib/webpack/utils');
 
-module.exports = (logger, targetDir, onitBuildFile) => {
+module.exports = (logger, targetDir, onitBuildFile, buildMode) => {
 
     return new Promise(async (resolve, reject) => {
 
@@ -17,6 +17,11 @@ module.exports = (logger, targetDir, onitBuildFile) => {
 
         // load the default config
         let  webpackConfig = require('../../../../configFiles/build/webpack.config');
+
+        // webpackConfig build mode (defaults to production)
+        if( buildMode !== 'production'){
+            webpackConfig.mode = buildMode;
+        }
 
         // add dynamic entry points to the webpack config
         webpackConfig.entry = webpackUtils.searchEntryPoints();

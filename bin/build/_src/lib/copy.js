@@ -3,7 +3,7 @@ const fse = require('fs-extra');
 const path = require('path');
 const ncp = require('ncp').ncp;
 
-module.exports = (logger, ignoreFilter, targetDir) => {
+module.exports = (logger, targetDir, ignoreFilter) => {
     return new Promise((resolve, reject) => {
 
         logger.info("[COPY] Copio progetto nella directory di build "+targetDir+" in corso...");
