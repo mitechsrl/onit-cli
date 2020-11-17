@@ -1,0 +1,11 @@
+node_modules
+.git
+
+# skip build
+/build
+
+# except subfolder named build. Some external lib may have it
+#!*/**/build'
+
+# old dev-utils directory 
+dev-utils

@@ -1,5 +1,5 @@
 const babelRcJs = require('./babel.config');
-
+const UnminifiedWebpackPlugin = require('unminified-webpack-plugin');
 
 /**
  * Webpack standard config. Some values may be changed at runtime (especially entry points and/or mode)
@@ -8,6 +8,8 @@ const babelRcJs = require('./babel.config');
 module.exports = {
     mode: 'production',
     context: process.cwd(),
+    
+    watch: false,
 
     // babel files loader
     module: {
@@ -15,17 +17,17 @@ module.exports = {
             {
                 test: /\.css$/i,
                 use: [{
-                    loader: 'style-loader',
+                    loader: require.resolve('style-loader'),
                     options: { injectType: 'singletonStyleTag' }
                 },
                 {
-                    loader: 'css-loader'
+                    loader: require.resolve('css-loader')
                 }]
             },
             {
                 test: /\.jsx$/,
                 use: {
-                    loader: 'babel-loader',
+                    loader: require.resolve('babel-loader'),
                     options: babelRcJs
                 }
             }
@@ -42,7 +44,7 @@ module.exports = {
     },
 
     plugins: [
-        'unminified-webpack-plugin'
+        //new UnminifiedWebpackPlugin()
     ],
 
     // add previosly found entry point
@@ -64,6 +66,6 @@ module.exports = {
         toastr: 'toastr'
     },
 
-    stats:'errors-only' //normal on build
+    stats:'normal' //normal on build
 
 };
