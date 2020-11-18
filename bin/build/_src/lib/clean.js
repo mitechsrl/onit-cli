@@ -21,16 +21,15 @@ let removePath = (logger, localPath) => {
  * @param {*} buildMode 
  */
 let cleanPackageJson = (logger, buildMode) => {
-    logger.log('Rimuovo valori non voluti da package.json...');
+    logger.log('Rimuovo valori non voluti da package.json');
     const json = JSON.parse(fs.readFileSync('package.json'));
     const start = json.scripts.start;
+    
     json.scripts = { start: start };
-
-    json.devDependencies = null;
+    delete json.husky;
     delete json.devDependencies;
-    if (buildMode === 'production') {
-        json._productionBuild = true;
-    }
+    json._productionBuild = buildMode === 'production';
+    
     fs.writeFileSync('package.json', JSON.stringify(json, null, 2));
 }
 
@@ -43,7 +42,7 @@ let removeSourceJsxFiles = (logger, jsxCleanPath) => {
 
     return new Promise((resolve) => {
         // remove all jxs files
-        logger.log('Rimuovo i files sorgenti jsx...');
+        logger.log('Rimuovo i files sorgenti jsx');
         const searchPath = path.join(process.cwd(), jsxCleanPath);
         if (!fs.existsSync(searchPath)) {
             resolve(0);
@@ -67,6 +66,20 @@ let removeSourceJsxFiles = (logger, jsxCleanPath) => {
         });
     })
 }
+
+
+/**
+ * 
+ */
+removeFiles = (logger, files) => {
+
+    files.forEach(f => {
+        if (fs.existsSync(f)){
+            logger.log('Rimuovo '+ f);
+            fs.unlinkSync(f);
+        }
+    })
+}
 module.exports = (logger, targetDir, buildMode) => {
 
     return new Promise(async (resolve, reject) => {
@@ -82,9 +95,15 @@ module.exports = (logger, targetDir, buildMode) => {
         // clean stages
         removePath(logger, 'node_modules');
         removePath(logger, 'dev-utils');
+        removeFiles(logger, [
+            'onitbuild.config.js',
+            'onitbuild.config.json'
+        ]);
+
         cleanPackageJson(logger, buildMode)
         await removeSourceJsxFiles(logger, 'client');
 
+        
         logger.info("[CLEAN] completato");
         process.chdir(originalPath);
 

@@ -2,6 +2,7 @@
 const fse = require('fs-extra');
 const path = require('path');
 const ncp = require('ncp').ncp;
+const fs = require('fs');
 
 module.exports = (logger, targetDir, ignoreFilter) => {
     return new Promise((resolve, reject) => {
@@ -24,7 +25,7 @@ module.exports = (logger, targetDir, ignoreFilter) => {
 
         const baseDir = process.cwd();
         
-        //const copyLog = [];
+        const copyLog = [];
         let copied = 0;
         let skipped = 0;
 
@@ -37,11 +38,11 @@ module.exports = (logger, targetDir, ignoreFilter) => {
                 if (!ret) {
                     copied++;
                     //logger.log('Copia '+ filename);
-                    //copyLog.push('COPY ' + filename);
+                    copyLog.push('COPY ' + filename);
                 } else {
                     skipped++;
                     logger.warn('[COPY] Skip ' + filename);
-                    //copyLog.push('SKIP ' + filename);
+                    copyLog.push('SKIP ' + filename);
                 }
                 return !ret;
             }
@@ -55,11 +56,11 @@ module.exports = (logger, targetDir, ignoreFilter) => {
 
             logger.info('[COPY] Copiati: '+ copied);
             logger.warn('[COPY] Saltati: '+ skipped);
-            //console.log('Scrivo log copia...');
+            console.log('Scrivo log copia...');
 
-            //const filename = path.join('build\\copy-prod-' + (new Date().toISOString().replace(/:/g, '-')) + '.log';
-            //console.log('log file: ' + filename);
-            //fs.writeFileSync(filename, copyLog.join('\n'));
+            const filename = path.join(targetDir,'../copy-prod-' + (new Date().toISOString().replace(/:/g, '-')) + '.log');
+            console.log('log file: ' + filename);
+            fs.writeFileSync(filename, copyLog.join('\n'));
             logger.info('[COPY] Copia completata');
 
             resolve(0);

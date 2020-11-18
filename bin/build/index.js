@@ -45,6 +45,7 @@ module.exports.cmd = async function (basepath, params, logger) {
     if (!buildTarget){
         throw new Error("Errore nella selezione del buildTarget");
     }
+    buildTarget.key = answers.buildTarget;
 
     // selector for extra steps
     let extraSteps = (buildTarget.buildExtraSteps || []);
@@ -58,10 +59,12 @@ module.exports.cmd = async function (basepath, params, logger) {
     answers = await  inquirer.prompt(list);
     extraSteps = extraSteps.filter((step, index) => answers['step_'+index]);
 
-    // we have all the needed data.
-    // launch the build process
+    // we have all the needed data. We can start the build process
     try{
+        // effective build
         let { targetDir } = await build.build(logger, buildTarget, onitBuildFile);
+        
+        // extra steps management
         
         const vars = {
             $_PROJECT_DIR: process.cwd(),

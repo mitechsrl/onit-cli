@@ -8,7 +8,7 @@ module.exports.build = async function (logger, buildTarget, onitBuildFile) {
 
     const buildMode = buildTarget.mode || 'production';
     const baseName = path.basename(process.cwd());
-    const targetDir = path.resolve(process.cwd(),'../.build-'+buildMode+'-'+baseName);
+    const targetDir = path.resolve(process.cwd(),'./build/'+(buildTarget.key || buildMode));
     
     const ig = loadIgnore();
 
@@ -24,7 +24,9 @@ module.exports.build = async function (logger, buildTarget, onitBuildFile) {
 
     await clean(logger, targetDir, buildMode);
     
-    logger.info("Build completato!")
+    logger.info("Build completato.")
+    logger.info("Directory di build: "+targetDir)
+    
     
     return {
         targetDir: targetDir
