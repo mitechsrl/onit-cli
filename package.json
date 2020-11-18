@@ -28,7 +28,7 @@
         "tar": "^6.0.5",
         "tmp": "^0.2.1",
         "tmp-promise": "^3.0.2",
-        "unminified-webpack-plugin": "^2.0.0",
+        "uglifyjs-webpack-plugin": "^2.2.0",
         "uuid": "^8.0.0",
         "webpack": "^5.4.0",
         "webpack-merge": "^5.4.0"

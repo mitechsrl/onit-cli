@@ -1,5 +1,4 @@
 const babelRcJs = require('./babel.config');
-const UnminifiedWebpackPlugin = require('unminified-webpack-plugin');
 
 /**
  * Webpack standard config. Some values may be changed at runtime (especially entry points and/or mode)
@@ -8,9 +7,11 @@ const UnminifiedWebpackPlugin = require('unminified-webpack-plugin');
 module.exports = {
     mode: 'production',
     context: process.cwd(),
-    
     watch: false,
 
+    // add source maps also on production mode so we can debug a production-deployed page with more accuracy if needed 
+    devtool:'source-map',
+    
     // babel files loader
     module: {
         rules: [
@@ -40,14 +41,12 @@ module.exports = {
         splitChunks: false
     },
 
-    resolve: {
-    },
+    // resolves will be populated dynamically from project dependency files (onitbuild.config.json's)
+    resolve: {},
 
-    plugins: [
-        //new UnminifiedWebpackPlugin()
-    ],
+    plugins: [],
 
-    // add previosly found entry point
+    // see https://webpack.js.org/configuration/output/
     output: {
         path: process.cwd(),
         filename: '[name].min.js', 
@@ -66,6 +65,7 @@ module.exports = {
         toastr: 'toastr'
     },
 
-    stats:'normal' //normal on build
+    // see https://webpack.js.org/configuration/stats/#stats-presets
+    stats:'verbose'
 
 };

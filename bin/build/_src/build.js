@@ -15,6 +15,13 @@ module.exports.build = async function (logger, buildTarget, onitBuildFile) {
     
     await copy(logger, targetDir, ig);
     await webpack(logger, targetDir, onitBuildFile, buildMode);
+
+    const nonMinBuildExtraConfig = {
+        optimization: { minimize: false},
+        output: {filename: '[name].js'},
+    }
+    await webpack(logger, targetDir, onitBuildFile, buildMode, nonMinBuildExtraConfig);
+
     await clean(logger, targetDir, buildMode);
     
     logger.info("Build completato!")

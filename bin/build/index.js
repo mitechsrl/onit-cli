@@ -68,8 +68,11 @@ module.exports.cmd = async function (basepath, params, logger) {
             $_BUILD_DIR: targetDir
         }
 
-        logger.log("Avvio esecuzione steps post-build")
-        for(step of extraSteps) await extraStepRunner(logger, step, vars);
+        if (extraSteps.length>0){
+            logger.log("");
+            logger.log("Avvio esecuzione steps post-build")
+            for(step of extraSteps) await extraStepRunner(logger, step, vars);
+        }
 
     } catch (e) {
         logger.error(e.message);

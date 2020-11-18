@@ -4,11 +4,11 @@ const _ = require('lodash');
 const webpack = require('webpack');
 const webpackUtils = require('../../../../lib/webpack/utils');
 
-module.exports = (logger, targetDir, onitBuildFile, buildMode) => {
+module.exports = (logger, targetDir, onitBuildFile, buildMode, injectBuildOptions = null) => {
 
     return new Promise(async (resolve, reject) => {
 
-        logger.info("[WEBPACK] Eseguo build webpack...");
+        logger.info("[WEBPACK] Eseguo build webpack "+(injectBuildOptions ? "con configurazione extra "+JSON.stringify(injectBuildOptions): "standard"));
 
         const originalPath = process.cwd();
 
@@ -31,6 +31,9 @@ module.exports = (logger, targetDir, onitBuildFile, buildMode) => {
 
         webpackConfig = _.mergeWith(webpackConfig, onitBuildWebpackData, webpackUtils.webpackMergeFn);
 
+        if (injectBuildOptions){
+            webpackConfig = _.mergeWith(webpackConfig, injectBuildOptions, webpackUtils.webpackMergeFn);
+        }
         webpack(webpackConfig, (err, stats) => {
             // do we had internal errors?
             if (err) {
