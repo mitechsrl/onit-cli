@@ -51,8 +51,16 @@ module.exports = (logger, step, vars) => {
 
         // handler for cmd-type step
         if (step.cmd){
-            await spawn(step.cmd[0] || step.cmd, step.cmd[1] || [], true, {
-                cwd: process.cwd() // NOTE: this is inherithed from the current process(which already did the cwd!)
+            const cmd = Array.isArray(step.cmd) ? step.cmd[0] : step.cmd;
+            const params = (Array.isArray(step.cmd) && (step.cmd.length>1)) ? [step.cmd[1]] : [];
+            
+            await spawn(cmd, params, true, {
+                // This allows to run command on windows without adding '.cmd' or '.bat'. See 
+                // https://nodejs.org/api/child_process.html#child_process_spawning_bat_and_cmd_files_on_windows
+                shell: true,
+
+                // NOTE: this is inherithed from the current process(which already did the cwd!)
+                cwd: process.cwd() 
             });
         }
         

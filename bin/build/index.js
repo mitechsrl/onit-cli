@@ -65,8 +65,7 @@ module.exports.cmd = async function (basepath, params, logger) {
         
         const vars = {
             $_PROJECT_DIR: process.cwd(),
-            $_BUILD_DIR: targetDir,
-            $_WIN_CMD: os.platform() === "win32" ? ".cmd":""
+            $_BUILD_DIR: targetDir
         }
 
         logger.log("Avvio esecuzione steps post-build")
