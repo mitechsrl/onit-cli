@@ -34,6 +34,9 @@ module.exports = (logger, targetDir, onitBuildFile, buildMode, injectBuildOption
         if (injectBuildOptions){
             webpackConfig = _.mergeWith(webpackConfig, injectBuildOptions, webpackUtils.webpackMergeFn);
         }
+
+        // TODO: aggiungere flag verbose per vedere piu info come questa?
+        //console.log(webpackConfig);
         webpack(webpackConfig, (err, stats) => {
             // do we had internal errors?
             if (err) {

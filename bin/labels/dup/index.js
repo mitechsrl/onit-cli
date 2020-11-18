@@ -15,7 +15,10 @@
 const checker = require('./_src/duplicate');
 
 module.exports.info = 'Utility verifica duplicazione e correzione labels.';
-module.exports.help = [];
+module.exports.help = [
+    'Questa utility verifica i files json delle labels alla ricerca di duplicati.',
+    'Esegue rimozione in-place verificando che non esistano duplicati sia intra-json, che cross-json'
+];
 
 module.exports.cmd = async function (basepath, params, logger) {
     logger.info('Verifica directory corrente');

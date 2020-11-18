@@ -14,7 +14,7 @@
 
 const serve = require('./_src/serve');
 
-module.exports.info = 'Onit run utility';
+module.exports.info = 'Dev Run/serve utility. Lancia il progetto in ambiente di sviluppo';
 module.exports.help = [];
 
 module.exports.cmd = async function (basepath, params, logger) {

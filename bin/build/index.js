@@ -18,8 +18,7 @@ const build = require('./_src/build');
 const extraStepRunner = require('./_src/lib/extraStepRunner');
 const os = require('os');
 
-
-module.exports.info = 'Onit build utility';
+module.exports.info = 'Build utility. Compila il progetto in un pacchetto pronto per il deploy';
 module.exports.help = [];
 
 module.exports.cmd = async function (basepath, params, logger) {
