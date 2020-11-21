@@ -14,7 +14,11 @@ module.exports.start = async (logger, onitRunFile) => {
             // serve: devo calcolare la config di nodemon prima di lanciarlo a partire dal file di config onitrun.config.[js,json]
             const nodemonConfig = JSON.parse(fs.readFileSync(path.join(__dirname, '../../../../configFiles/serve/nodemon.json')).toString());
             // 1) aggiungo watch su moduli caricati così cambiamenti in quelle cartelle rilanciano nodemon!
-            const enabledModulesPaths = (onitRunFile.json.loadComponents || []).filter(c => c.enabled).map(c => c.path);
+            const enabledModulesPaths = (onitRunFile.json.loadComponents || [])
+            .filter(c => c.enabled) // watch on enabled only
+            .filter(c => c.path.indexOf('node_modules')<0) // don't watch on node_modules dirs
+            .map(c => c.path)
+            
             nodemonConfig.watch = [process.cwd(), ...(nodemonConfig.watch || []), ...enabledModulesPaths];
             // 2) aggiungo environment
             const env = (onitRunFile.json.environment || {});

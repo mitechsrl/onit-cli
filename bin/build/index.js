@@ -48,16 +48,17 @@ module.exports.cmd = async function (basepath, params, logger) {
 
     // selector for extra steps
     let extraSteps = (buildTarget.buildExtraSteps || []);
-    if (extraSteps.length === 0) return [];
-    logger.log("Selezione step aggiuntivi post-build:")
-    list = extraSteps.map((step,index) => ({
-            type:'confirm',
-            name: 'step_'+index,
-            message: "Eseguire <"+step.name+">?"
-    }));
-    answers = await  inquirer.prompt(list);
-    extraSteps = extraSteps.filter((step, index) => answers['step_'+index]);
+    if (extraSteps.length > 0){
 
+        logger.log("Selezione step aggiuntivi post-build:")
+        list = extraSteps.map((step,index) => ({
+                type:'confirm',
+                name: 'step_'+index,
+                message: "Eseguire <"+step.name+">?"
+        }));
+        answers = await  inquirer.prompt(list);
+        extraSteps = extraSteps.filter((step, index) => answers['step_'+index]);
+    }
     // we have all the needed data. We can start the build process
     try{
         // effective build

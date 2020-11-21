@@ -1,3 +1,4 @@
+const path = require('path');
 const babelRcJs = require('./babel.config');
 
 
@@ -26,11 +27,18 @@ module.exports = {
                 }]
             },
             {
-                test: /\.sass$/,
+                test: /\.s[ac]ss$/,
                 use: [
                     {
                         loader: require.resolve('file-loader'),
-                        options: { name: '[path][name].css'}
+                        options: { 
+                            name: (resourcePath) =>{
+                                const dirName = path.dirname(resourcePath);
+                                const baseName = path.basename(resourcePath).replace(/(sass|scss)$/, "css");
+                                return path.relative(process.cwd(), path.join(dirName, baseName))
+                                //was '[path][name].css'
+                            }
+                        }
                     },
                     require.resolve('sass-loader')
                 ]

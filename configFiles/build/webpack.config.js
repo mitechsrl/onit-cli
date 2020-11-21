@@ -26,7 +26,7 @@ module.exports = {
                 }]
             },
             {
-                test: /\.sass$/,
+                test: /\.s[ac]ss$/,
                 use: [
                     {
                         loader: require.resolve('file-loader'),
