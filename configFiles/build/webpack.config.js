@@ -26,6 +26,16 @@ module.exports = {
                 }]
             },
             {
+                test: /\.sass$/,
+                use: [
+                    {
+                        loader: require.resolve('file-loader'),
+                        options: { name: '[path][name].css'}
+                    },
+                    require.resolve('sass-loader')
+                ]
+            },
+            {
                 test: /\.jsx$/,
                 use: {
                     loader: require.resolve('babel-loader'),

@@ -18,17 +18,27 @@ module.exports = {
             {
                 test: /\.css$/i,
                 use: [{
-                    loader: 'style-loader',
+                    loader: require.resolve('style-loader'),
                     options: { injectType: 'singletonStyleTag' }
                 },
                 {
-                    loader: 'css-loader'
+                    loader: require.resolve('css-loader')
                 }]
+            },
+            {
+                test: /\.sass$/,
+                use: [
+                    {
+                        loader: require.resolve('file-loader'),
+                        options: { name: '[path][name].css'}
+                    },
+                    require.resolve('sass-loader')
+                ]
             },
             {
                 test: /\.jsx$/,
                 use: {
-                    loader: 'babel-loader',
+                    loader: require.resolve('babel-loader'),
                     options: babelRcJs
                 }
             }
