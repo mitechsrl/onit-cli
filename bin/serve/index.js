@@ -15,10 +15,13 @@
 const serve = require('./_src/serve');
 
 module.exports.info = 'Dev Run/serve utility. Lancia il progetto in ambiente di sviluppo';
-module.exports.help = [];
+module.exports.help = [
+    ['-w', 'Esegui solo webpack, skip nodemon'],
+    ['-n', 'Esegui solo nodemon, skip webpack']
+];
 
 module.exports.cmd = async function (basepath, params, logger) {
     
-    await serve.serve(logger);
+    await serve.serve(logger, params);
 
 };

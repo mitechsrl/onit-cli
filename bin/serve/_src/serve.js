@@ -4,9 +4,12 @@ const nodemon = require('./lib/nodemon');
 const webpack = require('./lib/webpack');
 const onitFileLoader = require('../../../lib/onitFileLoader');
 
-module.exports.serve = async function (logger) {
+module.exports.serve = async function (logger, params) {
 
     
+    const minusW = params.get('-w').found;
+    const minusN = params.get('-n').found;
+
     // processi da eseguire IN PARALLELO per lo start
     // vedi https://nodejs.org/api/child_process.html#child_process_subprocess_stdio per gestione STDIO
     /*const serve = [
@@ -27,10 +30,10 @@ module.exports.serve = async function (logger) {
 
         
         // tempo di lanciare il serve effettivo
-        logger.log("Lancio nodemon & webpack...")
+        logger.log("Lancio nodemon & webpack..."+ (minusN ? 1:0) + (minusW ? 1:0))
         await Promise.all([
-            webpack.start(logger, onitRunFile, onitBuildFile),
-            nodemon.start(logger, onitRunFile)
+            (!minusN) ? webpack.start(logger, onitRunFile, onitBuildFile) : Promise.resolve(),  // -n cause only webpack to be run live
+            (!minusW) ? nodemon.start(logger, onitRunFile) : Promise.resolve() // -w cause only webpack to be run live
         ]);
 
         // lancio tutto quello che c'è in parallelo. Passare il filename di nodemon

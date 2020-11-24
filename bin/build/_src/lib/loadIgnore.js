@@ -1,10 +1,8 @@
 const ignore = require('ignore');
 const fs = require('fs');
-const path = require('path');
 
 
-
-module.exports = () => {
+module.exports = (ignoreFilesList = []) => {
 
     const _load = function(ignoreFileName){
         // prepara gestione ignore files
@@ -24,10 +22,17 @@ module.exports = () => {
         return ignoreFilters;
     }
     
+    let ignoreFilters = ignoreFilesList.reduce((acc, file) => {
+        acc.push(..._load(file))
+        return acc;
+    },[]);
+    console.log("IGNORE filters", ignoreFilters)
+
+    /*
     let ignoreFilters = [
         ..._load(path.join(process.cwd(), './.onitbuildignore')),
         ..._load(path.join(__dirname, '../../../../configFiles/build/.defaultignore'))
-    ];
+    ];*/
 
     return ignore().add(ignoreFilters);
 }

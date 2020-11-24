@@ -2,7 +2,7 @@ const path = require('path');
 const fs = require('fs');
 const fse = require('fs-extra');
 const find = require('find');
-
+const loadIgnore = require('./loadIgnore');
 /**
  * 
  * @param {*} logger 
@@ -100,7 +100,13 @@ module.exports = (logger, targetDir, buildMode) => {
             'onitbuild.config.json'
         ]);
 
-        cleanPackageJson(logger, buildMode)
+        cleanPackageJson(logger, buildMode);
+
+        const ignoreFiles = [
+            path.join(__dirname, '../../../../configFiles/build/.clean')
+        ];
+        const ig = loadIgnore(ignoreFiles);
+
         await removeSourceJsxFiles(logger, 'client');
 
         

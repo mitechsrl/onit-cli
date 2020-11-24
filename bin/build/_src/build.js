@@ -10,8 +10,13 @@ module.exports.build = async function (logger, buildTarget, onitBuildFile) {
     const baseName = path.basename(process.cwd());
     const targetDir = path.resolve(process.cwd(),'./build/'+(buildTarget.key || buildMode));
     
-    const ig = loadIgnore();
 
+    const ignoreFiles = [
+        path.join(process.cwd(), './.onitbuildignore'),
+        path.join(__dirname, '../../../configFiles/build/.defaultignore')
+    ]
+
+    const ig = loadIgnore(ignoreFiles);
     
     await copy(logger, targetDir, ig);
     await webpack(logger, targetDir, onitBuildFile, buildMode);

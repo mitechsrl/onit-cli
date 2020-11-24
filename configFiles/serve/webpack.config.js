@@ -34,8 +34,13 @@ module.exports = {
                         options: { 
                             name: (resourcePath) =>{
                                 const dirName = path.dirname(resourcePath);
-                                const baseName = path.basename(resourcePath).replace(/(sass|scss)$/, "css");
-                                return path.relative(process.cwd(), path.join(dirName, baseName))
+                                
+                                // use min also for non min. We don't care about it in dev mode, but we can leave the min import somewhere and don't bother it when
+                                // production build is compiled
+                                const baseName = path.basename(resourcePath).replace(/(sass|scss)$/, "min.css"); 
+                                const finalName = path.relative(process.cwd(), path.join(dirName, baseName));
+                                
+                                return finalName;
                                 //was '[path][name].css'
                             }
                         }

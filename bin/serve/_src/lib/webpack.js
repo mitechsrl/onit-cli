@@ -19,6 +19,8 @@ module.exports.start = async (logger, onitRunFile, mainOnitBuildFile) => {
 
     webpackConfig = _.mergeWith(webpackConfig, onitBuildWebpackData, webpackUtils.webpackMergeFn);
 
+    console.log(webpackConfig);
+    
     // watcher callback
     const watcherCallback = (err, stats) => {
         // do we had internal errors?
