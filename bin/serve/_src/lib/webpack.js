@@ -43,8 +43,6 @@ module.exports.start = async (logger, cwdOnitRunFile, cwdOnitBuildFile) => {
         webpackConfigs.push(webpackConfig);
     }
 
-    console.log(webpackConfigs);
-
     // create a list of promises, each one will launch a webpack watcher managing one single config.
     const promises = webpackConfigs.map(webpackConfig => {
         return new Promise(resolve => {

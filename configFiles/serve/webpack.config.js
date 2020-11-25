@@ -1,11 +1,12 @@
 const path = require('path');
 const babelRcJs = require('./babel.config');
 
+
 /**
  * Webpack standard config. Some values may be changed at runtime (especially entry points and/or mode)
+ * @param {*} context: the webpack context path
  */
-
-module.exports = (context) => { // context usually is process.env()
+module.exports = (context) => {
     return {
         mode: 'development',
         context: context,

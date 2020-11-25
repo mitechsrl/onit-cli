@@ -23,10 +23,11 @@ module.exports.serve = async function (logger, params) {
 
         // pre-serve: run sequentially waiting for each async resolve
         logger.log('Eseguo <Nodemon startup>...');
-        await pm2Dev.start();
+        const launchedCount = await pm2Dev.start(onitRunFile);
 
         // tempo di lanciare il serve effettivo
-        logger.log('Lancio nodemon & webpack...' + (minusN ? 1 : 0) + (minusW ? 1 : 0));
+        const message = [(!minusN ? 'webpack' : ''), (!minusW ? 'nodemon' : '')].join(' e ');
+        logger.log('Lancio ' + message + '...');
         await Promise.all([
             (!minusN) ? webpack.start(logger, onitRunFile, onitBuildFile) : Promise.resolve(), // -n cause only webpack to be run live
             (!minusW) ? nodemon.start(logger, onitRunFile) : Promise.resolve() // -w cause only webpack to be run live
@@ -35,10 +36,11 @@ module.exports.serve = async function (logger, params) {
         // lancio tutto quello che c'è in parallelo. Passare il filename di nodemon
         // await promisify.parallelize(serve.map(cmd => runProcess(cmd)), 1000);
 
-        // after-serve: run sequentially waiting for each async resolve
-        logger.log('Eseguo <Nodemon shutdown>...');
-        await pm2Dev.stop();
-
+        if (launchedCount > 0) {
+            // after-serve: run sequentially waiting for each async resolve
+            logger.log('Eseguo <Nodemon shutdown>...');
+            await pm2Dev.stop();
+        }
         // bye!
         logger.error('Exit serve...');
         process.exit(0);
