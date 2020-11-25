@@ -7,13 +7,13 @@ const webpack = util.promisify(_webpack);
 module.exports = async function (logger, targetDir, onitBuildFile, buildMode, injectBuildOptions = null) {
     logger.info('[WEBPACK] Eseguo build webpack ' + (injectBuildOptions ? 'con configurazione extra ' + JSON.stringify(injectBuildOptions) : 'standard'));
 
-    const originalPath = process.cwd();
-
+    // const originalPath = process.cwd();
+    const context = process.cwd();
     // change the working directory in the build path
-    process.chdir(targetDir);
+    // process.chdir(targetDir);
 
     // load the default config
-    let webpackConfig = require('../../../../configFiles/build/webpack.config');
+    let webpackConfig = require('../../../../configFiles/build/webpack.config')(context, targetDir);
 
     // webpackConfig build mode (defaults to production)
     if (buildMode !== 'production') {
@@ -49,7 +49,7 @@ module.exports = async function (logger, targetDir, onitBuildFile, buildMode, in
         console.info('[WEBPACK] Compile completato');
 
         // change back to the original directory
-        process.chdir(originalPath);
+        // process.chdir(originalPath);
     } catch (err) {
     // do we had internal errors?
 
