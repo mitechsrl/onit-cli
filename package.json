@@ -24,6 +24,7 @@
         "lodash": "^4.17.20",
         "ncp": "^2.0.0",
         "nodemon": "^2.0.6",
+        "parallel-webpack": "^2.6.0",
         "sass": "^1.29.0",
         "sass-loader": "^10.1.0",
         "style-loader": "^2.0.0",
