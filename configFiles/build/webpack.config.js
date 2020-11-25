@@ -1,17 +1,17 @@
 const babelRcJs = require('./babel.config');
-
+const path = require('path');
 /**
  * Webpack standard config. Some values may be changed at runtime (especially entry points and/or mode)
  */
- 
+
 module.exports = {
     mode: 'production',
     context: process.cwd(),
     watch: false,
 
-    // add source maps also on production mode so we can debug a production-deployed page with more accuracy if needed 
-    devtool:'source-map',
-    
+    // add source maps also on production mode so we can debug a production-deployed page with more accuracy if needed
+    devtool: 'source-map',
+
     // babel files loader
     module: {
         rules: [
@@ -30,7 +30,7 @@ module.exports = {
                 use: [
                     {
                         loader: require.resolve('file-loader'),
-                        options: { name: '[path][name].css'}
+                        options: { name: '[path][name].css' }
                     },
                     require.resolve('sass-loader')
                 ]
@@ -52,18 +52,22 @@ module.exports = {
     },
 
     // resolves will be populated dynamically from project dependency files (onitbuild.config.json's)
-    resolve: {},
+    resolve: {
+        alias: {
+            '~': path.join(process.cwd(), '/node_modules')
+        }
+    },
 
     plugins: [],
 
     // see https://webpack.js.org/configuration/output/
     output: {
         path: process.cwd(),
-        filename: '[name].min.js', 
+        filename: '[name].min.js'
     },
 
     // these libs are loaded manually in the browser (some of them are standard, some others are custom made)
-    externals:{
+    externals: {
         react: 'React',
         'react-dom': 'ReactDOM',
         moment: 'moment',
@@ -76,6 +80,6 @@ module.exports = {
     },
 
     // see https://webpack.js.org/configuration/stats/#stats-presets
-    stats:'verbose'
+    stats: 'verbose'
 
 };

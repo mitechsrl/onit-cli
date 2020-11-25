@@ -4,42 +4,41 @@ const fse = require('fs-extra');
 const find = require('find');
 const loadIgnore = require('./loadIgnore');
 /**
- * 
- * @param {*} logger 
- * @param {*} localPath 
+ *
+ * @param {*} logger
+ * @param {*} localPath
  */
-let removePath = (logger, localPath) => {
+const removePath = (logger, localPath) => {
     if (fse.pathExistsSync(localPath)) {
-        logger.log('Rimuovo '+ localPath);
+        logger.log('Rimuovo ' + localPath);
         fse.removeSync(localPath);
     }
-}
+};
 
 /**
- * 
- * @param {*} logger 
- * @param {*} buildMode 
+ *
+ * @param {*} logger
+ * @param {*} buildMode
  */
-let cleanPackageJson = (logger, buildMode) => {
+const cleanPackageJson = (logger, buildMode) => {
     logger.log('Rimuovo valori non voluti da package.json');
     const json = JSON.parse(fs.readFileSync('package.json'));
     const start = json.scripts.start;
-    
+
     json.scripts = { start: start };
     delete json.husky;
     delete json.devDependencies;
     json._productionBuild = buildMode === 'production';
-    
+
     fs.writeFileSync('package.json', JSON.stringify(json, null, 2));
-}
+};
 
 /**
- * 
- * @param {*} logger 
- * @param {*} jsxCleanPath 
+ *
+ * @param {*} logger
+ * @param {*} jsxCleanPath
  */
-let removeSourceJsxFiles = (logger, jsxCleanPath) => {
-
+const removeSourceJsxFiles = (logger, jsxCleanPath) => {
     return new Promise((resolve) => {
         // remove all jxs files
         logger.log('Rimuovo i files sorgenti jsx');
@@ -47,7 +46,7 @@ let removeSourceJsxFiles = (logger, jsxCleanPath) => {
         if (!fs.existsSync(searchPath)) {
             resolve(0);
         }
-        
+
         find.file(/\.jsx$/, searchPath, function (files) {
             files.forEach(jsxFile => {
                 // remove the original jsx file
@@ -64,55 +63,47 @@ let removeSourceJsxFiles = (logger, jsxCleanPath) => {
             });
             resolve(0);
         });
-    })
-}
-
+    });
+};
 
 /**
- * 
+ *
  */
-removeFiles = (logger, files) => {
-
+const removeFiles = (logger, files) => {
     files.forEach(f => {
-        if (fs.existsSync(f)){
-            logger.log('Rimuovo '+ f);
+        if (fs.existsSync(f)) {
+            logger.log('Rimuovo ' + f);
             fs.unlinkSync(f);
         }
-    })
-}
-module.exports = (logger, targetDir, buildMode) => {
-
-    return new Promise(async (resolve, reject) => {
-
-        logger.info("[CLEAN] Eseguo clean finale...");
-
-        const originalPath = process.cwd();
-
-        // change the working directory in the build path
-        process.chdir(targetDir);
-
-
-        // clean stages
-        removePath(logger, 'node_modules');
-        removePath(logger, 'dev-utils');
-        removeFiles(logger, [
-            'onitbuild.config.js',
-            'onitbuild.config.json'
-        ]);
-
-        cleanPackageJson(logger, buildMode);
-
-        const ignoreFiles = [
-            path.join(__dirname, '../../../../configFiles/build/.clean')
-        ];
-        const ig = loadIgnore(ignoreFiles);
-
-        await removeSourceJsxFiles(logger, 'client');
-
-        
-        logger.info("[CLEAN] completato");
-        process.chdir(originalPath);
-
-        resolve(0);
     });
-}
+};
+module.exports = async (logger, targetDir, buildMode) => {
+    logger.info('[CLEAN] Eseguo clean finale...');
+
+    const originalPath = process.cwd();
+
+    // change the working directory in the build path
+    process.chdir(targetDir);
+
+    // clean stages
+    removePath(logger, 'node_modules');
+    removePath(logger, 'dev-utils');
+    removeFiles(logger, [
+        'onitbuild.config.js',
+        'onitbuild.config.json'
+    ]);
+
+    cleanPackageJson(logger, buildMode);
+
+    // TODO: usare ig in qualche modo
+    const ig = loadIgnore([
+        path.join(__dirname, '../../../../configFiles/build/.clean')
+    ]);
+
+    await removeSourceJsxFiles(logger, 'client');
+
+    logger.info('[CLEAN] completato');
+    process.chdir(originalPath);
+
+    return 0;
+};

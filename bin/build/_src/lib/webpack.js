@@ -1,65 +1,63 @@
-const path = require('path');
-const fs = require('fs');
 const _ = require('lodash');
-const webpack = require('webpack');
+const _webpack = require('webpack');
 const webpackUtils = require('../../../../lib/webpack/utils');
+const util = require('util');
+const webpack = util.promisify(_webpack);
 
-module.exports = (logger, targetDir, onitBuildFile, buildMode, injectBuildOptions = null) => {
+module.exports = async function (logger, targetDir, onitBuildFile, buildMode, injectBuildOptions = null) {
+    logger.info('[WEBPACK] Eseguo build webpack ' + (injectBuildOptions ? 'con configurazione extra ' + JSON.stringify(injectBuildOptions) : 'standard'));
 
-    return new Promise(async (resolve, reject) => {
+    const originalPath = process.cwd();
 
-        logger.info("[WEBPACK] Eseguo build webpack "+(injectBuildOptions ? "con configurazione extra "+JSON.stringify(injectBuildOptions): "standard"));
+    // change the working directory in the build path
+    process.chdir(targetDir);
 
-        const originalPath = process.cwd();
+    // load the default config
+    let webpackConfig = require('../../../../configFiles/build/webpack.config');
 
-        // change the working directory in the build path
-        process.chdir(targetDir);
+    // webpackConfig build mode (defaults to production)
+    if (buildMode !== 'production') {
+        webpackConfig.mode = buildMode;
+    }
 
-        // load the default config
-        let  webpackConfig = require('../../../../configFiles/build/webpack.config');
+    // add dynamic entry points to the webpack config
+    webpackConfig.entry = webpackUtils.searchEntryPoints(process.cwd());
 
-        // webpackConfig build mode (defaults to production)
-        if( buildMode !== 'production'){
-            webpackConfig.mode = buildMode;
-        }
+    // get a combined weback config from this package and dependencies
+    const webpackExported = await webpackUtils.getWebpackExportsFromDependencies(process.cwd(), onitBuildFile);
+    webpackConfig = _.mergeWith(webpackConfig, webpackExported, webpackUtils.webpackMergeFn);
 
-        // add dynamic entry points to the webpack config
-        webpackConfig.entry = webpackUtils.searchEntryPoints();
+    // add externally-provided options if any
+    if (injectBuildOptions) {
+        webpackConfig = _.mergeWith(webpackConfig, injectBuildOptions, webpackUtils.webpackMergeFn);
+    }
 
-        // get a combined weback config from this package and dependencies
-        const onitBuildWebpackData = await webpackUtils.getOnitBuildFilesData(null, onitBuildFile);
+    // TODO: aggiungere flag verbose per vedere piu info come questa?
+    try {
+        const stats = await webpack(webpackConfig);
 
-        webpackConfig = _.mergeWith(webpackConfig, onitBuildWebpackData, webpackUtils.webpackMergeFn);
-
-        if (injectBuildOptions){
-            webpackConfig = _.mergeWith(webpackConfig, injectBuildOptions, webpackUtils.webpackMergeFn);
-        }
-
-        // TODO: aggiungere flag verbose per vedere piu info come questa?
-        // console.log(webpackConfig);
-        webpack(webpackConfig, (err, stats) => {
-            // do we had internal errors?
-            if (err) {
-                logger.error('[WEBPACK] Errore di compilazione');
-                logger.error(err.stack || err);
-                if (err.details) logger.error(err.details);
-                return reject(new Error("Build aborted"));
-            }
-
-            // do we had compile errors?
+        // do we had compile errors?
+        if (stats) {
             const info = stats.toJson();
             if (stats.hasErrors()) {
                 logger.error('[WEBPACK] Errore di compilazione');
                 info.errors.forEach(e => logger.error(e));
-                return reject(new Error("Build aborted"));
+                throw new Error('Build aborted');
             }
+        }
 
+        console.info('[WEBPACK] Compile completato');
 
-            console.info('[WEBPACK] Compile completato');
-        
-            // change back to the original directory
-            process.chdir(originalPath);
-            resolve(0);
-        });
-    })
-}
+        // change back to the original directory
+        process.chdir(originalPath);
+    } catch (err) {
+    // do we had internal errors?
+
+        logger.error('[WEBPACK] Errore di compilazione');
+        logger.error(err.stack || err);
+        if (err.details) logger.error(err.details);
+        throw new Error('Build aborted');
+    }
+
+    return 0;
+};

@@ -1,7 +1,6 @@
 const path = require('path');
 const babelRcJs = require('./babel.config');
 
-
 /**
  * Webpack standard config. Some values may be changed at runtime (especially entry points and/or mode)
  * @param {*} context: the webpack context path
@@ -67,6 +66,7 @@ module.exports = (context) => {
 
         // resolves will be populated dynamically from project dependency files (onitbuild.config.json's)
         resolve: {
+
         },
 
         // see https://webpack.js.org/configuration/output/
