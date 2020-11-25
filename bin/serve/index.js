@@ -21,7 +21,5 @@ module.exports.help = [
 ];
 
 module.exports.cmd = async function (basepath, params, logger) {
-    
     await serve.serve(logger, params);
-
 };
