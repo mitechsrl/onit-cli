@@ -26,7 +26,7 @@ module.exports.serve = async function (logger, params) {
         const launchedCount = await pm2Dev.start(onitRunFile);
 
         // tempo di lanciare il serve effettivo
-        const message = [(!minusN ? 'webpack' : ''), (!minusW ? 'nodemon' : '')].join(' e ');
+        const message = [(!minusN ? 'webpack' : ''), (!minusW ? 'nodemon' : '')].filter(m => !!m).join(' e ');
         logger.log('Lancio ' + message + '...');
         await Promise.all([
             (!minusN) ? webpack.start(logger, onitRunFile, onitBuildFile) : Promise.resolve(), // -n cause only webpack to be run live

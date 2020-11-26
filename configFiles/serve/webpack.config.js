@@ -71,7 +71,7 @@ module.exports = (context) => {
 
         // see https://webpack.js.org/configuration/output/
         output: {
-            path: context,
+            path: path.join(context, './client/dist'),
             filename: '[name].js' // or '[name].min.js'
         },
 
