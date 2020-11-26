@@ -8,8 +8,10 @@
         "*/react/*",
         "dev-utils/*",
         "git.json",
-        "*/static/*"
+        "*/static/*",
+        "assets/*",
+        "dist/*"
     ],
-    "nodeArgs":[],
-    "env":{}
+    "nodeArgs": [],
+    "env": {}
 }
