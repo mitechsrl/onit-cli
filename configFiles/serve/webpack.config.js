@@ -1,11 +1,15 @@
 const path = require('path');
 const babelRcJs = require('./babel.config');
+const CopyPlugin = require('copy-webpack-plugin');
 
 /**
  * Webpack standard config. Some values may be changed at runtime (especially entry points and/or mode)
  * @param {*} context: the webpack context path
  */
 module.exports = (context) => {
+    // NOTE: this is relative to the context path!
+    const outputPath = './dist';
+
     return {
         mode: 'development',
         context: context,
@@ -32,17 +36,7 @@ module.exports = (context) => {
                         {
                             loader: require.resolve('file-loader'),
                             options: {
-                                name: (resourcePath) => {
-                                    const dirName = path.dirname(resourcePath);
-
-                                    // use min also for non min. We don't care about it in dev mode, but we can leave the min import somewhere and don't bother it when
-                                    // production build is compiled
-                                    const baseName = path.basename(resourcePath).replace(/(sass|scss)$/, 'min.css');
-                                    const finalName = path.relative(context, path.join(dirName, baseName));
-
-                                    return finalName;
-                                    // was '[path][name].css'
-                                }
+                                name: '[path][name].min.css'
                             }
                         },
                         require.resolve('sass-loader')
@@ -69,9 +63,24 @@ module.exports = (context) => {
 
         },
 
+        plugins: [
+            new CopyPlugin({
+                patterns: [
+                    {
+                        from: path.join(context, './assets'),
+                        to: path.join(context, outputPath, './assets'),
+                        noErrorOnMissing: true // some components may not have the assets folder. Don't throw errors on these ones.
+                    }
+                ],
+                options: {
+                    concurrency: 100
+                }
+            })
+        ],
+
         // see https://webpack.js.org/configuration/output/
         output: {
-            path: path.join(context, './client/dist'),
+            path: path.join(context, outputPath),
             filename: '[name].js' // or '[name].min.js'
         },
 

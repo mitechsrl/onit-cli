@@ -15,6 +15,7 @@
         "babel-loader": "^8.2.1",
         "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
         "colors": "^1.4.0",
+        "copy-webpack-plugin": "^6.3.2",
         "css-loader": "^5.0.1",
         "file-loader": "^6.2.0",
         "find": "^0.3.0",
