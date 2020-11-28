@@ -35,39 +35,6 @@ const cleanPackageJson = (logger, buildMode) => {
 
 /**
  *
- * @param {*} logger
- * @param {*} jsxCleanPath
- */
-const removeSourceJsxFiles = (logger, jsxCleanPath) => {
-    return new Promise((resolve) => {
-        // remove all jxs files
-        logger.log('Rimuovo i files sorgenti jsx');
-        const searchPath = path.join(process.cwd(), jsxCleanPath);
-        if (!fs.existsSync(searchPath)) {
-            resolve(0);
-        }
-
-        find.file(/\.jsx$/, searchPath, function (files) {
-            files.forEach(jsxFile => {
-                // remove the original jsx file
-                fs.unlinkSync(jsxFile);
-
-                // recreate a placeholder jsx files on the folders we have to publish as static
-                // (this is used at runtime to detect wich filders need to be published staically)
-                const webpackFile = path.join(jsxFile, '../webpack.json');
-                const placeholderForSearch = path.join(jsxFile, '../.placeholder.jsx');
-                if (fs.existsSync(webpackFile)) {
-                    fs.closeSync(fs.openSync(placeholderForSearch, 'w'));
-                    fs.unlinkSync(webpackFile);
-                }
-            });
-            resolve(0);
-        });
-    });
-};
-
-/**
- *
  */
 const removeFiles = (logger, files) => {
     files.forEach(f => {
@@ -99,8 +66,6 @@ module.exports = async (logger, targetDir, buildMode) => {
     const ig = loadIgnore([
         path.join(__dirname, '../../../../configFiles/build/.clean')
     ]);
-
-    await removeSourceJsxFiles(logger, 'client');
 
     logger.info('[CLEAN] completato');
     process.chdir(originalPath);

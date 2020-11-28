@@ -1,11 +1,36 @@
+# ignore file for copy
+# These files will not be copyed to the build path
+
+# Dev stuff
 node_modules
 .git
+.gitignore
+.gimodules
+.npmignore
+.npmrc
+.eslintrc*
+.buildignore
+*/**/react
+webpack.json
+*.jsx
+test
 
-# skip build
+# our favourite editor stuff!
+.vscode
+
+# Onit build&run config files
+onitbuild.config.json
+onitbuild.config.js
+onitrun.config.json
+onitrun.config.js
+
+# previous builds path except subfolder named build. Some external lib may have it
 /build
+!*/**/build
 
-# except subfolder named build. Some external lib may have it
-#!*/**/build'
+# don't copy this module /dist but copy */**/dist paths (especially the ones from assets lib folder if any) 
+/dist
+!*/**/dist
 
 # old dev-utils directory 
 dev-utils

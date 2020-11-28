@@ -8,14 +8,6 @@ module.exports.serve = async function (logger, params) {
     const minusW = params.get('-w').found;
     const minusN = params.get('-n').found;
 
-    // processi da eseguire IN PARALLELO per lo start
-    // vedi https://nodejs.org/api/child_process.html#child_process_subprocess_stdio per gestione STDIO
-    /* const serve = [
-        { cmd: 'nodemon' + ext + ' --config ./dev-utils/nodemon-dyn.json', stdio: ['inherit', 'inherit', 'inherit'] },
-        { cmd: 'node ./dev-utils/frontend-webpack.js --live' }
-    ]; */
-
-    // avvia processo di start
 
     try {
         const onitRunFile = await onitFileLoader.load('run');
