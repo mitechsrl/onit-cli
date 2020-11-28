@@ -2,13 +2,18 @@ const path = require('path');
 const babelRcJs = require('./babel.config');
 const CopyPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const strip = require('strip-comments');
+const fs = require('fs');
+
+// some static config options
+const serveBaseConfig = JSON.parse(strip(fs.readFileSync(path.join(__dirname, './options.jsonc')).toString()));
+
 /**
  * Webpack standard config. Some values may be changed at runtime (especially entry points and/or mode)
  * @param {*} context: the webpack context path
  */
 module.exports = (context, config, packageJson) => {
     // NOTE: this is relative to the context path!
-    const outputPath = './dist';
 
     return {
         mode: 'development',
@@ -77,7 +82,7 @@ module.exports = (context, config, packageJson) => {
                 patterns: [
                     {
                         from: path.join(context, './assets'),
-                        to: path.join(context, outputPath, './assets'),
+                        to: path.join(context, serveBaseConfig.outputPath, './assets'),
                         noErrorOnMissing: true // some components may not have the assets folder. Don't throw errors on these ones.
                     }
                 ],
@@ -106,7 +111,7 @@ module.exports = (context, config, packageJson) => {
 
         // see https://webpack.js.org/configuration/output/
         output: {
-            path: path.join(context, outputPath),
+            path: path.join(context, serveBaseConfig.outputPath),
             filename: '[contenthash].js'
         },
 
