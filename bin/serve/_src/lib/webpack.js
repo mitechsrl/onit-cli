@@ -12,8 +12,15 @@ module.exports.start = async (logger, cwdOnitRunFile, cwdOnitBuildFile) => {
 
     // create a webpack config for the current directory and
     // add dynamic entry points to the webpack config for the current directory
-    let cwdWebpackConfig = webpackConfigFactory(process.cwd());
-    cwdWebpackConfig.entry = webpackUtils.searchEntryPoints(process.cwd());
+    const entryPoints = webpackUtils.searchEntryPoints(process.cwd());
+
+    // geth the package component at the current path
+    const cwdPackageJson = require(path.join(process.cwd(), 'package.json'));
+
+    // create a webpack config for the current path project
+    let cwdWebpackConfig = webpackConfigFactory(process.cwd(), {
+        entryPoints: entryPoints
+    }, cwdPackageJson);
 
     const buildWebpackData = (cwdOnitBuildFile.json.export || {}).webpack;
     if (buildWebpackData) {
@@ -29,10 +36,18 @@ module.exports.start = async (logger, cwdOnitRunFile, cwdOnitBuildFile) => {
     // create one webpack config for each one of the components loaded in dev environment
     for (const component of components) {
         const componentPath = path.resolve(process.cwd(), component.path);
+
+        // search entry points for this component
+        const componentEntryPoints = webpackUtils.searchEntryPoints(componentPath);
+
+        // read the package json at the target component
+        const componentPackageJson = require(path.join(componentPath, 'package.json'));
+
         // create a webpack config for the current directory and
         // add dynamic entry points to the webpack config for the current directory
-        let webpackConfig = webpackConfigFactory(componentPath);
-        webpackConfig.entry = webpackUtils.searchEntryPoints(componentPath);
+        let webpackConfig = webpackConfigFactory(componentPath, {
+            entryPoints: componentEntryPoints
+        }, componentPackageJson);
 
         // build the config for the dependencies
         const componentOnitBuildFile = await onitFileLoader.load('build', componentPath);
@@ -69,7 +84,6 @@ module.exports.start = async (logger, cwdOnitRunFile, cwdOnitBuildFile) => {
 
                 console.info('[WEBPACK] ' + componentName + ' - Compile finished');
             };
-
             // create a compiler based on the config
             const compiler = webpack(webpackConfig);
 
