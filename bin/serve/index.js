@@ -12,7 +12,10 @@
  * 0. You just DO WHAT THE FUCK YOU WANT TO.
  */
 
-const serve = require('./_src/serve');
+const onitFileLoader = require('../../lib/onitFileLoader');
+const fs = require('fs');
+const path = require('path');
+const semverMaxSatisfying = require('semver/ranges/max-satisfying');
 
 module.exports.info = 'Dev Run/serve utility. Lancia il progetto in ambiente di sviluppo';
 module.exports.help = [
@@ -21,5 +24,30 @@ module.exports.help = [
 ];
 
 module.exports.cmd = async function (basepath, params, logger) {
-    await serve.serve(logger, params);
+    try {
+        // load the buildFile
+        const onitServeFile = await onitFileLoader.load('serve');
+        logger.warn('Uso file build ' + onitServeFile.filename);
+
+        // lock to the required builder version or get the most recent one
+        const requiredVersion = onitServeFile.json.serveVersion || '*';
+
+        // load the available build versions
+        const availableVersions = fs.readdirSync(path.join(__dirname, './_src'));
+
+        // use npm semver to select the most recent usable version
+        const version = semverMaxSatisfying(availableVersions, requiredVersion);
+
+        if (!version) throw new Error('Nessuna versione di serve compatibile con ' + requiredVersion + ' trovata. Verifica il valore serveVersion del tuo file onitserve oppure aggiorna onit-cli');
+
+        // version found: Load that builder and use it.
+        logger.info('Uso serve V' + version);
+        const serve = require(path.join(__dirname, './_src/' + version + '/index.js'));
+
+        await serve.start(onitServeFile, version, basepath, params, logger);
+    } catch (e) {
+        logger.error(e);
+        logger.error('Build interrotto');
+        process.exit(-1);
+    }
 };

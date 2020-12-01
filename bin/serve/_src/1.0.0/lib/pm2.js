@@ -1,7 +1,6 @@
-const path = require('path');
 const fs = require('fs');
 const _ = require('lodash');
-const spawn = require('../../../../lib/spawn');
+const spawn = require('../../../../../lib/spawn');
 
 // windows fa il windows percui lui vuole 'pm2.cmd' anzichè 'pm2' come comando di avvio
 const isWindows = (process.env.OS || '').toUpperCase().includes('WIN');
@@ -11,9 +10,9 @@ module.exports.stop = async function () {
     return spawn(pm2exec, ['stop', 'all'], true);
 };
 
-module.exports.start = async function (onitRunFile) {
+module.exports.start = async function (onitServeFile) {
     // preparo ecosystem file temporaneo
-    let pm2Ecosystem = onitRunFile.json['pm2-dev-ecosystem'];
+    let pm2Ecosystem = onitServeFile.json['pm2-dev-ecosystem'];
     if (!pm2Ecosystem) {
         pm2Ecosystem = { apps: [] };
     }
@@ -38,7 +37,7 @@ module.exports.start = async function (onitRunFile) {
         return 0;
     }
 
-    const temporaryEcosystemFile = onitRunFile.filename + '-pm2-ecosystem.json';
+    const temporaryEcosystemFile = onitServeFile.filename + '-pm2-ecosystem.json';
     fs.writeFileSync(temporaryEcosystemFile, JSON.stringify(pm2Ecosystem, null, 4));
 
     // rimuovo ecosystem caricato in precedenza prima di rilanciare tutto

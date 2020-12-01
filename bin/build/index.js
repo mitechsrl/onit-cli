@@ -13,76 +13,35 @@
  */
 
 const onitFileLoader = require('../../lib/onitFileLoader');
-const inquirer = require('inquirer');
-const build = require('./_src/build');
-const extraStepRunner = require('./_src/lib/extraStepRunner');
+const path = require('path');
+const fs = require('fs');
+const semverMaxSatisfying = require('semver/ranges/max-satisfying');
 
 module.exports.info = 'Build utility. Compila il progetto in un pacchetto pronto per il deploy';
 module.exports.help = [];
 
 module.exports.cmd = async function (basepath, params, logger) {
-    const onitBuildFile = await onitFileLoader.load('build');
-
-    logger.warn('Uso file build ' + onitBuildFile.filename);
-
-    const buildTargets = onitBuildFile.json.buildTargets || {};
-    if (Object.keys(buildTargets).length === 0) {
-        logger.error('Nessun build target definito in ' + onitBuildFile.filename);
-        return;
-    }
-
-    // select build target. If only one buildTarget is available, use that one, show a selection prompt otherwise
-    let buildTarget = null;
-    if (Object.keys(buildTargets).length === 1) {
-        const key = Object.keys(buildTargets)[0];
-        buildTarget = buildTargets[key];
-        buildTarget.key = key;
-    } else {
-        const list = [{
-            type: 'list',
-            name: 'buildTarget',
-            message: 'Seleziona un build target',
-            choices: Object.keys(buildTargets)
-        }];
-        const answers = await inquirer.prompt(list);
-        buildTarget = buildTargets[answers.buildTarget];
-        if (!buildTarget) {
-            throw new Error('Errore nella selezione del buildTarget');
-        }
-        buildTarget.key = answers.buildTarget;
-    }
-    logger.info('Build target selezionato: ' + buildTarget.key);
-
-    // selector for extra steps (if available)
-    let extraSteps = (buildTarget.buildExtraSteps || []);
-    if (extraSteps.length > 0) {
-        logger.log('Selezione step aggiuntivi post-build:');
-        const list = extraSteps.map((step, index) => ({
-            type: 'confirm',
-            name: 'step_' + index,
-            message: 'Eseguire <' + step.name + '>?'
-        }));
-        const answers = await inquirer.prompt(list);
-        extraSteps = extraSteps.filter((step, index) => answers['step_' + index]);
-    }
-
-    // we have all the needed data. We can start the build process
     try {
-        // effective build
-        const { targetDir } = await build.build(logger, buildTarget, onitBuildFile);
+        // load the buildFile
+        const onitBuildFile = await onitFileLoader.load('build');
+        logger.warn('Uso file build ' + onitBuildFile.filename);
 
-        // extra steps management
+        // lock to the required builder version or get the most recent one
+        const requiredVersion = onitBuildFile.json.builderVersion || '*';
 
-        const vars = {
-            $_PROJECT_DIR: process.cwd(),
-            $_BUILD_DIR: targetDir
-        };
+        // load the available build versions
+        const availableVersions = fs.readdirSync(path.join(__dirname, './_src'));
 
-        if (extraSteps.length > 0) {
-            logger.log('');
-            logger.log('Avvio esecuzione steps post-build');
-            for (const step of extraSteps) await extraStepRunner(logger, step, vars);
-        }
+        // use npm semver to select the most recent usable version
+        const version = semverMaxSatisfying(availableVersions, requiredVersion);
+
+        if (!version) throw new Error('Nessuna versione builder compatibile con ' + requiredVersion + ' trovata. Verifica il valore buildVersion del tuo file onitBuild oppure aggiorna onit-cli');
+
+        // version found: Load that builder and use it.
+        logger.info('Uso builder V' + version);
+        const builder = require(path.join(__dirname, './_src/' + version + '/index.js'));
+
+        await builder.start(onitBuildFile, version, basepath, params, logger);
     } catch (e) {
         logger.error(e.message);
         logger.error('Build interrotto');

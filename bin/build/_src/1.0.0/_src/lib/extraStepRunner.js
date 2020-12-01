@@ -1,5 +1,5 @@
 
-const spawn = require('../../../../lib/spawn');
+const spawn = require('../../../../../../lib/spawn');
 
 const replace = function (obj, vars) {
     const stringReplace = function (v) {
@@ -33,6 +33,7 @@ const replace = function (obj, vars) {
     _replace(obj);
     return obj;
 };
+
 module.exports = (logger, step, vars) => {
     return new Promise(async (resolve, reject) => {
         logger.log('Eseguo step <' + step.name + '>...');

@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const _webpack = require('webpack');
-const webpackUtils = require('../../../../lib/webpack/utils');
+const webpackUtils = require('../../../../../../lib/webpack/utils');
 const util = require('util');
 const webpack = util.promisify(_webpack);
 const path = require('path');
@@ -9,7 +9,7 @@ module.exports = async function (logger, distTargetDir, onitBuildFile, buildMode
     logger.info('[WEBPACK] Eseguo build webpack ' + (injectBuildOptions ? 'con configurazione extra ' + JSON.stringify(injectBuildOptions) : 'standard'));
 
     // load the default config
-    const webpackConfigFactory = require('../../../../configFiles/build/webpack.config');
+    const webpackConfigFactory = require('../../configFiles/webpack.config');
 
     // const originalPath = process.cwd();
     const context = process.cwd();

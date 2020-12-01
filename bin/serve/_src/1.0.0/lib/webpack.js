@@ -1,12 +1,12 @@
 const path = require('path');
 const _ = require('lodash');
 const webpack = require('webpack');
-const onitFileLoader = require('../../../../lib/onitFileLoader');
-const webpackUtils = require('../../../../lib/webpack/utils');
+const onitFileLoader = require('../../../../../lib/onitFileLoader');
+const webpackUtils = require('../../../../../lib/webpack/utils');
 
-module.exports.start = async (logger, cwdOnitRunFile, cwdOnitBuildFile) => {
+module.exports.start = async (logger, cwdOnitServeFile, cwdOnitBuildFile) => {
     // load the default config
-    const webpackConfigFactory = require('../../../../configFiles/serve/webpack.config');
+    const webpackConfigFactory = require('../configFiles/webpack.config');
 
     const webpackConfigs = [];
 
@@ -29,7 +29,7 @@ module.exports.start = async (logger, cwdOnitRunFile, cwdOnitBuildFile) => {
     webpackConfigs.push(cwdWebpackConfig);
 
     // get the list of components we want to load
-    const components = (cwdOnitRunFile.json.loadComponents || [])
+    const components = (cwdOnitServeFile.json.loadComponents || [])
         .filter(c => c.enabled) // skip disabled ones
         .filter(c => c.path.indexOf('node_modules') < 0); // still never search stuff in ode_modules
 

@@ -28,6 +28,6 @@ if (process.argv.length === 3 && process.argv[2] === '-v') {
     try {
         await command.command(__dirname, process.argv.slice(2));
     } catch (e) {
-        logger.error(e);
+        logger.error(e.message || e);
     }
 })();

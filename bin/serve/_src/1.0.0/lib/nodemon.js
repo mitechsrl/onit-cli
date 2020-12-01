@@ -2,17 +2,17 @@ const nodemon = require('nodemon');
 const fs = require('fs');
 const path = require('path');
 
-module.exports.start = async (logger, onitRunFile) => {
+module.exports.start = async (logger, onitServeFile) => {
     return new Promise(resolve => {
         // add this to a delay so we give some time to other process to start without being too much cpu-heavy
         let delay = setTimeout(() => {
             delay = null;
 
-            // serve: devo calcolare la config di nodemon prima di lanciarlo a partire dal file di config onitrun.config.[js,json]
-            const nodemonConfig = JSON.parse(fs.readFileSync(path.join(__dirname, '../../../../configFiles/serve/nodemon.json')).toString());
+            // serve: devo calcolare la config di nodemon prima di lanciarlo a partire dal file di config onitserve.config.[js,json]
+            const nodemonConfig = JSON.parse(fs.readFileSync(path.join(__dirname, '../configFiles/nodemon.json')).toString());
 
             // aggiungo watch su moduli caricati così cambiamenti in quelle cartelle rilanciano nodemon!
-            const enabledModulesPaths = (onitRunFile.json.loadComponents || [])
+            const enabledModulesPaths = (onitServeFile.json.loadComponents || [])
                 .filter(c => c.enabled) // watch on enabled only
                 .filter(c => c.path.indexOf('node_modules') < 0) // don't watch on node_modules dirs
                 .map(c => c.path);
@@ -20,11 +20,11 @@ module.exports.start = async (logger, onitRunFile) => {
             nodemonConfig.watch = [process.cwd(), ...(nodemonConfig.watch || []), ...enabledModulesPaths];
 
             // Adding environment stuff (see https://github.com/remy/nodemon/blob/master/doc/sample-nodemon.md)
-            const env = onitRunFile.json.environment || {};
+            const env = onitServeFile.json.environment || {};
             Object.keys(env).forEach(key => {
                 if (typeof env[key] === 'object') { env[key] = JSON.stringify(env[key]); }
             });
-            const _env = Object.assign({ ONIT_RUN_FILE: onitRunFile.filename }, nodemonConfig.env || {}, env);
+            const _env = Object.assign({ ONIT_RUN_FILE: onitServeFile.filename }, nodemonConfig.env || {}, env);
             if (Object.keys(_env).length > 0) nodemonConfig.env = _env;
 
             // Finally launch nodemon
