@@ -94,7 +94,7 @@ module.exports = (context, config, packageJson) => {
                 // create a plugin instance
                 // see https://github.com/jantimon/html-webpack-plugin#options
                 return new HtmlWebpackPlugin({
-                    template: path.join(__dirname, '../common/chunksTemplate.htmlWebpackPlugin.ejs'),
+                    template: path.join(__dirname, '../../../../../configFiles/common/chunksTemplate.htmlWebpackPlugin.ejs'),
                     filename: filename + '.chunks.ejs',
                     // this will make the public path by package: dist/mitown, dist/mit-ask etc...
                     publicPath: '/dist' + packagePublishPath,

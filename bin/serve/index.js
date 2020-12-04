@@ -32,7 +32,7 @@ module.exports.cmd = async function (basepath, params, logger) {
         // lock to the required builder version or get the most recent one
         const requiredVersion = onitServeFile.json.serveVersion || '*';
 
-        // load the available build versions
+        // get a list of the available versions (each dir describe one version)
         const availableVersions = fs.readdirSync(path.join(__dirname, './_src'));
 
         // use npm semver to select the most recent usable version
@@ -46,7 +46,7 @@ module.exports.cmd = async function (basepath, params, logger) {
 
         await serve.start(onitServeFile, version, basepath, params, logger);
     } catch (e) {
-        logger.error(e);
+        logger.error(e.message);
         logger.error('Build interrotto');
         process.exit(-1);
     }
