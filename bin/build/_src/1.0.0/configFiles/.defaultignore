@@ -3,26 +3,32 @@
 
 # Dev stuff
 node_modules
-.git
-.gitignore
-.gimodules
-.npmignore
-.npmrc
+.git*
+.npm*
 .eslintrc*
 .buildignore
 */**/react
 webpack.json
 *.jsx
 test
+tests
+doc
+docs
+*.md
+example
+examples
 
 # our favourite editor stuff!
 .vscode
 
+# strange unwanted stuff from libs
+/assets/libs/**/nuget/**
+/assets/libs/**/*.lock
+
+
 # Onit build&run config files
-onitbuild.config.json
-onitbuild.config.js
-onitrun.config.json
-onitrun.config.js
+onitbuild.config.*
+onitserve.config.*
 
 # previous builds path except subfolder named build. Some external lib may have it
 /build
