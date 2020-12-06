@@ -55,7 +55,8 @@ module.exports.prompt = async (buildTarget, vars, cwdPackageJson, targetDir) => 
                 shell: true,
                 cwd: process.cwd()
             });
-            const v = semverInc(ret.data.trim(), increaseLevel);
+
+            const v = semverInc(ret.data.trim(), ...increaseLevel);
             if (v) {
                 list[0].choices.push({
                     name: versionManagement.additional.name + ' ' + v,
