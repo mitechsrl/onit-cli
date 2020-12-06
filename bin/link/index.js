@@ -13,33 +13,32 @@
  */
 
 const persistent = require('../../lib/persistent');
+const path = require('path');
+const fs = require('fs');
 
 module.exports.info = 'Dev dependency link utility';
-module.exports.help = [
-    ['-t', 'tag']
-];
+module.exports.help = [];
 
 module.exports.cmd = async function (basepath, params, logger) {
-    
-    let tag = params.get('-t');
-    if (!tag.found || !tag.value){
-        logger.error("Nessun tag specificato. Usa -t TAG per specificaren uno");
+    const packageJsonFilename = path.join(process.cwd(), 'package.json');
+    if (!fs.existsSync(packageJsonFilename)) {
+        logger.error('Nessun package.json in questa directory.');
         return;
-    }else{
-        tag = tag.value;
     }
 
-    let force = params.get('-f').found;
+    const packageJson = require(packageJsonFilename);
+    const tag = packageJson.name;
 
-
-    const config = persistent.get("dependency-link");
+    const force = params.get('-f').found;
+    const config = persistent.get('dependency-link');
     if (!force && config[tag]) {
-        logger.error("Tag già in uso. Specificane uno diverso oppure usa -f per forzare la sovrascrittura");
+        logger.error('Tag <' + tag + '> già in uso. Usa -f per forzare la sovrascrittura');
+        return;
     }
 
     config[tag] = process.cwd();
 
-    persistent.set("dependency-link", config);
-    
-    logger.info("Tag "+tag+" creato. Punta a "+process.cwd())
+    persistent.set('dependency-link', config);
+
+    logger.info('Tag ' + tag + ' creato. Punta a ' + process.cwd());
 };

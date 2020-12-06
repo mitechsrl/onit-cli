@@ -9,9 +9,9 @@ Onit dev CLI utility
 # Comandi 
 
 ```
-onit serve  # utility serve di sviluppo
-onit link # utility generazione tags di dipendenza 
+onit serve # utility serve di sviluppo
 onit build # utility build progetto
+onit link # utility generazione tags di dipendenza 
 onit labels # utility gestione lebels
 ```
 
@@ -53,6 +53,7 @@ Permette il build del progetto e la creazione dei files destinati alla pacchetti
 ```
 
 module.exports = {
+    builderVersion: String, versione (in formato stile npm) del builder richiesto. 
     dependencies: Array<String>, lista di dipendenze del progetto. Vedi Sezione **dipendenze build**
     export: {
         webpack: Object, configurazione webpack aggiuntiva iniettata da questo componente. Vedi **Export webpack**
@@ -63,6 +64,10 @@ module.exports = {
 };
 
 ```
+##### builderVersion
+Indica che il progetto richiede una specifica versione del builder di onit-cli. Se omesso usa l'ultima versione disponibile nella onit-cli, altrimenti risolve la versione utilizzabile tramite le logiche semver. Occorre pertanto fornire una stringa di versione in stile npm.
+
+Vedi https://semver.org/lang/it/
 
 ##### Dipendenze build
 Le dipendenze di build sono definite dalla proprietà **dependencies: Array<String>**.
@@ -104,17 +109,63 @@ import component from 'MitownReactComponents\component.jsx'
 {
     [buildTargetName]: {
         mode: 'production',
+        version: {
+            propose: true
+            additional: {
+                name: 'Versione successiva da repository npm',
+                cmd: 'npm view "$_PACKAGE_NAME" version'
+            }
+        },
         buildExtraSteps: [{
             name: 'myCommand',
-            cmd: ['cmd -param1 -param2 -param3],
+            cmd: 'cmd -param1 -param2 -param3',
             cwd: '$_BUILD_DIR'
         }]
     }
 }
 ```
 
+**mode** specifica se la build deve essere **production** oppure **development**. Le logiche di build nei due casi sono le stesse, ma le logiche di versionamento sono diverse, in particolare con **development** il sistema propone un versionamento più dinamico che non interferisce con le versioni di produzione già pubblicate. Vedi la sezione **version** per info aggiuntive.
 
-## TODO
-**versioning cli**
-Legare la versione di onit-cli (oppure del build/serve) al file onitbuild e onitRun (tramite un parametro in questi files)
-In questo modo si può specificare quale versione è richiesta dal progetto su cui operare.
+**version** abilita la gestione della versione del pacchetto in fase du build. La gestione viene abilitata se **version.propose** valuta true, e in caso affermativo, mostra **prima** del build un menu a selezione che permette all'utente la selezione della versione da applicare prima della compilazione (in questo modo si elimina la necessità di aumentare manualmente la versione in package.json prima o dopo il build).
+
+Nel caso di **production** il menu presenta le seguenti voci:
+
+- Mantieni la versione attuale: non fa nulla.
+- Incrementa a X.Y.Z: propone la versione **patch** successiva a quella trovata in package.json. Se selezionata, scrive in automatico la nuova versione in package.json e package-lock.json
+- Build precedente a X.Y.Z, incrementa a X.Y.Z': legge, se esiste, il package.json nella directory di build e propone la versione **patch** successiva a quella trovata.
+
+In caso di **development**, le voci presentae sono le stesse ma la versione successiva è calcolata con logica **prerelease** e **beta**. Vedi https://www.npmjs.com/package/semver, sezione increment
+
+**additional** rappresenta un comando shell che può essere eseguito per aggiungere una voce di menu alla lista precedente. Il comando deve ritornare una stringa rappresentante la versione base **NON** già incrementata, poichè l'incremento viene calcolato in automatico secondo le logiche interne. 
+
+E' possibile specificare una serie di **variabili** che vengono sostituite nei comandi tramite una semplice string replace:
+
+```
+$_PROJECT_DIR: path assoluta del progetto da compilare
+$_PACKAGE_NAME: nome del pacchetto come trovato nel package.json del progetto da compilare
+$_BUILD_DIR: path assoluta alla cartella di build del progetto
+```
+Sfruttando queste variabili, è possibile definire il comando additional come **npm view "$_PACKAGE_NAME" version**, il quale verifica la versione pubblicata su repository npm e pertanto la voce di menu aggiuntiva presentata propone la versione successiva all'ultima versione presente nel repository npm.
+
+**buildExtraSteps** rappresenta un array di comandi eseguibili in automatico **DOPO** il termine del build del progetto. La console chiede conferma all'esecuzione dei comandi prima della build, in modo da dare maggiore controllo all'utente sulle operazioni post-build.
+
+Ogni comando deve essere nel formato:
+
+```
+{
+    name: string, nome del comando poposto in console,
+    cmd: string, comando essettivo eseguito. E' possibile usare le variabili definite in precedenza per personalizzare il comando
+    cwd: string, path di esecuzione del comando. E' possibile usare le variabili per personalizzare il path, ad esempio inserendo **'$_BUILD_DIR'** l'esecuzione avviene nella directory di build
+}
+```
+
+### onit link
+Utility per la gestione di tags di dipendenza.
+Similmente a **npm link**, eseguendo **onit link** all'interno di una directory rapresentante un pacchetto npm (quindi con package.json), memorizza nel sistema una coppia **<packageName, projectPath>**, la quale permette poi l'uso di **packageName** come stringa di dipendenza in **onitBuild.package.[js|json]/dependencies**. Il sistema in fase di build utilizzerà quindi le definizioni opportune trovate in **projectPath** per compilare il progetto attuale.
+
+**onit link list** mostra la lsta di links memorizzati, **onit link delete** elimina un tag precedentemente creato 
+
+
+### onit labels
+TODO
