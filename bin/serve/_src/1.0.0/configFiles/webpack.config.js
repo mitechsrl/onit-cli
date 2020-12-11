@@ -6,7 +6,7 @@ const strip = require('strip-comments');
 const fs = require('fs');
 
 // some static config options
-const serveBaseConfig = JSON.parse(strip(fs.readFileSync(path.join(__dirname, './options.jsonc')).toString()));
+const baseConfig = JSON.parse(strip(fs.readFileSync(path.join(__dirname, './options.jsonc')).toString()));
 
 /**
  * Webpack serve config factory.
@@ -97,7 +97,7 @@ module.exports = (context, config, packageJson) => {
                     template: path.join(__dirname, '../../../../../configFiles/common/chunksTemplate.htmlWebpackPlugin.ejs'),
                     filename: filename + '.chunks.ejs',
                     // this will make the public path by package: dist/mitown, dist/mit-ask etc...
-                    publicPath: '/dist' + packagePublishPath,
+                    publicPath: '/dist-fe' + packagePublishPath,
                     // this particular instance will add (js chunk files) dependencies for this entrypoint
                     chunks: [entryPoint]
                 });
@@ -107,7 +107,7 @@ module.exports = (context, config, packageJson) => {
         // where to put final stuff.
         // see https://webpack.js.org/configuration/output/
         output: {
-            path: path.join(context, serveBaseConfig.outputPath),
+            path: path.join(context, baseConfig.outputPath),
             filename: '[contenthash].js'
         },
 
