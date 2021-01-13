@@ -22,13 +22,14 @@ const fs = require('fs');
 module.exports.prompt = async (buildTarget, vars, cwdPackageJson, targetDir) => {
     const versionManagement = buildTarget.version;
     const increaseLevel = buildTarget.mode === 'production' ? ['patch'] : ['prerelease', 'beta'];
+    const increaseLevelPreminor = buildTarget.mode === 'production' ? null : ['preminor', 'beta'];
     const when = buildTarget.mode === 'production' ? 'before' : 'after';
     let version = null;
     if (versionManagement && (versionManagement.propose !== false)) {
         const list = [{
             type: 'list',
             name: 'version',
-            message: 'Gestione versione',
+            message: 'Gestione versione. Atuale: ' + cwdPackageJson.version,
             choices: [{
                 name: 'Mantieni attuale ' + cwdPackageJson.version,
                 value: false
@@ -38,6 +39,13 @@ module.exports.prompt = async (buildTarget, vars, cwdPackageJson, targetDir) => 
             }]
         }];
 
+        if (increaseLevelPreminor) {
+            const v = semverInc(cwdPackageJson.version, ...increaseLevelPreminor);
+            list[0].choices.push({
+                name: 'Prossima minor ' + v,
+                value: { [when]: v }
+            });
+        }
         const oldBuildPackageJson = path.join(targetDir, 'package.json');
         if (fs.existsSync(oldBuildPackageJson)) {
             const oldPackageJson = require(oldBuildPackageJson);
