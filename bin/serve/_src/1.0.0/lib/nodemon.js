@@ -19,6 +19,13 @@ module.exports.start = async (logger, onitServeFile) => {
 
             nodemonConfig.watch = [process.cwd(), ...(nodemonConfig.watch || []), ...enabledModulesPaths];
 
+            // if you want to develop a single component and run it you can use the same
+            // onitRun file but with a property "component:true".
+            // This will make the serve utility to launch the dependency mitown loading this component
+            if (onitServeFile.json.component === true) {
+                nodemonConfig.script = onitServeFile.json.main || './node_modules/@mitech/mitown/server/server.js';
+            }
+
             // Adding environment stuff (see https://github.com/remy/nodemon/blob/master/doc/sample-nodemon.md)
             const env = onitServeFile.json.environment || {};
             Object.keys(env).forEach(key => {
