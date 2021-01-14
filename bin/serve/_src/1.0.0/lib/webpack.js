@@ -14,7 +14,7 @@ module.exports.start = async (logger, cwdOnitServeFile, cwdOnitBuildFile) => {
     // add dynamic entry points to the webpack config for the current directory
     const entryPoints = webpackUtils.searchEntryPoints(process.cwd());
 
-    // geth the package component at the current path
+    // get the package component at the current path
     const cwdPackageJson = require(path.join(process.cwd(), 'package.json'));
 
     // create a webpack config for the current path project
@@ -26,6 +26,15 @@ module.exports.start = async (logger, cwdOnitServeFile, cwdOnitBuildFile) => {
     if (buildWebpackData) {
         cwdWebpackConfig = _.mergeWith(cwdWebpackConfig, buildWebpackData, webpackUtils.webpackMergeFn);
     }
+
+    // if the current project path is a module, we auto-inject required dependency: mitown
+    if (cwdOnitServeFile.json.component) {
+        const mitownPathAsDep = path.join(process.cwd(), './node_modules/@mitech/mitown');
+        const mitownBuildFile = await onitFileLoader.load('build', mitownPathAsDep);
+        const dependenciesData = await webpackUtils.getWebpackExportsFromDependencies(mitownPathAsDep, mitownBuildFile);
+        cwdWebpackConfig = _.mergeWith(cwdWebpackConfig, dependenciesData, webpackUtils.webpackMergeFn);
+    }
+
     webpackConfigs.push(cwdWebpackConfig);
 
     // get the list of components we want to load

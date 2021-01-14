@@ -18,6 +18,7 @@ const webpackUtils = require('../../../../../../lib/webpack/utils');
 const util = require('util');
 const webpack = util.promisify(_webpack);
 const path = require('path');
+const onitFileLoader = require('../../../../../../lib/onitFileLoader');
 
 module.exports = async function (logger, distTargetDir, onitBuildFile, buildMode, injectBuildOptions = null) {
     logger.info('[WEBPACK] Eseguo build webpack ' + (injectBuildOptions ? 'con configurazione extra ' + JSON.stringify(injectBuildOptions) : 'standard'));
@@ -48,7 +49,20 @@ module.exports = async function (logger, distTargetDir, onitBuildFile, buildMode
         cwdWebpackConfig.mode = buildMode;
     }
 
-    // get a combined weback config from this package and dependencies
+    // if the current project path is a module, we auto-inject required dependency: mitown
+    if (onitBuildFile.json.component) {
+        // on build-as component, mit-own is inherently a dependency. Removing from the manual added list
+        // to avoid later parses since one is done here manually.
+        onitBuildFile.json.dependencies = (onitBuildFile.json.dependencies || []).filter(d => d !== 'mit-own');
+
+        // load here mit-own data
+        const mitownPathAsDep = path.join(process.cwd(), './node_modules/@mitech/mitown');
+        const mitownBuildFile = await onitFileLoader.load('build', mitownPathAsDep);
+        const dependenciesData = await webpackUtils.getWebpackExportsFromDependencies(mitownPathAsDep, mitownBuildFile);
+        cwdWebpackConfig = _.mergeWith(cwdWebpackConfig, dependenciesData, webpackUtils.webpackMergeFn);
+    }
+
+    // load dependencies webpack exports
     const webpackExported = await webpackUtils.getWebpackExportsFromDependencies(context, onitBuildFile);
     cwdWebpackConfig = _.mergeWith(cwdWebpackConfig, webpackExported, webpackUtils.webpackMergeFn);
 
