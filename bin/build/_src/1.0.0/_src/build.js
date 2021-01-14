@@ -17,14 +17,19 @@ const loadIgnore = require('../../../../../lib/loadIgnore');
 const copy = require('./lib/copy');
 const webpack = require('./lib/webpack');
 const clean = require('./lib/clean');
+const fs = require('fs');
 
 module.exports.build = async function (logger, buildTarget, targetDir, onitBuildFile) {
     const buildMode = buildTarget.mode || 'production';
 
+    let defaultIgnoreFile = path.join(__dirname, '../configFiles/.defaultignore.' + buildMode);
+    if (!fs.existsSync(defaultIgnoreFile)) {
+        defaultIgnoreFile = path.join(__dirname, '../configFiles/.defaultignore');
+    }
     // prepare the ignore file processor. This will be used to match files to be copied into the build path
     const ig = loadIgnore([
         path.join(process.cwd(), './.onitbuildignore'),
-        path.join(__dirname, '../configFiles/.defaultignore')
+        defaultIgnoreFile
     ]);
 
     // create a copy of the project into the build path
@@ -34,7 +39,7 @@ module.exports.build = async function (logger, buildTarget, targetDir, onitBuild
     await webpack(logger, buildTarget.key || buildMode, onitBuildFile, buildMode);
 
     // clean the build directory
-    await clean(logger, targetDir, buildMode);
+    await clean(logger, targetDir, onitBuildFile, buildMode);
 
     logger.info('Build completato.');
     logger.info('Directory di build: ' + targetDir);

@@ -21,9 +21,16 @@ const fs = require('fs');
 
 module.exports.prompt = async (buildTarget, vars, cwdPackageJson, targetDir) => {
     const versionManagement = buildTarget.version;
-    const increaseLevel = buildTarget.mode === 'production' ? ['patch'] : ['prerelease', 'beta'];
-    const increaseLevelPreminor = buildTarget.mode === 'production' ? null : ['preminor', 'beta'];
-    const when = buildTarget.mode === 'production' ? 'before' : 'after';
+    let increaseLevel = null; // how to calculate next version
+    let increaseLevelPreminor = null; // another way to calculate versions but only for test and dev
+    let when = null;
+
+    switch (buildTarget.mode) {
+    case 'production': increaseLevel = ['patch']; increaseLevelPreminor = null; when = 'before'; break;
+    case 'development': increaseLevel = ['prerelease', 'dev']; increaseLevelPreminor = ['preminor', 'dev']; when = 'after'; break;
+    case 'test': increaseLevel = ['prerelease', 'beta']; increaseLevelPreminor = ['preminor', 'beta']; when = 'after'; break;
+    }
+
     let version = null;
     if (versionManagement && (versionManagement.propose !== false)) {
         const list = [{

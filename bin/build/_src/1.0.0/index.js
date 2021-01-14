@@ -53,13 +53,13 @@ module.exports.start = async function (onitBuildFile, builderVersion, basepath, 
     }
     logger.info('Build target selezionato: ' + buildTarget.key);
 
-    const supportedBuildModes = ['production', 'development'];
+    const supportedBuildModes = ['production', 'development', 'test'];
 
     if (!supportedBuildModes.includes(buildTarget.mode)) {
         throw new Error('Build mode ' + buildTarget.mode + ' non supportato. Usa uno tra ' + supportedBuildModes.join(', '));
     }
 
-    const targetDir = path.resolve(process.cwd(), './build/' + (buildTarget.key || buildMode));
+    const targetDir = path.resolve(process.cwd(), './build/' + (buildTarget.key || buildTarget.mode));
 
     // prepare some vars for next steps
     const vars = {

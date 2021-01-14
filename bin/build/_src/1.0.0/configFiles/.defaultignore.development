@@ -8,8 +8,10 @@ node_modules
 .eslintrc*
 .buildignore
 */**/react
+!/client/components/react
 webpack.json
 *.jsx
+!/client/components/react/**/*.jsx
 test
 tests
 doc
@@ -17,7 +19,6 @@ docs
 *.md
 example
 examples
-.onitbuildignore
 
 # our favourite editor stuff!
 .vscode

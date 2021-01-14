@@ -12,7 +12,6 @@
  * 0. You just DO WHAT THE FUCK YOU WANT TO.
  */
 
-
 const fse = require('fs-extra');
 const path = require('path');
 const ncp = require('ncp').ncp;

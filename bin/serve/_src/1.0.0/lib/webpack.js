@@ -31,7 +31,7 @@ module.exports.start = async (logger, cwdOnitServeFile, cwdOnitBuildFile) => {
     // get the list of components we want to load
     const components = (cwdOnitServeFile.json.loadComponents || [])
         .filter(c => c.enabled) // skip disabled ones
-        .filter(c => c.path.indexOf('node_modules') < 0); // still never search stuff in ode_modules
+        .filter(c => c.path.indexOf('node_modules') < 0); // still never search stuff in node_modules
 
     // create one webpack config for each one of the components loaded in dev environment
     for (const component of components) {

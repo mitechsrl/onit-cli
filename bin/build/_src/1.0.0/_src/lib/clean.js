@@ -58,7 +58,7 @@ const removeFiles = (logger, files) => {
         }
     });
 };
-module.exports = async (logger, targetDir, buildMode) => {
+module.exports = async (logger, targetDir, onitBuildFile, buildMode) => {
     logger.info('[CLEAN] Eseguo clean finale...');
 
     const originalPath = process.cwd();
@@ -69,12 +69,16 @@ module.exports = async (logger, targetDir, buildMode) => {
     // clean stages
     removePath(logger, 'node_modules');
     removePath(logger, 'dev-utils');
-    removeFiles(logger, [
-        'onitbuild.config.js',
-        'onitbuild.config.json'
-    ]);
 
     cleanPackageJson(logger, buildMode);
+
+    // on development we must propagate the exports to be able later to use it for build other components
+    if (buildMode !== 'development') {
+        removeFiles(logger, [
+            'onitbuild.config.js',
+            'onitbuild.config.json'
+        ]);
+    }
 
     // TODO: usare ig in qualche modo
     const ig = loadIgnore([

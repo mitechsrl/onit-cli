@@ -1,5 +1,4 @@
 const nodemon = require('nodemon');
-const fs = require('fs');
 const path = require('path');
 
 module.exports.start = async (logger, onitServeFile) => {
@@ -9,7 +8,7 @@ module.exports.start = async (logger, onitServeFile) => {
             delay = null;
 
             // serve: devo calcolare la config di nodemon prima di lanciarlo a partire dal file di config onitserve.config.[js,json]
-            const nodemonConfig = JSON.parse(fs.readFileSync(path.join(__dirname, '../configFiles/nodemon.json')).toString());
+            const nodemonConfig = require(path.join(__dirname, '../configFiles/nodemon.js'));
 
             // aggiungo watch su moduli caricati così cambiamenti in quelle cartelle rilanciano nodemon!
             const enabledModulesPaths = (onitServeFile.json.loadComponents || [])
