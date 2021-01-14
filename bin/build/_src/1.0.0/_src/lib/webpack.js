@@ -44,10 +44,9 @@ module.exports = async function (logger, distTargetDir, onitBuildFile, buildMode
         buildPath: 'build/' + distTargetDir
     }, cwdPackageJson);
 
-    // webpackConfig build mode (defaults to production)
-    if (buildMode !== 'production') {
-        cwdWebpackConfig.mode = buildMode;
-    }
+    // webpack build is either development or production.
+    // everything non-development is translated to roduction (even out 'test' mode)
+    cwdWebpackConfig.mode = (buildMode !== 'development') ? 'production' : 'development';
 
     // if the current project path is a module, we auto-inject required dependency: mitown
     if (onitBuildFile.json.component) {
