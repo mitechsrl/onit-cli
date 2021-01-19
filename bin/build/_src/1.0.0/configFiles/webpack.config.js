@@ -38,16 +38,19 @@ module.exports = (context, config, packageJson) => {
                         loader: require.resolve('css-loader')
                     }]
                 },
+                // see https://webpack.js.org/loaders/sass-loader/
                 {
                     test: /\.s[ac]ss$/,
                     use: [
+                        require.resolve('style-loader'),
+                        require.resolve('css-loader'),
                         {
-                            loader: require.resolve('file-loader'),
+                            loader: require.resolve('sass-loader'),
                             options: {
-                                name: '[path][name].min.css'
+                                // Prefer `dart-sass`
+                                implementation: require('sass')
                             }
-                        },
-                        require.resolve('sass-loader')
+                        }
                     ]
                 },
                 {
