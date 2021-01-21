@@ -1,7 +1,7 @@
 const nodemon = require('nodemon');
 const path = require('path');
 
-module.exports.start = async (logger, onitServeFile) => {
+module.exports.start = async (logger, onitServeFile, debug, timeout) => {
     return new Promise(resolve => {
         // add this to a delay so we give some time to other process to start without being too much cpu-heavy
         let delay = setTimeout(() => {
@@ -25,6 +25,13 @@ module.exports.start = async (logger, onitServeFile) => {
                 nodemonConfig.script = onitServeFile.json.main || './node_modules/@mitech/mitown/server/server.js';
             }
 
+            if (debug) {
+                logger.warn('Modalità debug abilitata');
+                nodemonConfig.exec = 'node';
+                nodemonConfig.nodeArgs = nodemonConfig.nodeArgs || [];
+                nodemonConfig.nodeArgs.push('--inspect');
+            }
+
             // Adding environment stuff (see https://github.com/remy/nodemon/blob/master/doc/sample-nodemon.md)
             const env = onitServeFile.json.environment || {};
             Object.keys(env).forEach(key => {
@@ -46,7 +53,7 @@ module.exports.start = async (logger, onitServeFile) => {
 
             // nodemon.on('stdout', v => console.log(v));
             // nodemon.on('stderr', v => console.log(v));
-        }, 5000);
+        }, timeout);
 
         /**
          * Catch SIGINT (ctrl+c from console) so we stop nodemon when the user ask for it

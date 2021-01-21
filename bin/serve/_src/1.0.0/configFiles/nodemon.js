@@ -1,4 +1,4 @@
-module.export = {
+module.exports = {
     verbose: false,
     ext: 'js,json,jsonc',
     ignore: [
