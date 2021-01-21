@@ -17,14 +17,15 @@ onit labels # utility gestione lebels
 
 
 ### onit serve
-Permette il serve del progetto al path attuale. Richiede i files **onitbuild.config.[js|json]** (vedi sezione **onit build**) e **onitrun.config.[js|json]**
+Permette il serve del progetto al path attuale. Richiede i files **onitbuild.config.[js|json]** (vedi sezione **onit build**) e **onitserve.config.[js|json]**
 
-##### onitrun.config.[js|json]
+##### onitserve.config.[js|json]
 
 Il file contiene una serie di istruzioni per il lancio del progetto in ambiente di sviluppo.
 
 ```
 {
+    "component": boolean, se true avvia il progetto corrente in modalità "component", ovvero il progetto corrente deve rappresentare un componente aggiuntivo di mitown. Il sistema determina automaticamente i componenti da caricare, lancia *mitown* (che deve essere installato come dipendenza di sviluppo, nella versione mitown-dev) il quale carica in automatico il componente corrente. Con questo flag è possibile omettere del tutto loadComponents nel caso non si voglia caricare ulteriori componenti,
     "loadComponents": Array<Object>, array di componenti da caricare, dove Object segue la signature definita in loadObject,
     "environment": Object, oggetto iniettato in environment app
 }
@@ -44,6 +45,8 @@ Il file contiene una serie di istruzioni per il lancio del progetto in ambiente 
 
 **-w** Lancia solo il serve di webpack
 **-n** Lancia solo il serve dell'app node
+**-debug** Avvia l'app node con il flag "--inspect", avviando quindi l'app in modalità debug
+
 
 ### onit build
 Permette il build del progetto e la creazione dei files destinati alla pacchettizzazione tramite npm. Richiede i files **onitbuild.config.[js|json]**
@@ -159,6 +162,8 @@ Ogni comando deve essere nel formato:
     cwd: string, path di esecuzione del comando. E' possibile usare le variabili per personalizzare il path, ad esempio inserendo **'$_BUILD_DIR'** l'esecuzione avviene nella directory di build
 }
 ```
+
+**.onitbuildignore** può essere utilizzato per ignorare alcuni files dal processo di build (i quali quindi non finiranno nel pacchetto di build). Il formato è simile a **.gitignore** (Vedi https://git-scm.com/docs/gitignore)
 
 ### onit link
 Utility per la gestione di tags di dipendenza.
