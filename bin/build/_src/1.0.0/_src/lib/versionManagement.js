@@ -56,6 +56,11 @@ module.exports.prompt = async (buildTarget, vars, cwdPackageJson, targetDir) => 
         const oldBuildPackageJson = path.join(targetDir, 'package.json');
         if (fs.existsSync(oldBuildPackageJson)) {
             const oldPackageJson = require(oldBuildPackageJson);
+            list[0].choices.push({
+                name: 'Build precedente ' + oldPackageJson.version + ', mantieni ' + oldPackageJson.version,
+                value: { [when]: oldPackageJson.version }
+            });
+
             const v = semverInc(oldPackageJson.version, ...increaseLevel);
             list[0].choices.push({
                 name: 'Build precedente ' + oldPackageJson.version + ', incrementa a ' + v,
