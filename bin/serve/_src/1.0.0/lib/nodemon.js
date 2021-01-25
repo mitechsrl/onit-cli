@@ -27,7 +27,7 @@ module.exports.start = async (logger, onitServeFile, debug, timeout) => {
 
             if (debug) {
                 logger.warn('Modalità debug abilitata');
-                nodemonConfig.exec = 'node';
+                // nodemonConfig.exec = 'node';
                 nodemonConfig.nodeArgs = nodemonConfig.nodeArgs || [];
                 nodemonConfig.nodeArgs.push('--inspect');
             }
