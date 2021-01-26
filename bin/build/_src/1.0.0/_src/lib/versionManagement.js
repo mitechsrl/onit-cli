@@ -25,10 +25,11 @@ module.exports.prompt = async (buildTarget, vars, cwdPackageJson, targetDir) => 
     let increaseLevelPreminor = null; // another way to calculate versions but only for test and dev
     let when = null;
 
+    let append = '';
     switch (buildTarget.mode) {
     case 'production': increaseLevel = ['patch']; increaseLevelPreminor = null; when = 'before'; break;
-    case 'development': increaseLevel = ['prerelease', 'dev']; increaseLevelPreminor = ['preminor', 'dev']; when = 'after'; break;
-    case 'test': increaseLevel = ['prerelease', 'beta']; increaseLevelPreminor = ['preminor', 'beta']; when = 'after'; break;
+    case 'development': append = '-dev.0'; increaseLevel = ['prerelease', 'dev']; increaseLevelPreminor = ['preminor', 'dev']; when = 'after'; break;
+    case 'test': append = '-test.0'; increaseLevel = ['prerelease', 'beta']; increaseLevelPreminor = ['preminor', 'beta']; when = 'after'; break;
     }
 
     let version = null;
@@ -36,15 +37,20 @@ module.exports.prompt = async (buildTarget, vars, cwdPackageJson, targetDir) => 
         const list = [{
             type: 'list',
             name: 'version',
-            message: 'Gestione versione. Atuale: ' + cwdPackageJson.version,
+            message: 'Gestione versione. Attuale: ' + cwdPackageJson.version,
             choices: [{
                 name: 'Mantieni attuale ' + cwdPackageJson.version,
                 value: false
-            }, {
-                name: 'Incrementa a ' + semverInc(cwdPackageJson.version, ...increaseLevel),
-                value: { [when]: semverInc(cwdPackageJson.version, ...increaseLevel) }
             }]
         }];
+
+        // this allow us to create a dev/distribution of the current version
+        if (append) {
+            list[0].choices.push({
+                name: 'Passa a ' + cwdPackageJson.version + append,
+                value: { after: cwdPackageJson.version + append }
+            });
+        }
 
         if (increaseLevelPreminor) {
             const v = semverInc(cwdPackageJson.version, ...increaseLevelPreminor);
@@ -53,6 +59,11 @@ module.exports.prompt = async (buildTarget, vars, cwdPackageJson, targetDir) => 
                 value: { [when]: v }
             });
         }
+
+        list[0].choices.push({
+            name: 'Incrementa a ' + semverInc(cwdPackageJson.version, ...increaseLevel),
+            value: { [when]: semverInc(cwdPackageJson.version, ...increaseLevel) }
+        });
         const oldBuildPackageJson = path.join(targetDir, 'package.json');
         if (fs.existsSync(oldBuildPackageJson)) {
             const oldPackageJson = require(oldBuildPackageJson);
