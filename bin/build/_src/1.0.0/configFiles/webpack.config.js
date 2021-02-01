@@ -85,7 +85,10 @@ module.exports = (context, config, packageJson) => {
         entry: config.entryPoints || {},
 
         // resolves will be populated dynamically from project dependency files (onitbuild.config.json's)
-        resolve: {},
+        resolve: {
+            // https://webpack.js.org/configuration/resolve/#resolveextensions
+            extensions: ['.wasm', '.mjs', '.js', '.jsx', '.json']
+        },
 
         // https://webpack.js.org/plugins/
         plugins: [
