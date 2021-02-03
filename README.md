@@ -48,6 +48,38 @@ Il file contiene una serie di istruzioni per il lancio del progetto in ambiente 
 **-debug** Avvia l'app node con il flag "--inspect", avviando quindi l'app in modalità debug
 
 
+
+##### Debug
+
+Per avviare **il solo processo node backend** in debug, aggiungere il flag **-debug** al comando **onit serve**.
+Questo causerà l'aggiunta del flag node **--inspect** al processo lanciato da nodemon.
+
+E' possibile lanciare il debug tramite vscode (premendo F5 ad esempio) aggiungendo la configurazione di avvio al file **.vscode/launch.json**
+
+Esempio di launch.json per vscode
+
+```
+{
+    // Usare IntelliSense per informazioni sui possibili attributi.
+    // Al passaggio del mouse vengono visualizzate le descrizioni degli attributi esistenti.
+    // Per altre informazioni, visitare: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Avvia programma",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "runtimeExecutable": "onit",
+            "runtimeArgs":["serve", "-debug"]
+        }
+    ]
+}
+
+```
+
 ### onit build
 Permette il build del progetto e la creazione dei files destinati alla pacchettizzazione tramite npm. Richiede i files **onitbuild.config.[js|json]**
 
@@ -174,3 +206,5 @@ Similmente a **npm link**, eseguendo **onit link** all'interno di una directory 
 
 ### onit labels
 TODO
+
+
