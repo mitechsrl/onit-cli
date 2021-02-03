@@ -44,8 +44,10 @@ Il file contiene una serie di istruzioni per il lancio del progetto in ambiente 
 ##### Parametri
 
 **-w** Lancia solo il serve di webpack
+
 **-n** Lancia solo il serve dell'app node
-**-debug** Avvia l'app node con il flag "--inspect", avviando quindi l'app in modalità debug
+
+**-debug** Avvia l'app node con il flag "--inspect", avviando quindi l'app in modalità debug. Vedi sezione debug.
 
 
 
