@@ -29,7 +29,7 @@ module.exports.prompt = async (buildTarget, vars, cwdPackageJson, targetDir) => 
     switch (buildTarget.mode) {
     case 'production': increaseLevel = ['patch']; increaseLevelPreminor = null; when = 'before'; break;
     case 'development': append = '-dev.0'; increaseLevel = ['prerelease', 'dev']; increaseLevelPreminor = ['preminor', 'dev']; when = 'after'; break;
-    case 'test': append = '-test.0'; increaseLevel = ['prerelease', 'beta']; increaseLevelPreminor = ['preminor', 'beta']; when = 'after'; break;
+    case 'test': append = '-beta.0'; increaseLevel = ['prerelease', 'beta']; increaseLevelPreminor = ['preminor', 'beta']; when = 'after'; break;
     }
 
     let version = null;
