@@ -133,7 +133,6 @@ module.exports.prompt = async (buildTarget, vars, cwdPackageJson, targetDir) => 
         const answers = await inquirer.prompt(list);
         version = answers.version;
     }
-    process.exit();
     return version;
 };
 
