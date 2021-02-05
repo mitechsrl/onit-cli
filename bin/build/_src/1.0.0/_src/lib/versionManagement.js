@@ -14,10 +14,12 @@
 
 const spawn = require('../../../../../../lib/spawn');
 const semverInc = require('semver/functions/inc');
+const semverSort = require('semver/functions/sort');
 const replace = require('./replace').replace;
 const inquirer = require('inquirer');
 const path = require('path');
 const fs = require('fs');
+const logger = require('../../../../../../lib/logger');
 
 module.exports.prompt = async (buildTarget, vars, cwdPackageJson, targetDir) => {
     const versionManagement = buildTarget.version;
@@ -26,10 +28,26 @@ module.exports.prompt = async (buildTarget, vars, cwdPackageJson, targetDir) => 
     let when = null;
 
     let append = '';
+    let additionalMatch = null;
     switch (buildTarget.mode) {
-    case 'production': increaseLevel = ['patch']; increaseLevelPreminor = null; when = 'before'; break;
-    case 'development': append = '-dev.0'; increaseLevel = ['prerelease', 'dev']; increaseLevelPreminor = ['preminor', 'dev']; when = 'after'; break;
-    case 'test': append = '-beta.0'; increaseLevel = ['prerelease', 'beta']; increaseLevelPreminor = ['preminor', 'beta']; when = 'after'; break;
+    case 'production':
+        append = '';
+        additionalMatch = /^[0-9.]+$/;
+        increaseLevel = ['patch'];
+        increaseLevelPreminor = null;
+        when = 'before'; break;
+    case 'development':
+        append = '-dev.0';
+        additionalMatch = /^[0-9.]+-dev\.[0-9]+$/;
+        increaseLevel = ['prerelease', 'dev'];
+        increaseLevelPreminor = ['preminor', 'dev'];
+        when = 'after'; break;
+    case 'test':
+        append = '-beta.0';
+        additionalMatch = /^[0-9.]+-beta\.[0-9]+$/;
+        increaseLevel = ['prerelease', 'beta'];
+        increaseLevelPreminor = ['preminor', 'beta'];
+        when = 'after'; break;
     }
 
     let version = null;
@@ -82,12 +100,29 @@ module.exports.prompt = async (buildTarget, vars, cwdPackageJson, targetDir) => 
         if (versionManagement.additional) {
             const _additional = replace(versionManagement.additional, vars);
             console.log('Eseguo versionManagement additional: ' + _additional.cmd);
-            const ret = await spawn(_additional.cmd, [], false, {
+            let val = await spawn(_additional.cmd, [], false, {
                 shell: true,
                 cwd: process.cwd()
             });
+            val = val.data.trim();
 
-            const v = semverInc(ret.data.trim(), ...increaseLevel);
+            console.log('VAL ', val);
+            // we can process both a single string or an array of version strings.
+            // In case of array, get the next suitable version
+            try {
+                let _val = JSON.parse(val);
+                if (Array.isArray(_val)) {
+                    _val = _val.filter(v => !!v.match(additionalMatch));
+                    _val = semverSort(_val);
+                    val = _val.pop();
+                } else {
+                    val = _val;
+                }
+            } catch (e) {
+                logger.error(e);
+            }
+
+            const v = semverInc(val, ...increaseLevel);
             if (v) {
                 list[0].choices.push({
                     name: versionManagement.additional.name + ' ' + v,
@@ -98,6 +133,7 @@ module.exports.prompt = async (buildTarget, vars, cwdPackageJson, targetDir) => 
         const answers = await inquirer.prompt(list);
         version = answers.version;
     }
+    process.exit();
     return version;
 };
 
