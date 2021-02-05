@@ -106,7 +106,6 @@ module.exports.prompt = async (buildTarget, vars, cwdPackageJson, targetDir) => 
             });
             val = val.data.trim();
 
-            console.log('VAL ', val);
             // we can process both a single string or an array of version strings.
             // In case of array, get the next suitable version
             try {
