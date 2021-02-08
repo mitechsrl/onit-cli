@@ -15,35 +15,38 @@ module.exports.start = async (logger, cwdOnitServeFile) => {
     // add dynamic entry points to the webpack config for the current directory
     const entryPoints = webpackUtils.searchEntryPoints(process.cwd());
 
-    // if the current project path is a module, prepare the required dependency: mitown
-    let mitownWebpackDependencies = null;
+    // if the current project path is a module, prepare the required dependency: onit
+    let onitWebpackDependencies = null;
     if (cwdOnitServeFile.json.component) {
-        const mitownPathAsDep = path.join(process.cwd(), './node_modules/@mitech/mitown');
-        const mitownBuildFile = await onitFileLoader.load('build', mitownPathAsDep);
-        mitownWebpackDependencies = await webpackUtils.getWebpackExportsFromDependencies(mitownPathAsDep, mitownBuildFile);
+        // FIXME: questo diventerà @mitech/onit
+        const onitPathAsDep = path.join(process.cwd(), './node_modules/@mitech/mitown');
+        const onitBuildFile = await onitFileLoader.load('build', onitPathAsDep);
+        onitWebpackDependencies = await webpackUtils.getWebpackExportsFromDependencies(onitPathAsDep, onitBuildFile);
     }
 
     // check if we have a component at the current path. If true, auto add it as loadable module.
     let cwdPackageJson = path.join(process.cwd(), 'package.json');
     if (fs.existsSync(cwdPackageJson)) {
         cwdPackageJson = require(cwdPackageJson);
-        const cwdOnitBuildFile = await onitFileLoader.load('build');
-        // create a webpack config for the current path project
-        let cwdWebpackConfig = webpackConfigFactory(process.cwd(), {
-            entryPoints: entryPoints
-        }, cwdPackageJson);
+        if (cwdPackageJson.onit || cwdPackageJson.mitown) {
+            const cwdOnitBuildFile = await onitFileLoader.load('build');
+            // create a webpack config for the current path project
+            let cwdWebpackConfig = webpackConfigFactory(process.cwd(), {
+                entryPoints: entryPoints
+            }, cwdPackageJson);
 
-        const buildWebpackData = (cwdOnitBuildFile.json.export || {}).webpack;
-        if (buildWebpackData) {
-            cwdWebpackConfig = _.mergeWith(cwdWebpackConfig, buildWebpackData, webpackUtils.webpackMergeFn);
+            const buildWebpackData = (cwdOnitBuildFile.json.export || {}).webpack;
+            if (buildWebpackData) {
+                cwdWebpackConfig = _.mergeWith(cwdWebpackConfig, buildWebpackData, webpackUtils.webpackMergeFn);
+            }
+
+            // if the current project path is a module, we auto-inject required dependency: onit
+            if (onitWebpackDependencies !== null) {
+                cwdWebpackConfig = _.mergeWith(cwdWebpackConfig, onitWebpackDependencies, webpackUtils.webpackMergeFn);
+            }
+
+            webpackConfigs.push(cwdWebpackConfig);
         }
-
-        // if the current project path is a module, we auto-inject required dependency: mitown
-        if (mitownWebpackDependencies !== null) {
-            cwdWebpackConfig = _.mergeWith(cwdWebpackConfig, mitownWebpackDependencies, webpackUtils.webpackMergeFn);
-        }
-
-        webpackConfigs.push(cwdWebpackConfig);
     }
 
     // start the load of other components (as defined them in the serve file)
@@ -74,9 +77,9 @@ module.exports.start = async (logger, cwdOnitServeFile) => {
         const dependenciesData = await webpackUtils.getWebpackExportsFromDependencies(componentPath, componentOnitBuildFile);
         webpackConfig = _.mergeWith(webpackConfig, dependenciesData, webpackUtils.webpackMergeFn);
 
-        // if the current project path is a module, we auto-inject required dependency: mitown
-        if (mitownWebpackDependencies !== null) {
-            webpackConfig = _.mergeWith(webpackConfig, mitownWebpackDependencies, webpackUtils.webpackMergeFn);
+        // if the current project path is a module, we auto-inject required dependency: onit
+        if (onitWebpackDependencies !== null) {
+            webpackConfig = _.mergeWith(webpackConfig, onitWebpackDependencies, webpackUtils.webpackMergeFn);
         }
 
         // config completed.

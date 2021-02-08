@@ -25,10 +25,69 @@ Il file contiene una serie di istruzioni per il lancio del progetto in ambiente 
 
 ```
 {
-    "component": boolean, se true avvia il progetto corrente in modalità "component", ovvero il progetto corrente deve rappresentare un componente aggiuntivo di mitown. Il sistema determina automaticamente i componenti da caricare, lancia *mitown* (che deve essere installato come dipendenza di sviluppo, nella versione mitown-dev) il quale carica in automatico il componente corrente. Con questo flag è possibile omettere del tutto loadComponents nel caso non si voglia caricare ulteriori componenti,
+    "component": boolean, se true avvia il progetto corrente in modalità "component",
     "loadComponents": Array<Object>, array di componenti da caricare, dove Object segue la signature definita in loadObject,
     "environment": Object, oggetto iniettato in environment app
 }
+```
+
+##### Component
+
+Con questa modalità, la directory corrente rappresenta un componente aggiuntivo di mitown, oppure una cartella contenente più componenti mitown.
+
+** Singolo componente aggiuntivo **
+
+Si usa questa modalità quando il componente aggiuntivo è unico e non si necessita di mantenere in sviluppo piu componenti.
+
+
+La struttura della directory segue quindi:
+```
+node_modules
+index.js <-- entry point del componente
+onitserve.config.json
+onitbuild.config.json
+package.json <-- package.json del componente (integra come dipendenza @mitech/mitown versione dev)
+
+```
+
+Il sistema determina automaticamente i componenti da caricare, lancia *mitown* (che deve essere installato come dipendenza di sviluppo, nella versione mitown-dev) il quale carica in automatico il componente corrente. Con questo flag è possibile omettere del tutto loadComponents nel caso non si voglia caricare ulteriori componenti,
+
+
+** Multi-componente aggiuntivo **
+
+Si usa questa modalità quando occorre sviluppare piu componenti aggiuntivi allo stesso momento. In questa modalità, il sistem **NON** carica in automatico la directory corrente come componente in quanto il file package.json non contiene la proprietà **mitown**
+
+
+La struttura della directory segue quindi:
+```
+node_modules
+componente1/
+   package.json
+   onitbuild.config.json
+componente2/
+   package.json
+   onitbuild.config.json
+onitserve.config.json
+
+package.json <-- package.json del progetto (integra come dipendenza @mitech/mitown versione dev, ma non la proprietà mitown)
+
+```
+
+In questo caso occorre definire la lista di componenti da caricare tramite la proprietà **loadComponents** del file **onitserve.config.json**. Un esempio di tale configurazione è rappresentata da:
+
+```
+"loadComponents": [
+    {
+        "enabled": true,
+        "name": "componente1",
+        "path": "./componente1"
+    },
+    {
+        "enabled": true,
+        "name": "componente2",
+        "path": "./componente2"
+    }
+]
 ```
 
 ##### loadObject

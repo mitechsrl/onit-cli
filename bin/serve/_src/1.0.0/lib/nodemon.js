@@ -20,8 +20,9 @@ module.exports.start = async (logger, onitServeFile, debug, timeout) => {
 
             // if you want to develop a single component and run it you can use the same
             // onitRun file but with a property "component:true".
-            // This will make the serve utility to launch the dependency mitown loading this component
+            // This will make the serve utility to launch the dependency onit loading this component
             if (onitServeFile.json.component === true) {
+                // FIXME: questo diventerà @mitech/onit
                 nodemonConfig.script = onitServeFile.json.main || './node_modules/@mitech/mitown/server/server.js';
             }
 

@@ -19,6 +19,7 @@ const util = require('util');
 const webpack = util.promisify(_webpack);
 const path = require('path');
 const onitFileLoader = require('../../../../../../lib/onitFileLoader');
+const fs = require('fs');
 
 module.exports = async function (logger, distTargetDir, onitBuildFile, buildMode, injectBuildOptions = null) {
     logger.info('[WEBPACK] Eseguo build webpack ' + (injectBuildOptions ? 'con configurazione extra ' + JSON.stringify(injectBuildOptions) : 'standard'));

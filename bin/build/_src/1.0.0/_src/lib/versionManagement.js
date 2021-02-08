@@ -118,7 +118,7 @@ module.exports.prompt = async (buildTarget, vars, cwdPackageJson, targetDir) => 
                     val = _val;
                 }
             } catch (e) {
-                logger.error(e);
+                // logger.error(e);
             }
 
             const v = semverInc(val, ...increaseLevel);
