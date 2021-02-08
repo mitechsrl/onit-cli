@@ -10,8 +10,6 @@ module.exports.start = async function (onitServeFile, version, basepath, params,
     const debug = params.get('-debug').found;
 
     try {
-        const onitBuildFile = await onitFileLoader.load('build');
-
         // pre-serve: run sequentially waiting for each async resolve
         logger.log('Eseguo <Nodemon startup>...');
         const launchedCount = await pm2Dev.start(onitServeFile);
@@ -20,7 +18,7 @@ module.exports.start = async function (onitServeFile, version, basepath, params,
         const message = [(!minusN ? 'webpack' : ''), (!minusW ? 'nodemon' : '')].filter(m => !!m).join(' e ');
         logger.log('Lancio ' + message + '...');
         await Promise.all([
-            (!minusN) ? webpack.start(logger, onitServeFile, onitBuildFile) : Promise.resolve(), // -n cause only webpack to be run live
+            (!minusN) ? webpack.start(logger, onitServeFile) : Promise.resolve(), // -n cause only webpack to be run live
             (!minusW) ? nodemon.start(logger, onitServeFile, debug, minusN ? 0 : 5000) : Promise.resolve() // -w cause only webpack to be run live
         ]);
 
