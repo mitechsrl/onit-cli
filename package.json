@@ -1,6 +1,6 @@
 {
     "name": "onit-cli",
-    "version": "0.0.6",
+    "version": "0.0.7",
     "description": "Onit dev tool CLI",
     "main": "index.js",
     "bin": {
@@ -14,6 +14,7 @@
         "@babel/preset-react": "^7.12.5",
         "babel-loader": "^8.2.1",
         "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
+        "clean-webpack-plugin": "^3.0.0",
         "colors": "^1.4.0",
         "copy-webpack-plugin": "^6.3.2",
         "css-loader": "^5.0.1",

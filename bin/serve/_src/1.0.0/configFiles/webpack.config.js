@@ -5,6 +5,8 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const strip = require('strip-comments');
 const fs = require('fs');
+const ProgressPlugin = require('webpack').ProgressPlugin;
+const CleanWebpackPlugin = require('clean-webpack-plugin').CleanWebpackPlugin;
 
 // some static config options
 const baseConfig = JSON.parse(strip(fs.readFileSync(path.join(__dirname, './options.jsonc')).toString()));
@@ -18,10 +20,20 @@ const baseConfig = JSON.parse(strip(fs.readFileSync(path.join(__dirname, './opti
  * @param {*} packageJson the package.json content (js object) of the project to be webpacke'd.
  */
 module.exports = (context, config, packageJson) => {
+    const componentName = path.basename(context);
+
     // this packagePublishPathValue must match the one from the package (whic is calculated wit the same logic)
     let packagePublishPath = ((packageJson.mitown || {}).mountPath || packageJson.name.replace('@mitech/', ''));
     if (!packagePublishPath.startsWith('/')) packagePublishPath = '/' + packagePublishPath;
 
+    let _debounceMessage = '';
+    const progressHandler = (percentage, message, ...args) => {
+        if (message !== _debounceMessage) {
+            const p = (percentage * 100).toFixed(0);
+            _debounceMessage = message;
+            console.info('[WEBPACK] ' + componentName + ' build ' + p + '% ' + message);
+        }
+    };
     return {
         mode: 'development',
         context: context,
@@ -118,6 +130,11 @@ module.exports = (context, config, packageJson) => {
 
         // https://webpack.js.org/plugins/
         plugins: [
+            new CleanWebpackPlugin(),
+
+            new ProgressPlugin({
+                handler: progressHandler
+            }),
 
             new MiniCssExtractPlugin({
                 filename: (pathData, assetInfo) => {
