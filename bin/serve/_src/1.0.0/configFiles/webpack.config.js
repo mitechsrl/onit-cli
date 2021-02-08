@@ -130,7 +130,9 @@ module.exports = (context, config, packageJson) => {
 
         // https://webpack.js.org/plugins/
         plugins: [
-            new CleanWebpackPlugin(),
+            new CleanWebpackPlugin({
+                cleanStaleWebpackAssets: false
+            }),
 
             new ProgressPlugin({
                 handler: progressHandler
