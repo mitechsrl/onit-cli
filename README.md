@@ -33,9 +33,9 @@ Il file contiene una serie di istruzioni per il lancio del progetto in ambiente 
 
 ##### Component
 
-Con questa modalità, la directory corrente rappresenta un componente aggiuntivo di mitown, oppure una cartella contenente più componenti mitown.
+Con questa modalità, la directory corrente rappresenta un componente aggiuntivo di mitown, oppure una cartella contenente più componenti mitown. La discriminante utilizzata dal sistema per determinare la modalità da usare risiede nel package.json della directory di lancio del progetto: se esso viene interpretato come il package.json di un componente (tramite la proprietà **mitown** dello stesso) allora il sistema utiizza la modalità **singolo componente** , altrimenti procede con la modalità **multi componente**
 
-** Singolo componente aggiuntivo **
+**Modalità singolo componente**
 
 Si usa questa modalità quando il componente aggiuntivo è unico e non si necessita di mantenere in sviluppo piu componenti.
 
@@ -53,7 +53,7 @@ package.json <-- package.json del componente (integra come dipendenza @mitech/mi
 Il sistema determina automaticamente i componenti da caricare, lancia *mitown* (che deve essere installato come dipendenza di sviluppo, nella versione mitown-dev) il quale carica in automatico il componente corrente. Con questo flag è possibile omettere del tutto loadComponents nel caso non si voglia caricare ulteriori componenti,
 
 
-** Multi-componente aggiuntivo **
+**Modalità multi-componente**
 
 Si usa questa modalità quando occorre sviluppare piu componenti aggiuntivi allo stesso momento. In questa modalità, il sistem **NON** carica in automatico la directory corrente come componente in quanto il file package.json non contiene la proprietà **mitown**
 
@@ -89,6 +89,9 @@ In questo caso occorre definire la lista di componenti da caricare tramite la pr
     }
 ]
 ```
+
+Il sistema determina i componenti da caricare in base alla lista loadComponents a cui aggiunge automaticamente tutti i componenti installati come dipendenza in node_modules. Successivamente lancia *mitown* (che deve essere installato come dipendenza di sviluppo, nella versione mitown-dev) il quale di conseguenza carica la lista di componenti determinata in precedenza.
+
 
 ##### loadObject
 
