@@ -27,9 +27,22 @@ module.exports.start = async (logger, cwdOnitServeFile) => {
     // check if we have a component at the current path. If true, auto add it as loadable module.
     let cwdPackageJson = path.join(process.cwd(), 'package.json');
     if (fs.existsSync(cwdPackageJson)) {
+        // check if the current path is a onit-valid directory
+        let cwdOnitBuildFile = null;
+        try {
+            cwdOnitBuildFile = await onitFileLoader.load('build');
+        } catch (error) {
+            if (error.notFound === true) {
+                // this is not a onit-valid direcotry. Just skip this load
+                logger.log('Skip webpack setup for the current directory');
+            } else if (error) {
+            // the file was found but the load failed. This is a serious error, rethrow it.
+                throw error;
+            }
+        }
+
         cwdPackageJson = require(cwdPackageJson);
-        if (cwdPackageJson.onit || cwdPackageJson.mitown) {
-            const cwdOnitBuildFile = await onitFileLoader.load('build');
+        if (cwdOnitBuildFile) {
             // create a webpack config for the current path project
             let cwdWebpackConfig = webpackConfigFactory(process.cwd(), {
                 entryPoints: entryPoints
