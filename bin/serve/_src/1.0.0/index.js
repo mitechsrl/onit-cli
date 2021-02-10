@@ -8,7 +8,7 @@ module.exports.start = async function (onitServeFile, version, basepath, params,
     const minusW = params.get('-w').found;
     const minusN = params.get('-n').found;
     const debug = params.get('-debug').found;
-
+    const reload = params.get('-reload').found;
     try {
         // pre-serve: run sequentially waiting for each async resolve
         logger.log('Eseguo <Nodemon startup>...');
@@ -19,7 +19,7 @@ module.exports.start = async function (onitServeFile, version, basepath, params,
         logger.log('Lancio ' + message + '...');
         await Promise.all([
             (!minusN) ? webpack.start(logger, onitServeFile) : Promise.resolve(), // -n cause only webpack to be run live
-            (!minusW) ? nodemon.start(logger, onitServeFile, debug, minusN ? 0 : 5000) : Promise.resolve() // -w cause only webpack to be run live
+            (!minusW) ? nodemon.start(logger, onitServeFile, debug, reload, minusN ? 0 : 5000) : Promise.resolve() // -w cause only webpack to be run live
         ]);
 
         // lancio tutto quello che c'è in parallelo. Passare il filename di nodemon

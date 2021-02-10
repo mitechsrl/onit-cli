@@ -1,7 +1,7 @@
 const nodemon = require('nodemon');
 const path = require('path');
 
-module.exports.start = async (logger, onitServeFile, debug, timeout) => {
+module.exports.start = async (logger, onitServeFile, debug, reload, timeout) => {
     return new Promise(resolve => {
         // add this to a delay so we give some time to other process to start without being too much cpu-heavy
         let delay = setTimeout(() => {
@@ -31,6 +31,9 @@ module.exports.start = async (logger, onitServeFile, debug, timeout) => {
                 // nodemonConfig.exec = 'node';
                 nodemonConfig.nodeArgs = nodemonConfig.nodeArgs || [];
                 nodemonConfig.nodeArgs.push('--inspect');
+                if (!reload) {
+                    nodemonConfig.ignore = ['*'];
+                }
             }
 
             // Adding environment stuff (see https://github.com/remy/nodemon/blob/master/doc/sample-nodemon.md)

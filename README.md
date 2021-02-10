@@ -111,6 +111,8 @@ Il sistema determina i componenti da caricare in base alla lista loadComponents 
 
 **-debug** Avvia l'app node con il flag "--inspect", avviando quindi l'app in modalità debug. Vedi sezione debug.
 
+**-reload** Abbinato a -debug, avvia il processo node con watch&reload.
+
 
 
 ##### Debug
@@ -137,7 +139,7 @@ Esempio di launch.json per vscode
                 "<node_internals>/**"
             ],
             "runtimeExecutable": "onit",
-            "runtimeArgs":["serve", "-debug"]
+            "runtimeArgs":["serve", "-debug", "-reload]
         }
     ]
 }
