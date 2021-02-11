@@ -40,8 +40,7 @@ module.exports.start = async (logger, cwdOnitServeFile) => {
                 throw error;
             }
         }
-
-        cwdPackageJson = require(cwdPackageJson);
+        cwdPackageJson = JSON.parse(fs.readFileSync(cwdPackageJson).toString());
         if (cwdOnitBuildFile) {
             // create a webpack config for the current path project
             let cwdWebpackConfig = webpackConfigFactory(process.cwd(), {
@@ -77,8 +76,8 @@ module.exports.start = async (logger, cwdOnitServeFile) => {
         const componentEntryPoints = webpackUtils.searchEntryPoints(componentPath);
 
         // read the package json at the target component
-        const componentPackageJson = require(path.join(componentPath, 'package.json'));
-
+        const componentPackageJson = JSON.parse(fs.readFileSync(path.join(componentPath, 'package.json')).toString());
+        
         // create a webpack config for the current directory and
         // add dynamic entry points to the webpack config for the current directory
         let webpackConfig = webpackConfigFactory(componentPath, {

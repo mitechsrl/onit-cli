@@ -25,8 +25,8 @@ module.exports.cmd = async function (basepath, params, logger) {
         logger.error('Nessun package.json in questa directory.');
         return;
     }
-
-    const packageJson = require(packageJsonFilename);
+    
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonFilename).toString());
     const tag = packageJson.name;
 
     const force = params.get('-f').found;

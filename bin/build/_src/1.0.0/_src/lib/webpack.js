@@ -37,7 +37,7 @@ module.exports = async function (logger, distTargetDir, onitBuildFile, buildMode
     const entryPoints = webpackUtils.searchEntryPoints(context);
 
     // geth the package component at the current path
-    const cwdPackageJson = require(path.join(context, 'package.json'));
+    const cwdPackageJson = JSON.parse(fs.readFileSync(path.join(context, 'package.json')).toString());
 
     // create a webpack config for the current path project
     let cwdWebpackConfig = webpackConfigFactory(context, {

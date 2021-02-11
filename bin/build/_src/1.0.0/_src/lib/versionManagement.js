@@ -84,7 +84,7 @@ module.exports.prompt = async (buildTarget, vars, cwdPackageJson, targetDir) => 
         });
         const oldBuildPackageJson = path.join(targetDir, 'package.json');
         if (fs.existsSync(oldBuildPackageJson)) {
-            const oldPackageJson = require(oldBuildPackageJson);
+            const oldPackageJson = JSON.parse(fs.readFileSync(oldBuildPackageJson).toString());
             list[0].choices.push({
                 name: 'Build precedente ' + oldPackageJson.version + ', mantieni ' + oldPackageJson.version,
                 value: { [when]: oldPackageJson.version }
@@ -157,8 +157,8 @@ module.exports.updateBefore = async (cwdPackageJson, cwdPackageJsonFileName, ver
 module.exports.updateAfter = async (targetDir, version) => {
     const packageJsonFileName = path.join(targetDir, 'package.json');
     const packageLockJsonFileName = path.join(targetDir, 'package-lock.json');
-    const packageJson = require(packageJsonFileName);
-    const packageLockJson = require(packageLockJsonFileName);
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonFileName).toString());
+    const packageLockJson = JSON.parse(fs.readFileSync(packageLockJsonFileName).toString());
     packageJson.version = version;
     packageLockJson.version = version;
     fs.writeFileSync(packageJsonFileName, JSON.stringify(packageJson, null, 4));
