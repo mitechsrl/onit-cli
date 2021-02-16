@@ -19,7 +19,7 @@ const baseConfig = JSON.parse(strip(fs.readFileSync(path.join(__dirname, './opti
  */
 module.exports = (context, config, packageJson) => {
     // this packagePublishPathValue must match the one from the package (whic is calculated wit the same logic)
-    let packagePublishPath = ((packageJson.mitown || {}).mountPath || packageJson.name.replace('@mitech/', ''));
+    let packagePublishPath = packageJson.mountPath || (packageJson.mitown || {}).mountPath || packageJson.name.replace('@mitech/', '');
     if (!packagePublishPath.startsWith('/')) packagePublishPath = '/' + packagePublishPath;
 
     return {
@@ -101,7 +101,7 @@ module.exports = (context, config, packageJson) => {
                 filename: (pathData, assetInfo) => {
                     // the css name will be composed with the file name just to be easier to find them
                     // (not particular useful than hand made human check)
-                    const name = ((pathData.chunk || {}).name || '').split('\\').pop();
+                    const name = ((pathData.chunk || {}).name || '').split(path.sep).pop();
                     return (name ? name + '-' : '') + '[contenthash].min.css';
                 }
                 // filename: '[contenthash]-[name].min.css' // use [contenthash] on prod build
@@ -111,9 +111,10 @@ module.exports = (context, config, packageJson) => {
             ...Object.keys(config.entryPoints).map(entryPoint => {
                 // the output filename is just the input filename without the directory slashes.
                 // this will make a file in the dist directory directly having a name which will remember us his origin location
-                let filename = entryPoint.replace(new RegExp('\\' + path.sep, 'g'), '_');
-                filename = filename.replace(new RegExp('/', 'g'), '_');
-
+                let filename = entryPoint;
+                while (filename.indexOf(path.sep) >= 0) {
+                    filename = filename.replace(path.sep, '_');
+                }
                 // create a plugin instance
                 // see https://github.com/jantimon/html-webpack-plugin#options
                 return new HtmlWebpackPlugin({
@@ -131,7 +132,7 @@ module.exports = (context, config, packageJson) => {
         // see https://webpack.js.org/configuration/output/
         output: {
             path: path.join(context, config.buildPath, baseConfig.outputPath),
-            filename: '[fullhash:16][contenthash:16].js'
+            filename: '[contenthash].js'
         },
 
         // these libs are loaded manually in the browser (some of them are standard, some others are custom made)
