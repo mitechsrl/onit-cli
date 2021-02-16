@@ -1,13 +1,13 @@
 {
-    "name": "onit-cli",
-    "version": "0.0.8",
+    "name": "@mitech/onit-cli",
+    "version": "0.0.9",
     "description": "Onit dev tool CLI",
     "main": "index.js",
     "bin": {
         "onit": "bin/cli.js"
     },
     "author": "Mitech Srl.",
-    "license": "ISC",
+    "license": "MIT",
     "dependencies": {
         "@babel/core": "^7.12.3",
         "@babel/plugin-proposal-class-properties": "^7.12.1",
