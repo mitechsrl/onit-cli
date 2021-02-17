@@ -100,7 +100,7 @@ module.exports.start = async function (onitBuildFile, builderVersion, basepath, 
     }
 
     // effective build
-    await build.build(logger, buildTarget, targetDir, onitBuildFile);
+    await build.build(cwdPackageJson, logger, buildTarget, targetDir, onitBuildFile);
 
     // set build dir in the vars
     vars.$_BUILD_DIR = targetDir;
@@ -109,6 +109,8 @@ module.exports.start = async function (onitBuildFile, builderVersion, basepath, 
     if (packageVersion && packageVersion.after) {
         await versionManagement.updateAfter(targetDir, packageVersion.after);
     }
+
+
 
     // extra steps management
     if (extraSteps.length > 0) {

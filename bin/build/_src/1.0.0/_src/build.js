@@ -29,8 +29,9 @@ const copy = require('./lib/copy');
 const webpack = require('./lib/webpack');
 const clean = require('./lib/clean');
 const fs = require('fs');
+const makeReadme = require('./lib/makeReadme');
 
-module.exports.build = async function (logger, buildTarget, targetDir, onitBuildFile) {
+module.exports.build = async function (cwdPackageJson, logger, buildTarget, targetDir, onitBuildFile) {
     const buildMode = buildTarget.mode || 'production';
 
     let defaultIgnoreFile = path.join(__dirname, '../configFiles/.defaultignore.' + buildMode);
@@ -51,6 +52,9 @@ module.exports.build = async function (logger, buildTarget, targetDir, onitBuild
 
     // clean the build directory
     await clean(logger, targetDir, onitBuildFile, buildMode);
+
+    // build a basic readme file
+    await makeReadme(cwdPackageJson, targetDir);
 
     logger.info('Build completato.');
     logger.info('Directory di build: ' + targetDir);
