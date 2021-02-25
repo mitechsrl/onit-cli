@@ -11,6 +11,8 @@ module.exports = {
         '*/assets/*', // static assets changes don't cause reloads
         '*/dist-fe/*' // target directory for webpack compiled files. Don't reload on these files changes
     ],
-    nodeArgs: [],
+    nodeArgs: [
+        '--max-old-space-size=4096' // increase the heap limit
+    ],
     env: {}
 };
