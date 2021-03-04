@@ -32,6 +32,7 @@ module.exports.info = 'Dev Run/serve utility. Lancia il progetto in ambiente di 
 module.exports.help = [
     ['-w', 'Esegui solo webpack, skip nodemon'],
     ['-n', 'Esegui solo nodemon, skip webpack'],
+    ['-c serveFile', 'Utilizza il file di serve specificato'],
     ['-debug', 'Avvia il processo node con il flag --inspact'],
     ['-reload', 'Abbinato a -debug, avvia il processo node con watch&reload.']
 
@@ -39,9 +40,12 @@ module.exports.help = [
 
 module.exports.cmd = async function (basepath, params, logger) {
     try {
+        // check for manual serve file specifed
+        const manualSeveFile = params.get('-c');
+
         // load the buildFile
-        const onitServeFile = await onitFileLoader.load('serve');
-        logger.warn('Uso file build ' + onitServeFile.filename);
+        const onitServeFile = await onitFileLoader.load('serve', process.cwd(), manualSeveFile.found ? manualSeveFile.value : null);
+        logger.warn('Uso file serve ' + onitServeFile.filename);
 
         // lock to the required builder version or get the most recent one
         const requiredVersion = onitServeFile.json.serveVersion || '*';
