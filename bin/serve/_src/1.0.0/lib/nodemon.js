@@ -24,6 +24,7 @@ module.exports.start = async (logger, onitServeFile, debug, reload, timeout) => 
             if (onitServeFile.json.component === true) {
                 // FIXME: questo diventerà @mitech/onit
                 nodemonConfig.script = onitServeFile.json.main || './node_modules/@mitech/mitown/server/server.js';
+                enabledModulesPaths.push('.');
             }
 
             if (debug) {
@@ -43,6 +44,9 @@ module.exports.start = async (logger, onitServeFile, debug, reload, timeout) => 
             });
             const _env = Object.assign({ ONIT_RUN_FILE: onitServeFile.filename }, nodemonConfig.env || {}, env);
             if (Object.keys(_env).length > 0) nodemonConfig.env = _env;
+
+            // inject in the env the list of directories of components to be loaded (additionally to the node_modules ones)
+            nodemonConfig.env.ONIT_COMPONENTS = JSON.stringify(enabledModulesPaths.map(p => path.resolve(process.cwd(), p)));
 
             // Finally launch nodemon
             nodemon(nodemonConfig);
