@@ -65,7 +65,7 @@ module.exports.cmd = async function (basepath, params, logger) {
         await serve.start(onitServeFile, version, basepath, params, logger);
     } catch (e) {
         logger.error(e.message);
-        logger.error('Build interrotto');
+        logger.error('Serve interrotto');
         process.exit(-1);
     }
 };
