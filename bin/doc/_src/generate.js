@@ -44,12 +44,13 @@ module.exports.generate = function (config, outputPath, logger) {
                     const onitDoc = block.tags.find(t => t.tag === 'onitDoc');
                     if (!onitDoc) return;
 
+                    let start = '';
                     onitDoc.source.forEach(s => {
-                        s.tokens.start = '';
+                        if (s.tokens.tag === '@onitDoc') start = s.tokens.start;
+                        s.tokens.start = s.tokens.start.replace(new RegExp('^' + start), '');
                         s.tokens.end = '';
                         s.tokens.tag = '';
                         s.tokens.delimiter = '';
-                        s.tokens.postDelimiter = s.tokens.postDelimiter.split('').slice(1).join('');
                     });
                     onitBlock.doc = stringify(onitDoc);
 
