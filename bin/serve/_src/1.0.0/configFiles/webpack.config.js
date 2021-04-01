@@ -7,6 +7,8 @@ const strip = require('strip-comments');
 const fs = require('fs');
 const ProgressPlugin = require('webpack').ProgressPlugin;
 const CleanWebpackPlugin = require('clean-webpack-plugin').CleanWebpackPlugin;
+const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin');
+const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 
 // some static config options
 const baseConfig = JSON.parse(strip(fs.readFileSync(path.join(__dirname, './options.jsonc')).toString()));
@@ -19,7 +21,7 @@ const baseConfig = JSON.parse(strip(fs.readFileSync(path.join(__dirname, './opti
  * @param {*} config
  * @param {*} packageJson the package.json content (js object) of the project to be webpacke'd.
  */
-module.exports = (context, config, packageJson) => {
+module.exports = (logger, context, config, packageJson) => {
     const componentName = path.basename(context);
 
     // this packagePublishPathValue must match the one from the package (whic is calculated wit the same logic)
@@ -28,15 +30,20 @@ module.exports = (context, config, packageJson) => {
 
     let _debounceMessage = '';
     const progressHandler = (percentage, message, ...args) => {
-        if (message !== _debounceMessage) {
+        // console.log('[WEBPACK] ' + componentName + ' ' + percentage);
+        if ((percentage < 0.99) && (message !== _debounceMessage)) {
             const p = (percentage * 100).toFixed(0);
             _debounceMessage = message;
-            console.info('[WEBPACK] ' + componentName + ' build ' + p + '% ' + message);
+            logger.warn('[WEBPACK] ' + componentName + ' build ' + p + '% ' + message);
         }
     };
     return {
         mode: 'development',
         context: context,
+
+        cache: {
+            type: 'filesystem'
+        },
 
         // see https://webpack.js.org/configuration/devtool/ for available devtools
         devtool: 'source-map',
@@ -69,32 +76,14 @@ module.exports = (context, config, packageJson) => {
                             loader: require.resolve('css-loader'),
                             options: { url: false }
                         },
-                        /* {
-                            loader: require.resolve('postcss-loader'),
-                            options: {
-                                postcssOptions: {}
-                            }
-                        }, */
+
                         {
                             loader: require.resolve('sass-loader'),
                             options: {
-                                // Prefer `dart-sass`
                                 implementation: require('sass')
                             }
                         }
 
-                        /* require.resolve('style-loader'),
-                        {
-                            loader: require.resolve('css-loader'),
-                            options: { url: false }
-                        },
-                        {
-                            loader: require.resolve('sass-loader'),
-                            options: {
-                                // Prefer `dart-sass`
-                                implementation: require('sass')
-                            }
-                        } */
                     ]
                 },
                 {
@@ -130,6 +119,12 @@ module.exports = (context, config, packageJson) => {
 
         // https://webpack.js.org/plugins/
         plugins: [
+            new CaseSensitivePathsPlugin(),
+
+            new FriendlyErrorsWebpackPlugin({
+                clearConsole: false
+            }),
+
             new CleanWebpackPlugin({
                 cleanStaleWebpackAssets: false
             }),
@@ -139,13 +134,7 @@ module.exports = (context, config, packageJson) => {
             }),
 
             new MiniCssExtractPlugin({
-                filename: (pathData, assetInfo) => {
-                    // the css name will be composed with the file name just to be easier to find them
-                    // (not particular useful than hand made human check)
-                    const name = ((pathData.chunk || {}).name || '').split(path.sep).pop();
-                    return (name ? name + '-' : '') + '[contenthash].min.css';
-                }
-                // filename: '[contenthash]-[name].min.css' // use [contenthash] on prod build
+                filename: '[contenthash].min.css' // use [contenthash] on prod build
             }),
 
             // these plugin instances will create an html file(for chunck dependency inclusion) for each entry point

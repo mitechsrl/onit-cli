@@ -40,9 +40,10 @@ module.exports.start = async function (onitServeFile, version, basepath, params,
         // tempo di lanciare il serve effettivo
         const message = [(!minusN ? 'webpack' : ''), (!minusW ? 'nodemon' : '')].filter(m => !!m).join(' e ');
         logger.log('Lancio ' + message + '...');
+
         await Promise.all([
             (!minusN) ? webpack.start(logger, onitServeFile) : Promise.resolve(), // -n cause only webpack to be run live
-            (!minusW) ? nodemon.start(logger, onitServeFile, debug, reload, minusN ? 0 : 5000) : Promise.resolve() // -w cause only webpack to be run live
+            (!minusW) ? nodemon.start(logger, onitServeFile, debug, reload, minusN ? 0 : 10000) : Promise.resolve() // -w cause only webpack to be run live
         ]);
 
         if (launchedCount > 0) {

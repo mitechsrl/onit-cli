@@ -23,7 +23,6 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
 
-
 const path = require('path');
 const _ = require('lodash');
 const webpack = require('webpack');
@@ -70,7 +69,7 @@ module.exports.start = async (logger, cwdOnitServeFile) => {
         if (cwdOnitBuildFile) {
             cwdPackageJson = JSON.parse(fs.readFileSync(cwdPackageJson).toString());
             // create a webpack config for the current path project
-            let cwdWebpackConfig = webpackConfigFactory(process.cwd(), {
+            let cwdWebpackConfig = webpackConfigFactory(logger, process.cwd(), {
                 entryPoints: entryPoints
             }, cwdPackageJson);
 
@@ -107,7 +106,7 @@ module.exports.start = async (logger, cwdOnitServeFile) => {
 
         // create a webpack config for the current directory and
         // add dynamic entry points to the webpack config for the current directory
-        let webpackConfig = webpackConfigFactory(componentPath, {
+        let webpackConfig = webpackConfigFactory(logger, componentPath, {
             entryPoints: componentEntryPoints
         }, componentPackageJson);
 
@@ -131,34 +130,58 @@ module.exports.start = async (logger, cwdOnitServeFile) => {
             // watcher callback
             const componentName = path.basename(webpackConfig.context);
 
+            let booting = true;
+            let hadErrorBoot = false;
+            let startsWatch = null;
+            let watcher = null;
+
             // callback for build completed
             const watcherCallback = (err, stats) => {
+                // Errors on boot requires reboot because some files are not generated on sequentials partial builds.
+                // This is probably caused by some misconfiguration, but now can't find where it is.
+                if (hadErrorBoot) {
+                    hadErrorBoot = false;
+                    watcher.close(() => {
+                        booting = true;
+                        watcher = startsWatch();
+                    });
+                    return;
+                }
+
                 // do we had internal errors?
                 if (err) {
-                    logger.error('[WEBPACK] ' + componentName + ' - compile error');
-                    logger.error(err.stack || err);
-                    if (err.details) logger.error(err.details);
+                    // logger.error('[WEBPACK] ' + componentName + ' - compile error');
+                    // logger.error(err.stack || err);
+                    // if (err.details) logger.error(err.details);
+                    if (booting) hadErrorBoot = true;
                     return;
                 }
 
                 // do we had compile errors?
-                const info = stats.toJson();
+                // const info = stats.toJson();
                 if (stats.hasErrors()) {
-                    logger.error('[WEBPACK] ' + componentName + ' - compile error');
-                    info.errors.forEach(e => logger.error(e));
+                    // logger.error('[WEBPACK] ' + componentName + ' - compile error');
+                    // info.errors.forEach(e => logger.error(e));
+                    if (booting) hadErrorBoot = true;
                     return;
                 }
 
-                console.info('[WEBPACK] ' + componentName + ' - Compile finished');
+                booting = false;
+                logger.info('[WEBPACK] ' + componentName + ' - Compile completed');
             };
-            // create a compiler based on the config
-            const compiler = webpack(webpackConfig);
+
+            startsWatch = function () {
+                hadErrorBoot = false;
+                booting = true;
+                // create a compiler based on the config
+                return webpack(webpackConfig).watch({
+                    aggregateTimeout: 700,
+                    ignored: ['files/**/*.js', 'node_modules/**']
+                }, watcherCallback);
+            };
 
             // start the watcher!
-            const watcher = compiler.watch({
-                aggregateTimeout: 500,
-                ignored: ['files/**/*.js', 'node_modules/**']
-            }, watcherCallback);
+            watcher = startsWatch();
 
             // catch the SIGINT and then stop the watcher
             process.on('SIGINT', () => {

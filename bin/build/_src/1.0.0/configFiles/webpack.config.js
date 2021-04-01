@@ -5,6 +5,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const strip = require('strip-comments');
 const fs = require('fs');
 const ProgressBarPlugin = require('progress-bar-webpack-plugin');
+const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 
 // some static config options
 const baseConfig = JSON.parse(strip(fs.readFileSync(path.join(__dirname, './options.jsonc')).toString()));
@@ -92,6 +93,7 @@ module.exports = (context, config, packageJson) => {
 
         // https://webpack.js.org/plugins/
         plugins: [
+            new CaseSensitivePathsPlugin(),
 
             // show a progress bar in console while building
             // https://github.com/clessg/progress-bar-webpack-plugin#readme
