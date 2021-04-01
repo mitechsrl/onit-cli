@@ -41,10 +41,10 @@ module.exports = (logger, context, config, packageJson) => {
         mode: 'development',
         context: context,
 
-        cache: {
+ /*       cache: {
             type: 'filesystem'
         },
-
+*/
         // see https://webpack.js.org/configuration/devtool/ for available devtools
         devtool: 'source-map',
 
