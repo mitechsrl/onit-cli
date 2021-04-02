@@ -13,6 +13,9 @@ module.exports.generate = function (config, outputPath, logger) {
                 './assets/**/*',
                 './dist/**/*',
                 './dist-fe/**/*',
+                './docs/**/*',
+                './onit-doc/**/*',
+                './test/**/*',
                 ...(config.ignore || [])
             ]
         };
