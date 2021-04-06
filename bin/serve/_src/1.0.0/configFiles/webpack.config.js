@@ -41,10 +41,14 @@ module.exports = (logger, context, config, packageJson) => {
         mode: 'development',
         context: context,
 
- /*       cache: {
-            type: 'filesystem'
-        },
-*/
+        /*this sometimes crashes node??
+        cache: {
+            type: 'filesystem',
+            store: 'pack',
+            idleTimeout: 10000,
+            idleTimeoutForInitialStore: 30000
+        },*/
+
         // see https://webpack.js.org/configuration/devtool/ for available devtools
         devtool: 'source-map',
 
