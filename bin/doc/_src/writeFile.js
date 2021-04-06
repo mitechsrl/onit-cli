@@ -12,7 +12,7 @@ const generateBlock = (block) => {
     str += block.doc + '\n\n';
 
     if (block.params.length > 0) {
-        str += '### Params\n';
+        str += '#### Params\n';
     }
 
     block.params.forEach(param => {
