@@ -145,9 +145,9 @@ module.exports = (context, config, packageJson) => {
             'prop-types': 'PropTypes',
             utility: 'utility',
             d3: 'd3',
-            swal2b: 'Swal2b', //FIXME: 07-04-2021 qui per retrocompatibilità. Rimuovere
+            swal2b: 'Swal2b', //FIXME: 07-04-2021 qui per retrocompatibilità. Rimuovere in futuro
             lodash: '_',
-            toastr: 'toastr' //FIXME: 07-04-2021 qui per retrocompatibilità. Rimuovere
+            toastr: 'toastr', //FIXME: 07-04-2021 qui per retrocompatibilità. Rimuovere in futuro
             jquery: 'jQuery'
         },
 
