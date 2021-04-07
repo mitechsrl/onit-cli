@@ -41,13 +41,13 @@ module.exports = (logger, context, config, packageJson) => {
         mode: 'development',
         context: context,
 
-        /*this sometimes crashes node??
+        /* this sometimes crashes node??
         cache: {
             type: 'filesystem',
             store: 'pack',
             idleTimeout: 10000,
             idleTimeoutForInitialStore: 30000
-        },*/
+        }, */
 
         // see https://webpack.js.org/configuration/devtool/ for available devtools
         devtool: 'source-map',
@@ -178,9 +178,10 @@ module.exports = (logger, context, config, packageJson) => {
             'prop-types': 'PropTypes',
             utility: 'utility',
             d3: 'd3',
-            swal2b: 'Swal2b',
+            swal2b: 'Swal2b', // FIXME: 07-04-2021 qui per retrocompatibilità. Rimuovere
             lodash: '_',
-            toastr: 'toastr'
+            toastr: 'toastr', // FIXME: 07-04-2021 qui per retrocompatibilità. Rimuovere
+            jquery: 'jQuery'
         },
 
         // see https://webpack.js.org/configuration/stats/#stats-presets

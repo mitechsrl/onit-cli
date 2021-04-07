@@ -145,9 +145,10 @@ module.exports = (context, config, packageJson) => {
             'prop-types': 'PropTypes',
             utility: 'utility',
             d3: 'd3',
-            swal2b: 'Swal2b',
+            swal2b: 'Swal2b', //FIXME: 07-04-2021 qui per retrocompatibilità. Rimuovere
             lodash: '_',
-            toastr: 'toastr'
+            toastr: 'toastr' //FIXME: 07-04-2021 qui per retrocompatibilità. Rimuovere
+            jquery: 'jQuery'
         },
 
         // see https://webpack.js.org/configuration/stats/#stats-presets
