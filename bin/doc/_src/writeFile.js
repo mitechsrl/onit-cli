@@ -47,7 +47,13 @@ const writeFile = function (configFile, blocks, output) {
         const chapterKey = chapter;
 
         let chapterName = (configFile.chapterTitles[chapterKey] || '').replace(/[^a-zA-Z0-9]/g, '-');
-        if (chapterName) chapterName = '-' + chapterName;
+        if (chapterName) {
+            chapterName = '-' + chapterName;
+        } else {
+            try {
+                chapterName = '-' + blocks.chapters[chapterKey][0].title.trim();
+            } catch (e) {}
+        }
         const file = path.join(outDir, chapterKey + chapterName + '.md');
 
         const chapterFileContent = blocks.chapters[chapterKey].map(block => generateBlock(block)).join('\n\n');
