@@ -31,6 +31,15 @@ module.exports.parse = (fileContent, blocks) => {
             onitBlock.title = onitTitle.name + ' ' + onitTitle.description;
         }
 
+        const onitPriority = block.tags.find(t => t.tag === 'onitPriority');
+        if (onitPriority) {
+            onitBlock.priority = parseInt(onitPriority.name);
+        } else {
+            onitBlock.priority = 1000;
+        }
+
+        console.log("PRIOOOOO", onitBlock.priority);
+
         const onitType = block.tags.find(t => t.tag === 'onitType');
         if (onitType) {
             onitBlock.type = onitType.name + ' ' + onitType.description;

@@ -8,7 +8,13 @@ const path = require('path');
  * @returns
  */
 const generateBlock = (block) => {
-    let str = '## ' + block.title + '\n\n';
+    let str = '';
+
+    // autoset the title but only if the docs don't starts with his own title
+    block.doc = block.doc.trim();
+
+    if (!block.doc.startsWith('#')) { str += '## ' + block.title + '\n\n'; }
+
     str += block.doc + '\n\n';
 
     if (block.params.length > 0) {
@@ -55,6 +61,8 @@ const writeFile = function (configFile, blocks, output) {
             } catch (e) {}
         }
         const file = path.join(outDir, chapterKey + chapterName + '.md');
+
+        blocks.chapters[chapterKey].sort((a, b) => a.priority - b.priority);
 
         const chapterFileContent = blocks.chapters[chapterKey].map(block => generateBlock(block)).join('\n\n');
         fs.writeFileSync(file, chapterFileContent);

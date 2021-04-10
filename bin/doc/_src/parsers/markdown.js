@@ -48,6 +48,10 @@ module.exports.parse = (fileContent, blocks) => {
             break;
         }
 
+        // extract priority
+        const onitPriorityMatcher = section.match(/^[^\n\ra-z@]*@onitPriority +(.+)$/mi);
+        onitBlock.priority = parseInt((onitPriorityMatcher ? onitPriorityMatcher[1] : '1000').trim());
+
         // extract doc
         const docStart = section.indexOf('@onitDoc');
         if (docStart < 0) {
@@ -55,6 +59,8 @@ module.exports.parse = (fileContent, blocks) => {
             break;
         }
         onitBlock.doc = section.substr(docStart + onitDocLength).trim();
+
+        console.log("MARKDWON", onitBlock.priority);
 
         // append to the previous blocks
         blocks.chapters[onitBlock.chapter] = blocks.chapters[onitBlock.chapter] || [];
