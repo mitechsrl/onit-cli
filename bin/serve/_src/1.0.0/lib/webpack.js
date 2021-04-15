@@ -184,12 +184,16 @@ module.exports.start = async (logger, cwdOnitServeFile) => {
             watcher = startsWatch();
 
             // catch the SIGINT and then stop the watcher
+            let called = false;
             process.on('SIGINT', () => {
-                logger.warn('[WEBPACK] ' + componentName + ' - Stop webpack watcher...');
-                watcher.close(() => {
-                    logger.warn('[WEBPACK] ' + componentName + ' - Webpack watch stopped');
-                    resolve(0);
-                });
+                if (!called) {
+                    called = true;
+                    logger.warn('[WEBPACK] ' + componentName + ' - Stop webpack watcher...');
+                    watcher.close(() => {
+                        logger.warn('[WEBPACK] ' + componentName + ' - Webpack watch stopped');
+                        resolve(0);
+                    });
+                }
             });
         });
     });

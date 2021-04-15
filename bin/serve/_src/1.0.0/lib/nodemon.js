@@ -69,12 +69,14 @@ module.exports.start = async (logger, onitServeFile, debug, reload, timeout) => 
         process.on('SIGINT', () => {
             logger.warn('Stop/reset nodemon...');
             if (delay) {
-                // delay still active/nodemon not launched. just stop the timer
+                // delay still active, nodemon not already launched. Just stop the timer.
                 clearTimeout(delay);
+                resolve(0);
             } else {
-                nodemon.reset();
+                nodemon.once('exit', function () {
+                    resolve(0);
+                }).emit('quit');
             }
-            resolve(0);
         });
     });
 };
