@@ -28,26 +28,19 @@ module.exports = (logger, context, config, packageJson) => {
     let packagePublishPath = packageJson.mountPath || (packageJson.mitown || {}).mountPath || packageJson.name.replace('@mitech/', '');
     if (!packagePublishPath.startsWith('/')) packagePublishPath = '/' + packagePublishPath;
 
+    // progress message handler
     let _debounceMessage = '';
     const progressHandler = (percentage, message, ...args) => {
-        // console.log('[WEBPACK] ' + componentName + ' ' + percentage);
         if ((percentage < 0.99) && (message !== _debounceMessage)) {
             const p = (percentage * 100).toFixed(0);
             _debounceMessage = message;
             logger.warn('[WEBPACK] ' + componentName + ' build ' + p + '% ' + message);
         }
     };
+
     return {
         mode: 'development',
         context: context,
-
-        /* this sometimes crashes node??
-        cache: {
-            type: 'filesystem',
-            store: 'pack',
-            idleTimeout: 10000,
-            idleTimeoutForInitialStore: 30000
-        }, */
 
         // see https://webpack.js.org/configuration/devtool/ for available devtools
         devtool: 'source-map',
@@ -56,19 +49,12 @@ module.exports = (logger, context, config, packageJson) => {
         module: {
             rules: [
                 {
+                    // pack css as standalone files
                     test: /\.css$/i,
                     use: [
                         MiniCssExtractPlugin.loader,
                         require.resolve('css-loader')
                     ]
-                    /* use: [{
-                        loader: require.resolve('style-loader'),
-                        options: { injectType: 'singletonStyleTag' }
-                    },
-                    {
-                        loader: require.resolve('css-loader')
-                    }
-                    ] */
                 },
 
                 // see https://webpack.js.org/loaders/sass-loader/
@@ -80,14 +66,12 @@ module.exports = (logger, context, config, packageJson) => {
                             loader: require.resolve('css-loader'),
                             options: { url: false }
                         },
-
                         {
                             loader: require.resolve('sass-loader'),
                             options: {
                                 implementation: require('sass')
                             }
                         }
-
                     ]
                 },
                 {
@@ -123,16 +107,21 @@ module.exports = (logger, context, config, packageJson) => {
 
         // https://webpack.js.org/plugins/
         plugins: [
+
+            // force case sensitive to be correct (thinking of windows in detail)
             new CaseSensitivePathsPlugin(),
 
+            // show human readable errors
             new FriendlyErrorsWebpackPlugin({
                 clearConsole: false
             }),
 
+            // delete old webpack stuff on start
             new CleanWebpackPlugin({
                 cleanStaleWebpackAssets: false
             }),
 
+            // show a compilation progress info
             new ProgressPlugin({
                 handler: progressHandler
             }),

@@ -41,4 +41,5 @@ if (process.argv.length === 3 && process.argv[2] === '-v') {
     } catch (e) {
         logger.error(e.message || e);
     }
+    process.exit();
 })();

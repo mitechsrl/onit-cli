@@ -6,6 +6,7 @@ const strip = require('strip-comments');
 const fs = require('fs');
 const ProgressBarPlugin = require('progress-bar-webpack-plugin');
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
+const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin');
 
 // some static config options
 const baseConfig = JSON.parse(strip(fs.readFileSync(path.join(__dirname, './options.jsonc')).toString()));
@@ -27,6 +28,7 @@ module.exports = (context, config, packageJson) => {
         mode: 'production',
         context: context,
         watch: false,
+
         // see https://webpack.js.org/configuration/devtool/ for available devtools
         // add source maps also on production mode so we can debug a production-deployed page with more accuracy if needed
         devtool: 'source-map',
@@ -35,6 +37,7 @@ module.exports = (context, config, packageJson) => {
         module: {
             rules: [
                 {
+                    // pack css as standalone files
                     test: /\.css$/i,
                     use: [
                         MiniCssExtractPlugin.loader,
@@ -54,7 +57,6 @@ module.exports = (context, config, packageJson) => {
                         {
                             loader: require.resolve('sass-loader'),
                             options: {
-                                // Prefer `dart-sass`
                                 implementation: require('sass')
                             }
                         }
@@ -93,20 +95,21 @@ module.exports = (context, config, packageJson) => {
 
         // https://webpack.js.org/plugins/
         plugins: [
+
+            // force case sensitive to be correct (thinking of windows in detail)
             new CaseSensitivePathsPlugin(),
+
+            // show human readable errors
+            new FriendlyErrorsWebpackPlugin({
+                clearConsole: false
+            }),
 
             // show a progress bar in console while building
             // https://github.com/clessg/progress-bar-webpack-plugin#readme
             new ProgressBarPlugin(),
 
             new MiniCssExtractPlugin({
-                filename: (pathData, assetInfo) => {
-                    // the css name will be composed with the file name just to be easier to find them
-                    // (not particular useful than hand made human check)
-                    const name = ((pathData.chunk || {}).name || '').split(path.sep).pop();
-                    return (name ? name + '-' : '') + '[contenthash].min.css';
-                }
-                // filename: '[contenthash]-[name].min.css' // use [contenthash] on prod build
+                filename: '[contenthash].min.css'
             }),
 
             // these plugin instances will create an html file(for chunck dependency inclusion) for each entry point
@@ -117,6 +120,7 @@ module.exports = (context, config, packageJson) => {
                 while (filename.indexOf(path.sep) >= 0) {
                     filename = filename.replace(path.sep, '_');
                 }
+
                 // create a plugin instance
                 // see https://github.com/jantimon/html-webpack-plugin#options
                 return new HtmlWebpackPlugin({
@@ -145,9 +149,9 @@ module.exports = (context, config, packageJson) => {
             'prop-types': 'PropTypes',
             utility: 'utility',
             d3: 'd3',
-            swal2b: 'Swal2b', //FIXME: 07-04-2021 qui per retrocompatibilità. Rimuovere in futuro
+            swal2b: 'Swal2b', // FIXME: 07-04-2021 qui per retrocompatibilità. Rimuovere in futuro
             lodash: '_',
-            toastr: 'toastr', //FIXME: 07-04-2021 qui per retrocompatibilità. Rimuovere in futuro
+            toastr: 'toastr', // FIXME: 07-04-2021 qui per retrocompatibilità. Rimuovere in futuro
             jquery: 'jQuery'
         },
 
