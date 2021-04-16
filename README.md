@@ -280,3 +280,10 @@ Similmente a **npm link**, eseguendo **onit link** all'interno di una directory 
 TODO
 
 
+### Windows powershell
+
+Note per windows powershell:
+
+** Esecuzione cmdlet per default**
+
+Lanciando il comando **onit**, powershell esegue per default il comando **onit.cmd** anzichè **onit.ps1** dipendentemente dalla variabile di ambiente di windows **PATHEXT**. Verificare in quella variabile se la dicitura **.ps1** è presente. Deve essere specificata in ordine **prima** di **.cmd**.
