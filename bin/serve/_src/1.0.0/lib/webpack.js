@@ -25,16 +25,17 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 const path = require('path');
 const _ = require('lodash');
-const webpack = require('webpack');
 const onitFileLoader = require('../../../../../lib/onitFileLoader');
 const webpackUtils = require('../../../../../lib/webpack/utils');
 const fs = require('fs');
 const { loadWebpackComponent } = require('./loadWebpackComponent');
+const webpackWatcherPromiseGenerator = require('./webpackWatcherPromiseGenerator');
 
 module.exports.start = async (logger, cwdOnitServeFile) => {
     // load the default config
     const webpackConfigFactory = require('../configFiles/webpack.config');
 
+    // cache for the webpack configurations to be run
     const webpackConfigs = [];
 
     // create a webpack config for the current directory and
@@ -62,18 +63,21 @@ module.exports.start = async (logger, cwdOnitServeFile) => {
                 // this is not a onit-valid direcotry. Just skip this load
                 logger.log('Skip webpack setup for the current directory');
             } else if (error) {
-            // the file was found but the load failed. This is a serious error, rethrow it.
+                // the file was found but the load failed. This is a serious error, rethrow it.
                 throw error;
             }
         }
 
+        // continue if we have a valid onitRun file
         if (cwdOnitBuildFile) {
+            // get the package json in the current directory
             cwdPackageJson = JSON.parse(fs.readFileSync(cwdPackageJson).toString());
             // create a webpack config for the current path project
             let cwdWebpackConfig = webpackConfigFactory(logger, process.cwd(), {
                 entryPoints: entryPoints
             }, cwdPackageJson);
 
+            // merge the webpack exports if any
             const buildWebpackData = (cwdOnitBuildFile.json.export || {}).webpack;
             if (buildWebpackData) { cwdWebpackConfig = _.mergeWith(cwdWebpackConfig, buildWebpackData, webpackUtils.webpackMergeFn); }
 
@@ -103,6 +107,7 @@ module.exports.start = async (logger, cwdOnitServeFile) => {
     // create one webpack config for each one of the components loaded in dev environment
     for (const component of components) {
         let webpackConfig = loadWebpackComponent(component, logger, webpackConfigFactory);
+
         // if the current project path is a module, we auto-inject required dependency: onit
         if (onitWebpackDependencies !== null) {
             webpackConfig = _.mergeWith(webpackConfig, onitWebpackDependencies, webpackUtils.webpackMergeFn);
@@ -112,79 +117,7 @@ module.exports.start = async (logger, cwdOnitServeFile) => {
         webpackConfigs.push(webpackConfig);
     }
 
-    // create a list of promises, each one will launch a webpack watcher managing one single config.
-    const promises = webpackConfigs.map(webpackConfig => {
-        return new Promise(resolve => {
-            // watcher callback
-            const componentName = path.basename(webpackConfig.context);
-
-            let booting = true;
-            let hadErrorBoot = false;
-            let startsWatch = null;
-            let watcher = null;
-
-            // callback for build completed
-            const watcherCallback = (err, stats) => {
-                // Errors on boot requires reboot because some files are not generated on sequentials partial builds.
-                // This is probably caused by some misconfiguration, but now can't find where it is.
-                if (hadErrorBoot) {
-                    hadErrorBoot = false;
-                    watcher.close(() => {
-                        booting = true;
-                        watcher = startsWatch();
-                    });
-                    return;
-                }
-
-                // do we had internal errors?
-                if (err) {
-                    // logger.error('[WEBPACK] ' + componentName + ' - compile error');
-                    // logger.error(err.stack || err);
-                    // if (err.details) logger.error(err.details);
-                    if (booting) hadErrorBoot = true;
-                    return;
-                }
-
-                // do we had compile errors?
-                // const info = stats.toJson();
-                if (stats.hasErrors()) {
-                    // logger.error('[WEBPACK] ' + componentName + ' - compile error');
-                    // info.errors.forEach(e => logger.error(e));
-                    if (booting) hadErrorBoot = true;
-                    return;
-                }
-
-                booting = false;
-                logger.info('[WEBPACK] ' + componentName + ' - Compile completed');
-            };
-
-            startsWatch = function () {
-                hadErrorBoot = false;
-                booting = true;
-                // create a compiler based on the config
-                return webpack(webpackConfig).watch({
-                    aggregateTimeout: 700,
-                    ignored: ['files/**/*.js', 'node_modules/**']
-                }, watcherCallback);
-            };
-
-            // start the watcher!
-            watcher = startsWatch();
-
-            // catch the SIGINT and then stop the watcher
-            let called = false;
-            process.on('SIGINT', () => {
-                if (!called) {
-                    called = true;
-                    logger.warn('[WEBPACK] ' + componentName + ' - Stop webpack watcher...');
-                    watcher.close(() => {
-                        logger.warn('[WEBPACK] ' + componentName + ' - Webpack watch stopped');
-                        resolve(0);
-                    });
-                }
-            });
-        });
-    });
-
-    return Promise.all(promises);
+    // generate the array of webpack watcher instances and run'em all
+    const webpackWatchersPromises = webpackWatcherPromiseGenerator(webpackConfigs, logger);
+    return Promise.all(webpackWatchersPromises);
 };
