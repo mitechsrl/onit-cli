@@ -49,6 +49,12 @@ module.exports = (logger, context, config, packageJson) => {
         module: {
             rules: [
                 {
+                    test: /\.m?js/,
+                    resolve: {
+                        fullySpecified: false
+                    }
+                },
+                {
                     // pack css as standalone files
                     test: /\.css$/i,
                     use: [
