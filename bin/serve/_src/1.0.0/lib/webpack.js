@@ -106,7 +106,7 @@ module.exports.start = async (logger, cwdOnitServeFile) => {
 
     // create one webpack config for each one of the components loaded in dev environment
     for (const component of components) {
-        let webpackConfig = loadWebpackComponent(component, logger, webpackConfigFactory);
+        let webpackConfig = await loadWebpackComponent(component, logger, webpackConfigFactory);
 
         // if the current project path is a module, we auto-inject required dependency: onit
         if (onitWebpackDependencies !== null) {

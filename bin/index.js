@@ -23,14 +23,14 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
 
-const {printHelp} = require('../lib/command.js');
+const { printHelp } = require('../lib/command.js');
 
 module.exports = {
-    info:"",
-    help:[
-        ['-v','Stampa la versione della CLI']
+    info: '',
+    help: [
+        ['-v', 'Stampa la versione della CLI']
     ],
-    cmd:  (basepath, parameters)=>{
+    cmd: (basepath, parameters) => {
         printHelp(basepath);
     }
-}
+};
