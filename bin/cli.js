@@ -28,12 +28,30 @@ OTHER DEALINGS IN THE SOFTWARE.
 const logger = require('../lib/logger');
 const command = require('../lib/command');
 const header = require('../lib/header');
+const spawn = require('../lib/spawn');
 
-// mostra versione globale CLI
+// show CLI version
 if (process.argv.length === 3 && process.argv[2] === '-v') {
     header();
     process.exit(0);
 }
+
+// after some time (2 minutes), just check for newer versions and show a info in the console
+// This is just for a reminder, doesn't do anything else.
+setTimeout(() => {
+    spawn('npm', ['view', '@mitech/onit-cli', '--registry=https://registry.npmjs.org/', 'version'], false, { shell: true, cwd: __dirname })
+        .then(status => {
+            const semverGt = require('semver/functions/gt');
+            const fs = require('fs');
+            const path = require('path');
+            const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, '../package.json')));
+            status.data = status.data.trim();
+            const newVersion = semverGt(status.data.trim(), packageJson.version);
+            if (newVersion) {
+                logger.warn('[ONIT-CLI UPDATE] A new version of onit-cli is available. Current: ' + packageJson.version + ', newer: ' + status.data + '. Install with <npm install -g ' + packageJson.name + '@' + status.data + '>');
+            }
+        });
+}, 120000);
 
 (async () => {
     try {
@@ -43,3 +61,4 @@ if (process.argv.length === 3 && process.argv[2] === '-v') {
     }
     process.exit();
 })();
+
