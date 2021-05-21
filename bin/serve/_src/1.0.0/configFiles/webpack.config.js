@@ -54,6 +54,9 @@ module.exports = (logger, context, config, packageJson) => {
                         fullySpecified: false
                     }
                 },
+
+                // https://webpack.js.org/loaders/css-loader/ 
+                // https://webpack.js.org/plugins/mini-css-extract-plugin/
                 {
                     // pack css as standalone files
                     test: /\.css$/i,
@@ -80,16 +83,14 @@ module.exports = (logger, context, config, packageJson) => {
                         }
                     ]
                 },
+
+                // https://webpack.js.org/loaders/babel-loader/
                 {
                     test: /\.jsx$/,
                     use: {
                         loader: require.resolve('babel-loader'),
                         options: babelRcJs
                     }
-                },
-                {
-                    test: /\.htmlWebpackPlugin\.ejs$/,
-                    loader: require.resolve('raw-loader')
                 }
             ]
         },
@@ -114,7 +115,8 @@ module.exports = (logger, context, config, packageJson) => {
         // https://webpack.js.org/plugins/
         plugins: [
 
-            // force case sensitive to be correct (thinking of windows in detail)
+            // force case sensitive to be correct (thanks windows)
+            // https://www.npmjs.com/package/case-sensitive-paths-webpack-plugin
             new CaseSensitivePathsPlugin(),
 
             // show human readable errors
@@ -132,6 +134,8 @@ module.exports = (logger, context, config, packageJson) => {
                 handler: progressHandler
             }),
 
+            // separate css from js files
+            // https://webpack.js.org/plugins/mini-css-extract-plugin/
             new MiniCssExtractPlugin({
                 filename: '[contenthash].min.css' // use [contenthash] on prod build
             }),
@@ -148,7 +152,12 @@ module.exports = (logger, context, config, packageJson) => {
                 // create a plugin instance
                 // see https://github.com/jantimon/html-webpack-plugin#options
                 return new HtmlWebpackPlugin({
-                    template: path.join(__dirname, '../../../../../configFiles/common/chunksTemplate.htmlWebpackPlugin.ejs'),
+                    // we need just the list of tags. Position in the page is managed by onit render
+                    templateContent: ({ htmlWebpackPlugin }) => `
+                        ${htmlWebpackPlugin.tags.headTags}
+                        ${htmlWebpackPlugin.tags.bodyTags}
+                    `,
+                    inject: false, // do not add other tags than the ones from templateContent
                     filename: filename + '.chunks.ejs',
                     // this will make the public path by package: dist/mitown, dist/mit-ask etc...
                     publicPath: '/dist-fe' + packagePublishPath,
