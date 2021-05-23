@@ -5,10 +5,14 @@
     "main": "index.js",
     "bin": {
         "onit": "bin/cli.js"
-        
     },
     "author": "Mitech Srl.",
     "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/mitechsrl/onit-cli.git"
+    },
+    "homepage": "https://github.com/mitechsrl/onit-cli",
     "dependencies": {
         "@babel/core": "^7.12.3",
         "@babel/plugin-proposal-class-properties": "^7.12.1",
