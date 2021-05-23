@@ -12,7 +12,7 @@ npm install -g @mitech/onit-cli
 ```
 
 ## Licenza
-[MIT](https://github.com/angular/angular-cli/blob/master/LICENSE)
+[MIT](./LICENSE)
 
 
 ## Documentazione
