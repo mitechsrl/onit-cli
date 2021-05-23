@@ -5,6 +5,7 @@
     "main": "index.js",
     "bin": {
         "onit": "bin/cli.js"
+        
     },
     "author": "Mitech Srl.",
     "license": "MIT",
