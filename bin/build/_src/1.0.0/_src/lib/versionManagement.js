@@ -30,7 +30,6 @@ const replace = require('./replace').replace;
 const inquirer = require('inquirer');
 const path = require('path');
 const fs = require('fs');
-const logger = require('../../../../../../lib/logger');
 
 module.exports.prompt = async (buildTarget, vars, cwdPackageJson, targetDir) => {
     const versionManagement = buildTarget.version;
