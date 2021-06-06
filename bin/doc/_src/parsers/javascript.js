@@ -45,6 +45,8 @@ module.exports.parse = (fileContent, blocks) => {
         });
         onitBlock.doc = stringify(onitDoc);
 
+        // Parser for onitChapter
+        // The chapter is a string who must match something from the current onitdocumentation.config file, property 'chapters'
         const onitChapter = block.tags.find(t => t.tag === 'onitChapter');
         if (onitChapter) {
             onitBlock.chapter = onitChapter.name;
@@ -52,11 +54,13 @@ module.exports.parse = (fileContent, blocks) => {
             return;
         }
 
+        // Parser for title. NOTE: This title is this page title, does not ends up into jekill.
         const onitTitle = block.tags.find(t => t.tag === 'onitTitle');
         if (onitTitle) {
             onitBlock.title = onitTitle.name + ' ' + onitTitle.description;
         }
 
+        // Parser for onitPriority. Just for internal sorting purposes
         const onitPriority = block.tags.find(t => t.tag === 'onitPriority');
         if (onitPriority) {
             onitBlock.priority = parseInt(onitPriority.name);
@@ -64,8 +68,7 @@ module.exports.parse = (fileContent, blocks) => {
             onitBlock.priority = 1000;
         }
 
-        console.log("PRIOOOOO", onitBlock.priority);
-
+        // ?
         const onitType = block.tags.find(t => t.tag === 'onitType');
         if (onitType) {
             onitBlock.type = onitType.name + ' ' + onitType.description;

@@ -23,7 +23,6 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
 
-
 var glob = require('glob-all');
 var fs = require('fs');
 const writeFile = require('./writeFile');
@@ -34,14 +33,7 @@ module.exports.generate = function (config, outputPath, logger) {
         const options = {
             ignore: [
                 './node_modules/**/*',
-                './extras/**/*',
-                './build/**/*',
-                './assets/**/*',
                 './dist/**/*',
-                './dist-fe/**/*',
-                './docs/**/*',
-                './onit-doc/**/*',
-                './test/**/*',
                 ...(config.ignore || [])
             ]
         };
@@ -81,5 +73,5 @@ module.exports.generate = function (config, outputPath, logger) {
         });
     });
 };
-// console.log(extract.file('some-file.js'), { cwd: 'some/path' });
+
 
