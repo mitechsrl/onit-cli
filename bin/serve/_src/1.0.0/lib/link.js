@@ -22,29 +22,27 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
+const path = require('path');
+const fs = require('fs').promises;
+const spawn = require('../../../../../lib/spawn');
 
-const persistent = require('../../../lib/persistent');
+const isWindows = (process.env.OS || '').toUpperCase().includes('WIN');
+const npmExec = isWindows ? 'npm.cmd' : 'npm';
 
-module.exports.info = 'Dev dependency link utility';
-module.exports.help = [
-    ['-t', 'tag']
-];
-
-module.exports.cmd = async function (basepath, params, logger) {
-    
-    let tag = params.get('-t');
-    if (!tag.found || !tag.value){
-        logger.error("Nessun tag specificato. Usa -t TAG per specificarne uno");
-        return;
-    }else{
-        tag = tag.value;
+async function start (logger, onitServeFile) {
+    // do we have links to be checked?
+    if (!onitServeFile.json.link || onitServeFile.json.link.length === 0) {
+        return null;
     }
 
+    for await (const l of onitServeFile.json.link) {
+        const p = path.resolve(process.cwd(), './node_modules', './' + l.link);
 
-    const config = persistent.get("dependency-link");
-
-    delete config[tag];
-    persistent.set("dependency-link", config);
-    
-    logger.info("Tag "+tag+" rimosso")
-};
+        const stat = await fs.lstat(p);
+        if (!stat.isSymbolicLink()) {
+            logger.warn(p + ' is not a symlink. Adding with <npm link>');
+            await spawn(npmExec, ['link', l.link], true, { shell: true });
+        }
+    };
+}
+module.exports.start = start;

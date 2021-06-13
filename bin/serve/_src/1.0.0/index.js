@@ -26,6 +26,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 const pm2Dev = require('./lib/pm2');
 const nodemon = require('./lib/nodemon');
 const webpack = require('./lib/webpack');
+const links = require('./lib/link');
 
 module.exports.start = async function (onitServeFile, version, basepath, params, logger) {
     const minusW = params.get('-w').found;
@@ -33,6 +34,9 @@ module.exports.start = async function (onitServeFile, version, basepath, params,
     const debug = params.get('-debug').found;
     const reload = params.get('-reload').found;
     try {
+        logger.log('Verifico links...');
+        await links.start(logger, onitServeFile);
+
         // pre-serve: run sequentially waiting for each async resolve
         logger.log('Eseguo <Nodemon startup>...');
         const launchedCount = await pm2Dev.start(onitServeFile);

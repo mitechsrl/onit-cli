@@ -45,7 +45,7 @@ module.exports.cmd = async function (basepath, params, logger) {
 
         // load the buildFile
         const onitServeFile = await onitFileLoader.load('serve', process.cwd(), manualSeveFile.found ? manualSeveFile.value : null);
-        logger.warn('Uso file serve ' + onitServeFile.filename);
+        logger.warn('Uso files serve ' + onitServeFile.sources.join(', '));
 
         // lock to the required builder version or get the most recent one
         const requiredVersion = onitServeFile.json.serveVersion || '*';

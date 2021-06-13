@@ -1,9 +1,14 @@
 # Onit-cli
 Onit dev CLI utility
 
-### Installazione
+### Installazione da repository git
  - Clona questo repository
  - npm install && npm link
+
+### Installazione da npm
+```
+npm install -g @mitech/onit-cli
+```
 
 
 # Comandi 
@@ -11,9 +16,21 @@ Onit dev CLI utility
 ```
 onit serve # utility serve di sviluppo
 onit build # utility build progetto
-onit link # utility generazione tags di dipendenza 
+onit docs #tuility estrazione/generazione documentazione
 onit labels # utility gestione lebels
 ```
+
+### Files di configurazione locali/globali
+
+I comandi **serve** e **build** necessitano di files di configurazione(vedi rispettive sezioni per info).
+
+I files di configurazione possono esssere locali/globali:
+
+- globali: file nominato **something.config.[js,json]**, contenente configurazioni statiche e/o globali per la funzione richiesta, indipendenti dal sistema, il quale è previsto possa essere posto **in staging git**
+
+- locali: file nominato **something.config.local.[js,json]**, contenente configurazioni specifiche del sistema corrente, come puntamenti a files esterni al progetto oppure configurazioni locali configurate dallo sviluppatore. Tale file **non è previsto venga messo in staging git**. Usa questo file per aggiungere comandi custom o dipendenti dalla struttura fs locale.
+
+Il sistema legge automaticamente il file **.local** ed esegue un merge della sua configurazione con quella del file **non .local**.
 
 
 ### onit serve
@@ -26,6 +43,7 @@ Il file contiene una serie di istruzioni per il lancio del progetto in ambiente 
 ```
 {
     "component": boolean, se true avvia il progetto corrente in modalità "component",
+    "link": utility helper allo sviluppo per la gestione automatica di npm link,
     "loadComponents": Array<Object>, array di componenti da caricare, dove Object segue la signature definita in loadObject,
     "environment": Object, oggetto iniettato in environment app
 }
@@ -92,6 +110,17 @@ In questo caso occorre definire la lista di componenti da caricare tramite la pr
 
 Il sistema determina i componenti da caricare in base alla lista loadComponents a cui aggiunge automaticamente tutti i componenti installati come dipendenza in node_modules. Successivamente lancia *mitown* (che deve essere installato come dipendenza di sviluppo, nella versione mitown-dev) il quale di conseguenza carica la lista di componenti determinata in precedenza.
 
+##### link
+
+```
+[
+    {
+        "link": "something"
+    }
+]
+```
+
+Questo array di oggetti viene utilizzato per verificare la presenza dei moduli citati come symlink locali. Ad esempio, se il componente **something** è presente nella directory **node_modules/something** ma **non è un symlink**, il serve eseguirà il comando **npm link something**. Questo tool è utilizzabile per mitigare la problematica di perdita dei symlink in npm@6 
 
 ##### loadObject
 
@@ -268,12 +297,6 @@ Ogni comando deve essere nel formato:
 ```
 
 **.onitbuildignore** può essere utilizzato per ignorare alcuni files dal processo di build (i quali quindi non finiranno nel pacchetto di build). Il formato è simile a **.gitignore** (Vedi https://git-scm.com/docs/gitignore)
-
-### onit link
-Utility per la gestione di tags di dipendenza.
-Similmente a **npm link**, eseguendo **onit link** all'interno di una directory rapresentante un pacchetto npm (quindi con package.json), memorizza nel sistema una coppia **<packageName, projectPath>**, la quale permette poi l'uso di **packageName** come stringa di dipendenza in **onitBuild.package.[js|json]/dependencies**. Il sistema in fase di build utilizzerà quindi le definizioni opportune trovate in **projectPath** per compilare il progetto attuale.
-
-**onit link list** mostra la lsta di links memorizzati, **onit link delete** elimina un tag precedentemente creato 
 
 
 ### onit labels
