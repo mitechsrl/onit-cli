@@ -26,6 +26,7 @@ const path = require('path');
 const fs = require('fs').promises;
 const spawn = require('../../../../../lib/spawn');
 
+// windows being windows.. need a ".cmd" extension
 const isWindows = (process.env.OS || '').toUpperCase().includes('WIN');
 const npmExec = isWindows ? 'npm.cmd' : 'npm';
 
@@ -35,24 +36,31 @@ async function start (logger, onitServeFile) {
         return null;
     }
 
+    // if we have some links definitions iterate over them and check each one
     for await (const l of onitServeFile.json.link) {
         const p = path.resolve(process.cwd(), './node_modules', './' + l.link);
         let stat = null;
         let error = null;
 
+        // use lstat instead of stat so we can use his  isSymbolicLink function
         try {
             stat = await fs.lstat(p);
         } catch (e) {
             error = e;
         }
 
-        if (stat && !stat.isSymbolicLink()) {
-            logger.warn(p + ' non è un symlink. eseguo <npm link ' + l.link + '>');
-            await spawn(npmExec, ['link', l.link], true, { shell: true });
-        } else if (error && error.code === 'ENOENT') {
+        // does the  file exists? If not, create it
+        if (error && error.code === 'ENOENT') {
             logger.warn(p + ' does not exists. Adding with <npm link ' + l.link + '>');
             const exit = await spawn(npmExec, ['link', l.link], true, { shell: true });
             if (exit.exitCode !== 0) throw new Error(exit.data);
+
+        // is this a symlink?
+        } else if (stat && !stat.isSymbolicLink()) {
+            logger.warn(p + ' non è un symlink. eseguo <npm link ' + l.link + '>');
+            await spawn(npmExec, ['link', l.link], true, { shell: true });
+
+        // got some other error
         } else if (error) {
             throw error;
         }
