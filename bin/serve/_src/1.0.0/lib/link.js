@@ -47,10 +47,10 @@ async function start (logger, onitServeFile) {
         }
 
         if (stat && !stat.isSymbolicLink()) {
-            logger.warn(p + ' is not a symlink. Adding with <npm link>');
+            logger.warn(p + ' non è un symlink. eseguo <npm link ' + l.link + '>');
             await spawn(npmExec, ['link', l.link], true, { shell: true });
         } else if (error && error.code === 'ENOENT') {
-            logger.warn(p + ' does not exists. Adding with <npm link>');
+            logger.warn(p + ' does not exists. Adding with <npm link ' + l.link + '>');
             const exit = await spawn(npmExec, ['link', l.link], true, { shell: true });
             if (exit.exitCode !== 0) throw new Error(exit.data);
         } else if (error) {
