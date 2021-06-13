@@ -37,11 +37,24 @@ async function start (logger, onitServeFile) {
 
     for await (const l of onitServeFile.json.link) {
         const p = path.resolve(process.cwd(), './node_modules', './' + l.link);
+        let stat = null;
+        let error = null;
 
-        const stat = await fs.lstat(p);
-        if (!stat.isSymbolicLink()) {
+        try {
+            stat = await fs.lstat(p);
+        } catch (e) {
+            error = e;
+        }
+
+        if (stat && !stat.isSymbolicLink()) {
             logger.warn(p + ' is not a symlink. Adding with <npm link>');
             await spawn(npmExec, ['link', l.link], true, { shell: true });
+        } else if (error && error.code === 'ENOENT') {
+            logger.warn(p + ' does not exists. Adding with <npm link>');
+            const exit = await spawn(npmExec, ['link', l.link], true, { shell: true });
+            if (exit.exitCode !== 0) throw new Error(exit.data);
+        } else if (error) {
+            throw error;
         }
     };
 }
