@@ -23,7 +23,6 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
 
-
 module.exports.parse = (fileContent, blocks) => {
     /* @onitTitle Database Initialization
     * @onitChapter 1.0.1.1
@@ -34,7 +33,7 @@ module.exports.parse = (fileContent, blocks) => {
 
     const onitTitleLength = '@onitTitle'.length;
     const onitDocLength = '@onitDoc'.length;
-    var startFrom = 0;
+    let startFrom = 0;
     while (true) {
         const onitBlock = {
             type: '',
@@ -86,7 +85,7 @@ module.exports.parse = (fileContent, blocks) => {
         }
         onitBlock.doc = section.substr(docStart + onitDocLength).trim();
 
-        console.log("MARKDWON", onitBlock.priority);
+        console.log('MARKDWON', onitBlock.priority);
 
         // append to the previous blocks
         blocks.chapters[onitBlock.chapter] = blocks.chapters[onitBlock.chapter] || [];

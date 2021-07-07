@@ -110,8 +110,6 @@ module.exports.start = async function (onitBuildFile, builderVersion, basepath, 
         await versionManagement.updateAfter(targetDir, packageVersion.after);
     }
 
-
-
     // extra steps management
     if (extraSteps.length > 0) {
         logger.log('');

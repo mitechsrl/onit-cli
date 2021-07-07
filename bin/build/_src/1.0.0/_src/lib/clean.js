@@ -26,7 +26,6 @@ OTHER DEALINGS IN THE SOFTWARE.
 const path = require('path');
 const fs = require('fs');
 const fse = require('fs-extra');
-const find = require('find');
 const loadIgnore = require('../../../../../../lib/loadIgnore');
 /**
  *

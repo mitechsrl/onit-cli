@@ -1,4 +1,4 @@
-#! /usr/bin/env node
+#!/usr/bin/env node
 
 /*
 Copyright (c) 2021 Mitech S.R.L.
@@ -33,6 +33,8 @@ const npmVersionCheck = require('../lib/npmVersionCheck');
 // show CLI version
 if (process.argv.length === 3 && process.argv[2] === '-v') {
     header();
+
+    // eslint-disable-next-line no-process-exit
     process.exit(0);
 }
 
@@ -46,6 +48,7 @@ npmVersionCheck();
     } catch (e) {
         logger.error(e);
     }
+    // eslint-disable-next-line no-process-exit
     process.exit();
 })();
 

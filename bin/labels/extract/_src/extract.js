@@ -14,13 +14,16 @@ const fs = require('fs');
 
 if (process.argv.length < 5) {
     console.log('Uso: node label-extract.js applicationId page filename');
+
+    // eslint-disable-next-line no-process-exit
     process.exit(0);
 }
 
 let file = fs.readFileSync(process.argv[4]);
 file = file.toString();
 
-const regex = /i18n\(([^\)]+)\)/g;
+// const regex = /i18n\(([^\)]+)\)/g;
+const regex = /i18n\(([^)]+)\)/g;
 
 let m;
 let labels = [];

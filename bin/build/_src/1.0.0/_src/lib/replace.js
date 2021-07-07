@@ -23,7 +23,6 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
 
-
 module.exports.replace = function (obj, vars) {
     const stringReplace = function (v) {
         while (true) {
@@ -55,4 +54,4 @@ module.exports.replace = function (obj, vars) {
 
     _replace(obj);
     return obj;
-}
+};

@@ -23,8 +23,8 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
 
-var glob = require('glob-all');
-var fs = require('fs');
+const glob = require('glob-all');
+const fs = require('fs');
 const writeFile = require('./writeFile');
 const path = require('path');
 
@@ -73,5 +73,4 @@ module.exports.generate = function (config, outputPath, logger) {
         });
     });
 };
-
 

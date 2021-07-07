@@ -23,16 +23,18 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
 
-
 module.exports = {
     cacheDirectory: true,
     cacheCompression: false,
     plugins: [
         //  https://babeljs.io/docs/en/babel-plugin-proposal-class-properties
-        require.resolve('@babel/plugin-proposal-class-properties')
+        // require.resolve('@babel/plugin-proposal-class-properties')
     ],
     presets: [
         // https://babeljs.io/docs/en/babel-preset-react
-        require.resolve('@babel/preset-react')
+        require.resolve('@babel/preset-react'),
+
+        // https://babeljs.io/docs/en/babel-preset-react
+        require.resolve('@babel/preset-env')
     ]
 };

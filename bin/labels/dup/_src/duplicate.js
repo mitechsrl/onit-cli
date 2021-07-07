@@ -59,7 +59,7 @@ module.exports.checkDirectory = function (dir, logger) {
             const duplicates = Object.values(map).filter(m => m.count > 1);
 
             let doSave = false;
-            if (previousFilesDuplicates.length>0) {
+            if (previousFilesDuplicates.length > 0) {
                 doSave = true;
                 logger.log('Duplicati da files precedenti: ' + previousFilesDuplicates.length);
             }
@@ -68,12 +68,11 @@ module.exports.checkDirectory = function (dir, logger) {
                 logger.log('Duplicati nello stesso file trovati: ' + duplicates.length);
             }
             if (doSave) {
-                
                 json.labels = Object.values(map).map(m => m.label);
-                if (json.labels.length === 0){
-                    logger.warn("File risultante vuoto. Il file verrà rimosso.")
+                if (json.labels.length === 0) {
+                    logger.warn('File risultante vuoto. Il file verrà rimosso.');
                     fs.unlinkSync(filename);
-                }else{
+                } else {
                     fs.writeFileSync(filename, JSON.stringify(json, null, 4));
                 }
             }

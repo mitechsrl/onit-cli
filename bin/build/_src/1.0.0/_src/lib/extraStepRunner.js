@@ -23,7 +23,6 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
 
-
 const spawn = require('../../../../../../lib/spawn');
 const replace = require('./replace').replace;
 
@@ -38,14 +37,14 @@ module.exports = (logger, step, vars) => {
 
     return Promise.resolve()
         .then(() => {
-        // handler for cmd-type step
+            // handler for cmd-type step
             if (step.cmd) {
                 const cmd = Array.isArray(step.cmd) ? step.cmd[0] : step.cmd;
                 const params = (Array.isArray(step.cmd) && (step.cmd.length > 1)) ? [step.cmd[1]] : [];
 
                 return spawn(cmd, params, true, {
-                // This allows to run command on windows without adding '.cmd' or '.bat'. See
-                // https://nodejs.org/api/child_process.html#child_process_spawning_bat_and_cmd_files_on_windows
+                    // This allows to run command on windows without adding '.cmd' or '.bat'. See
+                    // https://nodejs.org/api/child_process.html#child_process_spawning_bat_and_cmd_files_on_windows
                     shell: true,
 
                     // NOTE: this is inherithed from the current process(which already did the cwd!)

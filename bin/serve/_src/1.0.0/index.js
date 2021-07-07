@@ -57,10 +57,12 @@ module.exports.start = async function (onitServeFile, version, basepath, params,
         }
         // bye!
         logger.error('Exit serve...');
+        // eslint-disable-next-line no-process-exit
         process.exit(0);
     } catch (e) {
         logger.error(e.message);
         logger.error('Run interrotto');
+        // eslint-disable-next-line no-process-exit
         process.exit(-1);
     }
 };

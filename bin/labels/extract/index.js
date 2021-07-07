@@ -23,26 +23,25 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
 
-//const extract = require('./_src/extract');
+// const extract = require('./_src/extract');
 
 module.exports.info = 'Utility estrazione labels';
 module.exports.help = [
-    ['-f filename','File da processare']
+    ['-f filename', 'File da processare']
 ];
 module.exports.catchUnimplementedParams = true;
 module.exports.cmd = async function (basepath, params, logger) {
     logger.info('Verifica directory corrente');
 
-    
     // get the input file: the one marked from -f or the first param
     let inputFile = params.get('-f');
-    if (!inputFile.found || !inputFile.value){
+    if (!inputFile.found || !inputFile.value) {
         inputFile = params[0];
-    }else{
+    } else {
         inputFile = inputFile.value;
     }
 
-    console.log(inputFile)
+    console.log(inputFile);
 
     // extract.checkDirectory(process.cwd(), logger);
 };

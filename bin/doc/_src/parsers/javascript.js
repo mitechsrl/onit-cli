@@ -23,7 +23,6 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
 
-
 const { parse, stringify } = require('comment-parser/lib');
 
 module.exports.parse = (fileContent, blocks) => {
