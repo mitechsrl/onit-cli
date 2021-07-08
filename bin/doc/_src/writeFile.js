@@ -70,20 +70,25 @@ const generateBlock = (block, chapters) => {
         if (m.index === regex.lastIndex) {
             regex.lastIndex++;
         }
-        const found = m[0];
-        const chapter = m[1];
-        const anchor = m[2] || '';
-        let text = m[3] || '';
+        const found = m[0]; // all the matched piece of code
+        const chapter = m[1]; // chapter number
+        const anchor = m[2] || ''; // anchor
+
+        let text = m[3] || ''; // link text.
         if (text.startsWith('(')) text = text.substr(1);
         if (text.endsWith(')')) text = text.substr(0, text.length - 1);
 
         const referenceChapter = m[1].replace(/\./g, '/');
         const referenceTitle = ((chapters[chapter] || {}).title || '').replace(/ /g, '-');
 
+        // build the link. We must build it as we need on the final page because jackill is not going to process it
         const referencePath = '/docs/' + referenceChapter + '/' + referenceTitle + '.html' + anchor;
         if (!text) text = referencePath;
+
+        // this is a markdown link format
         const replace = '[' + text + '](' + referencePath + ')';
-        console.log('Resolved', found, 'to', replace);
+
+        // console.log('Resolved', found, 'to', replace);
         str = str.replace(found, replace);
     }
 

@@ -35,6 +35,7 @@ module.exports.parse = (fileContent, blocks) => {
         if (!onitDoc) return;
 
         let start = '';
+
         onitDoc.source.forEach(s => {
             if (s.tokens.tag === '@onitDoc') start = s.tokens.start;
             s.tokens.start = s.tokens.start.replace(new RegExp('^' + start), '');
@@ -42,6 +43,7 @@ module.exports.parse = (fileContent, blocks) => {
             s.tokens.tag = '';
             s.tokens.delimiter = '';
         });
+
         onitBlock.doc = stringify(onitDoc);
 
         // Parser for onitChapter
@@ -65,12 +67,6 @@ module.exports.parse = (fileContent, blocks) => {
             onitBlock.priority = parseInt(onitPriority.name);
         } else {
             onitBlock.priority = 1000;
-        }
-
-        // ?
-        const onitType = block.tags.find(t => t.tag === 'onitType');
-        if (onitType) {
-            onitBlock.type = onitType.name + ' ' + onitType.description;
         }
 
         const params = block.tags.filter(b => b.tag === 'param');

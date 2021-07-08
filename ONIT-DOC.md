@@ -70,6 +70,14 @@ Definisce il capitolo di appartenenza della sezione di commento corrente. Accett
 */
 ```
 
+**@onitPriority**
+Definisce l'ordinamento con cui inserire blocchi di codice referenti allo stesso capitolo. Accetta un solo parametro, il valore numerico dell'ordine.
+
+```
+/**
+* @onitPriority 2000
+*/
+```
 
 **@onitDoc** 
 Definisce l'inizio del blocco di testo contente la documentazione da estrapolare. Il blocco di testo termina quando occorre una delle seguenti ragioni:

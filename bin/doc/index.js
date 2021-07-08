@@ -28,7 +28,7 @@ const { generate } = require('./_src/generate');
 
 module.exports.info = 'Utility generazione documentazione. WARNING: questa funzionalità è sperimentale';
 module.exports.help = [
-    ['Esegue la generazione della documentazione partendo dalla directory corrente'],
+    'Esegue la generazione della documentazione partendo dalla directory corrente',
     ['-o', 'Output path. Default ./onit-docs']
 ];
 
