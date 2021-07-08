@@ -45,7 +45,6 @@ module.exports.parse = (fileContent, blocks) => {
 
         const onitTitlePos = fileContent.indexOf('@onitTitle', startFrom);
         if (onitTitlePos < 0) {
-            console.log('EXIT title 1');
             break;
         };
 
@@ -61,7 +60,6 @@ module.exports.parse = (fileContent, blocks) => {
         const titleMatch = section.match(/^[^@]*@onitTitle +(.+)$/mi);
         onitBlock.title = (titleMatch ? titleMatch[1] : '').trim();
         if (!onitBlock.title) {
-            console.log('EXIT title');
             break;
         }
 
@@ -69,7 +67,6 @@ module.exports.parse = (fileContent, blocks) => {
         const onitChapterMatcher = section.match(/^[^\n\ra-z@]*@onitChapter +(.+)$/mi);
         onitBlock.chapter = (onitChapterMatcher ? onitChapterMatcher[1] : '').trim();
         if (!onitBlock.chapter) {
-            console.log('EXIT chapter');
             break;
         }
 
@@ -80,12 +77,9 @@ module.exports.parse = (fileContent, blocks) => {
         // extract doc
         const docStart = section.indexOf('@onitDoc');
         if (docStart < 0) {
-            console.log('EXIT docStart');
             break;
         }
         onitBlock.doc = section.substr(docStart + onitDocLength).trim();
-
-        console.log('MARKDWON', onitBlock.priority);
 
         // append to the previous blocks
         blocks.chapters[onitBlock.chapter] = blocks.chapters[onitBlock.chapter] || [];

@@ -32,7 +32,7 @@ const fse = require('fs-extra');
  * @param {*} block
  * @returns
  */
-const generateBlock = (block) => {
+const generateBlock = (block, chapters) => {
     let str = '';
 
     // autoset the title but only if the docs don't starts with his own title
@@ -61,6 +61,32 @@ const generateBlock = (block) => {
         str += '\n\n';
     });
 
+    // resolve reference links
+    const regex = /\[@onitChapter +([0-9.]+)(#[^\]]+)?\](\([^)]+\))?/gm;
+    let m;
+
+    while ((m = regex.exec(str)) !== null) {
+        // This is necessary to avoid infinite loops with zero-width matches
+        if (m.index === regex.lastIndex) {
+            regex.lastIndex++;
+        }
+        const found = m[0];
+        const chapter = m[1];
+        const anchor = m[2] || '';
+        let text = m[3] || '';
+        if (text.startsWith('(')) text = text.substr(1);
+        if (text.endsWith(')')) text = text.substr(0, text.length - 1);
+
+        const referenceChapter = m[1].replace(/\./g, '/');
+        const referenceTitle = ((chapters[chapter] || {}).title || '').replace(/ /g, '-');
+
+        const referencePath = '/docs/' + referenceChapter + '/' + referenceTitle + '.html' + anchor;
+        if (!text) text = referencePath;
+        const replace = '[' + text + '](' + referencePath + ')';
+        console.log(found, replace);
+        str = str.replace(found, replace);
+    }
+
     return str;
 };
 
@@ -80,6 +106,25 @@ function createFile (filename, header, content = '') {
 
     fs.writeFileSync(filename, jekillHeader + content);
 }
+
+/**
+ * Build the page content
+ * @param {*} blocks
+ * @param {*} chapterKey
+ * @returns
+ */
+function buildContent (blocks, chapterKey, chapters) {
+    // add extracted blocks markdown
+    if (blocks.chapters[chapterKey]) {
+        // sort them
+        blocks.chapters[chapterKey].sort((a, b) => a.priority - b.priority);
+        // merge all the blocks for this chapter into a "mega arkdown text"
+        return blocks.chapters[chapterKey].map(block => generateBlock(block, chapters)).join('\n\n');
+    }
+
+    return '';
+}
+
 /**
  * Write ot parsed files
  * @param {*} blocks
@@ -92,11 +137,12 @@ const writeFile = function (configFile, blocks, output) {
     fs.mkdirSync(outDir, { recursive: true });
 
     chapterKeys.forEach(chapter => {
+        // precalc chapters keys
         const chapterKey = chapter;
         const parentChapterKey = chapterKey.split('.').slice(0, -1).join('.');
         const grandParentChapterKey = parentChapterKey.split('.').slice(0, -1).join('.');
-        let chapterFileContent = '';
 
+        // precal chapter configs
         const chapterConfig = configFile.chapters[chapterKey];
         const parentChapterConfig = parentChapterKey ? configFile.chapters[parentChapterKey] : null;
         const grandParentChapterConfig = grandParentChapterKey ? configFile.chapters[grandParentChapterKey] : null;
@@ -104,26 +150,46 @@ const writeFile = function (configFile, blocks, output) {
         // calculate the destination directory file
         const fileDir = path.resolve(outDir, './' + chapterKey.split('.').join('/'));
 
+        // remove the previous file
         fse.removeSync(fileDir);
+
         // ensure we have the destination folder
         fs.mkdirSync(fileDir, { recursive: true });
+
+        // automatically add index in case of "children chapters"
+        if (chapterKeys.some(k => k.startsWith(chapterKey + '.'))) {
+            chapterConfig.index = chapterConfig.index || {};
+        }
 
         // this chapter defines a index configuration. Add the 'index.md' file
         if (chapterConfig.index) {
             chapterConfig.index.title = chapterConfig.title;
             const indexFullPath = path.join(fileDir, 'index.md');
 
+            // setup the "has_children" key by checking if we have defined sub-chapters
             if (chapterKeys.some(k => k.startsWith(chapterKey + '.'))) {
                 chapterConfig.index.has_children = 'true';
             }
+
             // setup hierarchy references
             if (parentChapterConfig) chapterConfig.index.parent = parentChapterConfig.title;
             if (grandParentChapterConfig) chapterConfig.index.grand_parent = grandParentChapterConfig.title;
 
-            createFile(indexFullPath, chapterConfig.index);
+            // create the index content
+            const chapterFileContent = buildContent(blocks, chapterKey, configFile.chapters);
+
+            // write the file out
+            createFile(indexFullPath, chapterConfig.index, '\n\n\n' + chapterFileContent);
+
+            return; // do not add other stuff to this page
         }
 
-        // this chapter defines a standard page configuration. Add the file with
+        // automatically add a page if we have some blocks for it
+        if (blocks.chapters[chapterKey]) {
+            chapterConfig.page = chapterConfig.page || {};
+        }
+
+        // create the page config
         if (chapterConfig.page) {
             chapterConfig.page.title = chapterConfig.title;
 
@@ -131,14 +197,10 @@ const writeFile = function (configFile, blocks, output) {
             if (parentChapterConfig) chapterConfig.page.parent = parentChapterConfig.title;
             if (grandParentChapterConfig) chapterConfig.page.grand_parent = grandParentChapterConfig.title;
 
-            // add extracted blocks markdown
-            if (blocks.chapters[chapterKey]) {
-                // sort them
-                blocks.chapters[chapterKey].sort((a, b) => a.priority - b.priority);
-                // merge all the blocks for this chapter into a "mega arkdown text"
-                chapterFileContent = blocks.chapters[chapterKey].map(block => generateBlock(block)).join('\n\n');
-            }
+            // create the page content
+            const chapterFileContent = buildContent(blocks, chapterKey);
 
+            // write the file out
             const fileFullPath = path.join(fileDir, chapterConfig.title.replace(/[^a-zA-Z0-9]/g, '-') + '.md');
             createFile(fileFullPath, chapterConfig.page, '\n\n\n' + chapterFileContent);
         }
