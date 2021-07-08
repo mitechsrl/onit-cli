@@ -83,7 +83,7 @@ const generateBlock = (block, chapters) => {
         const referencePath = '/docs/' + referenceChapter + '/' + referenceTitle + '.html' + anchor;
         if (!text) text = referencePath;
         const replace = '[' + text + '](' + referencePath + ')';
-        console.log(found, replace);
+        console.log('Resolved', found, 'to', replace);
         str = str.replace(found, replace);
     }
 
