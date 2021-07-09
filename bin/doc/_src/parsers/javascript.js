@@ -35,13 +35,18 @@ module.exports.parse = (fileContent, blocks) => {
         if (!onitDoc) return;
 
         let start = '';
-
+        let postDelimiter = '';
         onitDoc.source.forEach(s => {
-            if (s.tokens.tag === '@onitDoc') start = s.tokens.start;
+            if (s.tokens.tag === '@onitDoc') {
+                // get the spacing of this tag and remove the spaces for alll the text based on this
+                start = s.tokens.start;
+                postDelimiter = s.tokens.postDelimiter;
+            }
             s.tokens.start = s.tokens.start.replace(new RegExp('^' + start), '');
             s.tokens.end = '';
             s.tokens.tag = '';
             s.tokens.delimiter = '';
+            s.tokens.postDelimiter = s.tokens.postDelimiter.replace(new RegExp('^' + postDelimiter), '');
         });
 
         onitBlock.doc = stringify(onitDoc);
