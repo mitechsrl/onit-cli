@@ -27,8 +27,11 @@ const glob = require('glob-all');
 const fs = require('fs');
 const writeFile = require('./writeFile');
 const path = require('path');
+const copyImages = require('./copyImages');
 
 module.exports.generate = function (config, outputPath, logger) {
+    const scanTargetDir = process.cwd();
+
     return new Promise((resolve, reject) => {
         const options = {
             ignore: [
@@ -67,8 +70,16 @@ module.exports.generate = function (config, outputPath, logger) {
                 blocks = parser.parse(fileContent, blocks);
             });
 
-            logger.log('Writing out...');
-            writeFile.writeFile(config, blocks, outputPath);
+            logger.log('Create out directory out...');
+            const outDir = path.join(process.cwd(), outputPath.found ? outputPath.value : '/onit-doc/');
+            fs.mkdirSync(outDir, { recursive: true });
+
+            logger.log('Copying images...');
+            copyImages.copyImages(config, blocks, scanTargetDir, outDir);
+
+            logger.log('Writing files...');
+            writeFile.writeFile(config, blocks, scanTargetDir, outDir);
+
             resolve();
         });
     });

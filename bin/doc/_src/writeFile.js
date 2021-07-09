@@ -26,6 +26,47 @@ OTHER DEALINGS IN THE SOFTWARE.
 const fs = require('fs');
 const path = require('path');
 const fse = require('fs-extra');
+
+/**
+ * Replace internal reference links with marktown links
+ * @param {*} str
+ * @param {*} chapters
+ * @returns
+ */
+const resolveInternalReferences = (str, chapters) => {
+    // resolve reference links
+    const regex = /\[@onitChapter +([0-9.]+)(#[^\]]+)?\](\([^)]+\))?/gm;
+    let m;
+
+    while ((m = regex.exec(str)) !== null) {
+    // This is necessary to avoid infinite loops with zero-width matches
+        if (m.index === regex.lastIndex) {
+            regex.lastIndex++;
+        }
+        const found = m[0]; // all the matched piece of code
+        const chapter = m[1]; // chapter number
+        const anchor = m[2] || ''; // anchor
+
+        let text = m[3] || ''; // link text.
+        if (text.startsWith('(')) text = text.substr(1);
+        if (text.endsWith(')')) text = text.substr(0, text.length - 1);
+
+        const referenceChapter = m[1].replace(/\./g, '/');
+        const referenceTitle = ((chapters[chapter] || {}).title || '').replace(/ /g, '-');
+
+        // build the link. We must build it as we need on the final page because jackill is not going to process it
+        const referencePath = '/docs/' + referenceChapter + '/' + referenceTitle + '.html' + anchor;
+        if (!text) text = referencePath;
+
+        // this is a markdown link format
+        const replace = '[' + text + '](' + referencePath + ')';
+
+        // console.log('Resolved', found, 'to', replace);
+        str = str.replace(found, replace);
+    }
+    return str;
+};
+
 /**
  * Generate a block markdown
  *
@@ -61,37 +102,7 @@ const generateBlock = (block, chapters) => {
         str += '\n\n';
     });
 
-    // resolve reference links
-    const regex = /\[@onitChapter +([0-9.]+)(#[^\]]+)?\](\([^)]+\))?/gm;
-    let m;
-
-    while ((m = regex.exec(str)) !== null) {
-        // This is necessary to avoid infinite loops with zero-width matches
-        if (m.index === regex.lastIndex) {
-            regex.lastIndex++;
-        }
-        const found = m[0]; // all the matched piece of code
-        const chapter = m[1]; // chapter number
-        const anchor = m[2] || ''; // anchor
-
-        let text = m[3] || ''; // link text.
-        if (text.startsWith('(')) text = text.substr(1);
-        if (text.endsWith(')')) text = text.substr(0, text.length - 1);
-
-        const referenceChapter = m[1].replace(/\./g, '/');
-        const referenceTitle = ((chapters[chapter] || {}).title || '').replace(/ /g, '-');
-
-        // build the link. We must build it as we need on the final page because jackill is not going to process it
-        const referencePath = '/docs/' + referenceChapter + '/' + referenceTitle + '.html' + anchor;
-        if (!text) text = referencePath;
-
-        // this is a markdown link format
-        const replace = '[' + text + '](' + referencePath + ')';
-
-        // console.log('Resolved', found, 'to', replace);
-        str = str.replace(found, replace);
-    }
-
+    str = resolveInternalReferences(str, chapters);
     return str;
 };
 
@@ -134,12 +145,9 @@ function buildContent (blocks, chapterKey, chapters) {
  * Write ot parsed files
  * @param {*} blocks
  */
-const writeFile = function (configFile, blocks, output) {
+const writeFile = function (configFile, blocks, scanTargetDir, outDir) {
     const chapterKeys = Object.keys(configFile.chapters);
     chapterKeys.sort();
-
-    const outDir = path.join(process.cwd(), output.found ? output.value : '/onit-doc/');
-    fs.mkdirSync(outDir, { recursive: true });
 
     chapterKeys.forEach(chapter => {
         // precalc chapters keys

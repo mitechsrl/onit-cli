@@ -105,6 +105,14 @@ Definisce l'inizio del blocco di testo contente la documentazione da estrapolare
     */
     ```
 
+##### Immagini
+Utiluzzare il classito tag markdown per la gestione delle immagini:
+
+```
+![Stormtroopocat](/path/to/image.png)
+```
+
+NOTA: il path dell'immagine deve essere relativo al path del file **onitdocumentation.config.[js|json]** utilizzato
 
 ##### Riferimenti interni
 In relazione all'uso di **@onitDoc**, è possibile inserire in un qualsiasi punto del testo del commento uno dei tag seguenti:
