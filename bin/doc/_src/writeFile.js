@@ -138,7 +138,7 @@ const generateBlock = (block, chapters) => {
     }
 
     block.params.forEach(param => {
-        str += '##### **' + param.name + '**\n';
+        str += '**' + param.name + '**: ';
         param.source.forEach(s => {
             s.tokens.start = '';
             s.tokens.delimiter = '';
@@ -266,7 +266,13 @@ const writeFile = function (configFile, blocks, scanTargetDir, outDir) {
             if (grandParentChapterConfig) chapterConfig.page.grand_parent = grandParentChapterConfig.title;
 
             // create the page content
-            const chapterFileContent = buildContent(blocks, chapterKey);
+            const generatedFileContent = buildContent(blocks, chapterKey);
+
+            // h4 must not appear on file toc
+            const regex = /^(####.+)$/gm;
+            const subst = '$1\n{: .no_toc}\n';
+
+            const chapterFileContent = '1. TOC\n{:toc}\n---\n' + generatedFileContent.replace(regex, subst);
 
             // write the file out
             const fileFullPath = path.join(fileDir, chapterConfig.title.replace(/[^a-zA-Z0-9]/g, '-') + '.md');
