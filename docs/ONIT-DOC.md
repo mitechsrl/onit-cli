@@ -61,6 +61,15 @@ Definisce il titolo della sezione di commento
 */
 ```
 
+Aggiungere, subito dopo il tag @onitTitle, uno dei valori **h2, h3, h4** per pilotare la dimensione del titolo.
+
+```
+/**
+* @onitTitle h3 this is a title!
+*/
+```
+Il default di tale valore è **h2**
+
 **@onitChapter** 
 Definisce il capitolo di appartenenza della sezione di commento corrente. Accetta un unico valore, corrispondente ad una chiave come definita in *onitdocumentation.config.js -> chapters*
 
@@ -129,6 +138,18 @@ Viene risolto con un link verso il capitolo *n1.n2.n3*, con anchor *#Info*. Il t
 **[@onitChapter n1.n2.n3]**
 Viene risolto con un link verso il capitolo *n1.n2.n3*. Il testo visualizzato è l'url web del capitolo selezionato.
 
+##### Include di codic sorgente
+Utilizzare il tag 
+```
+[@onitSrc path transformFunction]
+```
+
+Per includere nel punto di chiamata un file esterno rappresentato da **path**. 
+**path** deve essere uin path relativo al file in cui si richiede tale inclusione. E' possibile utilizzare un parametero aggiuntivo, **transformFunction** per preprocessare il contenuto del file prima della sua inclusione. Se omesso, il file viene incluso in toto senza alcuna trasformazione.
+
+Esempi di **transformFunction** disponibili:
+
+- **model**: se path rappresenta un file **json** di modello, model ne esegue l'estrazione dei valori delle **properties** e delle **relazioni**
 
 ##### Esempio 
 

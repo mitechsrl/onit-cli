@@ -41,20 +41,19 @@ module.exports.generate = function (config, outputPath, logger) {
             ]
         };
 
+        // setup which files must be parsed and the relative parser. See https://en.wikipedia.org/wiki/Glob_(programming) for glob patterns
         const globList = [
             { extension: '.js', glob: './**/*.js', parser: path.join(__dirname, './parsers/javascript.js') },
             { extension: '.jsx', glob: './**/*.jsx', parser: path.join(__dirname, './parsers/javascript.js') },
             { extension: '.md', glob: './**/*.md', parser: path.join(__dirname, './parsers/markdown.js') },
-            ...(config.globList || [])
+            ...(config.globList || []) // add globs from config file
         ];
 
         const _globList = globList.map(g => g.glob || g);
         logger.log('Scanning target directories...');
         glob(_globList, options, function (er, files) {
-            // files is an array of filenames.
-            // If the `nonull` option is set, and nothing
-            // was found, then files is ["**/*.js"]
-            // er is an error object or null.
+            // files is an array of filenames. If the `nonull` option is set, and nothing was found, then files is ["**/*.js"]
+            if (er) return reject(er);
 
             let blocks = {
                 chapters: {}
@@ -67,7 +66,7 @@ module.exports.generate = function (config, outputPath, logger) {
                 // default parser
                 let parser = globType ? globType.parser : path.join(__dirname, './parsers/javascript.js');
                 parser = require(parser);
-                blocks = parser.parse(fileContent, blocks);
+                blocks = parser.parse(fileContent, file, blocks);
             });
 
             logger.log('Create out directory out...');

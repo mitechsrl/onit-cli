@@ -28,6 +28,51 @@ const path = require('path');
 const fse = require('fs-extra');
 
 /**
+ * replace the [@onitSrc filePath] with the content of filepath, using proper code tags
+ * @param {*} str
+ * @param {*} chapters
+ * @returns
+ */
+const resolveSourceIncludes = (block, str) => {
+    // resolve reference links
+    const regex = /\[@onitSrc +([^ \]]+) *([^ \]]+)? *(.*)?\]/gm;
+    let m;
+
+    while ((m = regex.exec(str)) !== null) {
+    // This is necessary to avoid infinite loops with zero-width matches
+        if (m.index === regex.lastIndex) {
+            regex.lastIndex++;
+        }
+        const found = m[0]; // all the matched piece of code
+        let file = m[1]; // file path relative to block.filePath to be included
+        const transformFunction = m[2]; // apply this function to the text before adding to the docs
+        const params = m[3]; // apply this function to the text before adding to the docs
+
+        file = path.join(block.filePath, '../', file);
+        if (fs.existsSync(file)) {
+            let replace = '';
+
+            const fileContent = fs.readFileSync(file).toString();
+            if (transformFunction) {
+                const transformFunctionPath = path.join(__dirname, './includeTransforms/', './' + transformFunction);
+                try {
+                    const fn = require(transformFunctionPath);
+                    replace = fn(fileContent, params);
+                } catch (e) {
+                    console.warn('Transform of ' + found + ' failed, error:' + e);
+                }
+            } else {
+                const ext = path.extname(file).replace('.', '');
+                replace = '```' + ext + '\n' + fileContent + '\n```';
+            }
+
+            str = str.replace(found, replace);
+        }
+    }
+    return str;
+};
+
+/**
  * Replace internal reference links with marktown links
  * @param {*} str
  * @param {*} chapters
@@ -76,10 +121,15 @@ const resolveInternalReferences = (str, chapters) => {
 const generateBlock = (block, chapters) => {
     let str = '';
 
-    // autoset the title but only if the docs don't starts with his own title
     block.doc = block.doc.trim();
 
-    if (!block.doc.startsWith('#')) { str += '## ' + block.title + '\n\n'; }
+    if (!block.doc.startsWith('#')) {
+        switch (block.titleFormat) {
+        case 'h3': str += '#'; break;
+        case 'h4': str += '##'; break;
+        }
+        str += '## ' + block.title + '\n\n';
+    }
 
     str += block.doc + '\n\n';
 
@@ -102,7 +152,12 @@ const generateBlock = (block, chapters) => {
         str += '\n\n';
     });
 
+    // resolve the internal links for better navigation
     str = resolveInternalReferences(str, chapters);
+
+    // resolve source include tags
+    str = resolveSourceIncludes(block, str);
+
     return str;
 };
 

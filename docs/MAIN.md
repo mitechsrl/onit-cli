@@ -16,7 +16,7 @@ npm install -g @mitech/onit-cli
 ```
 onit serve # utility serve di sviluppo
 onit build # utility build progetto
-onit docs #tuility estrazione/generazione documentazione
+onit doc #tuility estrazione/generazione documentazione
 onit labels # utility gestione lebels
 ```
 
@@ -302,8 +302,12 @@ Ogni comando deve essere nel formato:
 ### onit labels
 TODO
 
+### onit doc
 
-### Windows powershell
+Vedi la sezione dedicata ad [onit doc](ONIT-DOC.md)
+
+
+### Windows powershll
 
 Note per windows powershell:
 

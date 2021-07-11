@@ -24,12 +24,15 @@ OTHER DEALINGS IN THE SOFTWARE.
 */
 
 const { parse, stringify } = require('comment-parser/lib');
+const { priorityConverter } = require('../lib/priority');
 
-module.exports.parse = (fileContent, blocks) => {
+module.exports.parse = (fileContent, filePath, blocks) => {
     const commentBlocks = parse(fileContent);
 
     commentBlocks.forEach(block => {
-        const onitBlock = {};
+        const onitBlock = {
+            filePath: filePath
+        };
 
         const onitDoc = block.tags.find(t => t.tag === 'onitDoc');
         if (!onitDoc) return;
@@ -63,15 +66,20 @@ module.exports.parse = (fileContent, blocks) => {
         // Parser for title. NOTE: This title is this page title, does not ends up into jekill.
         const onitTitle = block.tags.find(t => t.tag === 'onitTitle');
         if (onitTitle) {
-            onitBlock.title = onitTitle.name + ' ' + onitTitle.description;
+            if (['h2', 'h3', 'h4'].includes(onitTitle.name)) {
+                onitBlock.title = onitTitle.description;
+                onitBlock.titleFormat = onitTitle.name;
+            } else {
+                onitBlock.title = onitTitle.name + ' ' + onitTitle.description;
+            }
         }
 
         // Parser for onitPriority. Just for internal sorting purposes
         const onitPriority = block.tags.find(t => t.tag === 'onitPriority');
-        if (onitPriority) {
-            onitBlock.priority = parseInt(onitPriority.name);
+        if (onitPriority && onitPriority.name) {
+            onitBlock.priority = priorityConverter(onitPriority.name);
         } else {
-            onitBlock.priority = 1000;
+            onitBlock.priority = 10000;
         }
 
         const params = block.tags.filter(b => b.tag === 'param');

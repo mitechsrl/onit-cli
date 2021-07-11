@@ -23,14 +23,14 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
 
-module.exports.parse = (fileContent, blocks) => {
-    /* @onitTitle Database Initialization
-    * @onitChapter 1.0.1.1
-    * @onitDoc
-    */
+const javascriptParse = require('./javascript').parse;
 
-    // TODO: onitType
+module.exports.parse = (fileContent, filePath, blocks) => {
+    // just wrap the text as if it was a js comment and parse using js comment parser
+    const _fileContent = '/**\n' + fileContent + '\n*/';
+    return javascriptParse(_fileContent, filePath, blocks);
 
+/*
     const onitTitleLength = '@onitTitle'.length;
     const onitDocLength = '@onitDoc'.length;
     let startFrom = 0;
@@ -72,7 +72,11 @@ module.exports.parse = (fileContent, blocks) => {
 
         // extract priority
         const onitPriorityMatcher = section.match(/^[^\n\ra-z@]*@onitPriority +(.+)$/mi);
-        onitBlock.priority = parseInt((onitPriorityMatcher ? onitPriorityMatcher[1] : '1000').trim());
+        if (onitPriorityMatcher) {
+            onitBlock.priority = priorityConverter(onitPriorityMatcher[1].trim());
+        } else {
+            onitBlock.priority = 10000;
+        }
 
         // extract doc
         const docStart = section.indexOf('@onitDoc');
@@ -88,5 +92,5 @@ module.exports.parse = (fileContent, blocks) => {
         startFrom = onitTitlePos + onitTitleLength;
     }
 
-    return blocks;
+    return blocks; */
 };
