@@ -266,7 +266,7 @@ const writeFile = function (configFile, blocks, scanTargetDir, outDir) {
             if (grandParentChapterConfig) chapterConfig.page.grand_parent = grandParentChapterConfig.title;
 
             // create the page content
-            const generatedFileContent = buildContent(blocks, chapterKey);
+            const generatedFileContent = buildContent(blocks, chapterKey, configFile.chapters);
 
             // h4 must not appear on file toc
             const regex = /^(####.+)$/gm;
