@@ -43,13 +43,19 @@ module.exports.generate = function (config, outputPath, logger) {
 
         // setup which files must be parsed and the relative parser. See https://en.wikipedia.org/wiki/Glob_(programming) for glob patterns
         const globList = [
-            { extension: '.js', glob: './**/*.js', parser: path.join(__dirname, './parsers/javascript.js') },
-            { extension: '.jsx', glob: './**/*.jsx', parser: path.join(__dirname, './parsers/javascript.js') },
-            { extension: '.md', glob: './**/*.md', parser: path.join(__dirname, './parsers/markdown.js') },
+            { extension: '.js', glob: ['./**/*.js', './**/*.JS'], parser: path.join(__dirname, './parsers/javascript.js') },
+            { extension: '.jsx', glob: ['./**/*.jsx', './**/*.JSX'], parser: path.join(__dirname, './parsers/javascript.js') },
+            { extension: '.md', glob: ['./**/*.md', './**/*.MD'], parser: path.join(__dirname, './parsers/markdown.js') },
             ...(config.globList || []) // add globs from config file
         ];
 
-        const _globList = globList.map(g => g.glob || g);
+        // create a unique glob list for the glob package
+        const _globList = globList.filter(g => g.glob) // skip empty globs for.... reasons
+            .reduce((a, g) => {
+                a.push(...(Array.isArray(g.glob) ? g.glob : [g.glob]));
+                return a;
+            }, []);
+
         logger.log('Scanning target directories...');
         glob(_globList, options, function (er, files) {
             // files is an array of filenames. If the `nonull` option is set, and nothing was found, then files is ["**/*.js"]
@@ -61,7 +67,7 @@ module.exports.generate = function (config, outputPath, logger) {
             files.forEach(file => {
                 logger.log('Processing ' + file);
                 const fileContent = fs.readFileSync(file).toString();
-                const globType = globList.find(g => file.endsWith(g.extension || '$failthisextension$'));
+                const globType = globList.find(g => file.toLowerCase().endsWith(g.extension.toLowerCase() || '$failthisextension$'));
 
                 // default parser
                 let parser = globType ? globType.parser : path.join(__dirname, './parsers/javascript.js');
@@ -69,8 +75,8 @@ module.exports.generate = function (config, outputPath, logger) {
                 blocks = parser.parse(fileContent, file, blocks);
             });
 
-            logger.log('Create out directory out...');
-            const outDir = path.join(process.cwd(), outputPath.found ? outputPath.value : '/onit-doc/');
+            const outDir = path.resolve(process.cwd(), outputPath.found ? outputPath.value : './onit-doc/');
+            logger.log('Create out directory: ' + outDir);
             fs.mkdirSync(outDir, { recursive: true });
 
             logger.log('Copying images...');
