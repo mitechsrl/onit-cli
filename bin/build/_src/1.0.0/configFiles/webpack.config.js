@@ -103,6 +103,19 @@ module.exports = (context, config, packageJson) => {
                         loader: require.resolve('babel-loader'),
                         options: babelRcJs
                     }
+                },
+                // https://webpack.js.org/loaders/file-loader/
+                {
+                    test: /\.(png|jpe?g|gif)$/i,
+                    use: [
+                        {
+                            loader: require.resolve('file-loader'),
+                            options: {
+                                // temporary fix for leaflet png imports, see https://github.com/PaulLeCam/react-leaflet/issues/255
+                                name: 'img/[name]_[hash:7].[ext]'
+                            }
+                        }
+                    ]
                 }
             ]
         },
