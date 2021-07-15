@@ -97,15 +97,21 @@ const resolveInternalReferences = (str, configFile) => {
         if (text.endsWith(')')) text = text.substr(0, text.length - 1);
 
         const referenceChapter = m[1].replace(/\./g, '/');
-        const referenceTitle = ((configFile.chapters[chapter] || {}).title || '').replace(/ /g, '-');
+        let referencePath = '';
 
-        // build the link. We must build it as we need on the final page because jackill is not going to process it
-        const referencePath = (configFile.baseUrl || '') + '/docs/' + referenceChapter + '/' + referenceTitle + '.html' + anchor;
+        // build the link path. Note that pages with the index properties have links like '/1/2', while standard pages have links like '/1/2/Title.html'
+        if (!configFile.chapters[chapter].index) {
+            // build the link. We must build it as we need on the final page because jackill is not going to process it
+            const referenceTitle = ((configFile.chapters[chapter] || {}).title || '').replace(/ /g, '-');
+            referencePath = (configFile.baseUrl || '') + '/docs/' + referenceChapter + '/' + referenceTitle + '.html' + anchor;
+        } else {
+            referencePath = (configFile.baseUrl || '') + '/docs/' + referenceChapter + anchor;
+        }
         if (!text) text = referencePath;
 
         // this is a markdown link format
         const replace = '[' + text + '](' + referencePath + ')';
-
+        console.log('Generate link ' + replace);
         // console.log('Resolved', found, 'to', replace);
         str = str.replace(found, replace);
     }
