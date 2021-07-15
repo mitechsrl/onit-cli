@@ -1,12 +1,9 @@
 # Onit-cli
 Onit development CLI
 
-Questo pacchetto fornisce il comando **onit**, utility per la gestione di progetti NodeJS basati su onit.
+This package provide the **onit** command, a developer tool for onit-based projects.
 
-## Prerequisiti
-E' richiesto l'uso di Node 12 o superiore
-
-## Installazione
+## Install
 ```shell
 npm install -g @mitech/onit-cli
 ```
@@ -14,7 +11,5 @@ npm install -g @mitech/onit-cli
 ## Licenza
 [MIT](./LICENSE)
 
-
 ## Documentazione
-
-[Consulta la sezione docs/ per dettagli implementativi](./docs/MAIN.md)
+[See docs for more info](./docs/MAIN.md)
