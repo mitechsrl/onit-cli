@@ -27,14 +27,12 @@ const path = require('path');
 const babelRcJs = require('./babel.config');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const strip = require('strip-comments');
-const fs = require('fs');
 const ProgressBarPlugin = require('progress-bar-webpack-plugin');
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin');
 
 // some static config options
-const baseConfig = JSON.parse(strip(fs.readFileSync(path.join(__dirname, './options.jsonc')).toString()));
+const baseConfig = require('../../../../../configFiles/1.0.0/shared/options');
 
 /**
  * Webpack build config factory.

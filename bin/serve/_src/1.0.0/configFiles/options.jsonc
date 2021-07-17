@@ -1,8 +1,0 @@
-/**
-This file keeps some static settings used during the serve process.
-WARN: changes to these vars may break something, do it with care.
-*/
-{
-    // path where to place built files (relative to context)
-    "outputPath": "./dist-fe"
-}

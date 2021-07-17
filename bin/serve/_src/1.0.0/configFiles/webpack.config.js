@@ -27,15 +27,14 @@ const path = require('path');
 const babelRcJs = require('./babel.config');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const strip = require('strip-comments');
-const fs = require('fs');
 const ProgressPlugin = require('webpack').ProgressPlugin;
 const CleanWebpackPlugin = require('clean-webpack-plugin').CleanWebpackPlugin;
 const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin');
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
+const progressHandler = require('../../../../../lib/webpack/progressHandler');
 
 // some static config options
-const baseConfig = JSON.parse(strip(fs.readFileSync(path.join(__dirname, './options.jsonc')).toString()));
+const baseConfig = require('../../../../../configFiles/1.0.0/shared/options');
 
 /**
  * Webpack serve config factory.
@@ -51,16 +50,6 @@ module.exports = (logger, context, config, packageJson) => {
     // this packagePublishPathValue must match the one from the package (whic is calculated wit the same logic)
     let packagePublishPath = packageJson.mountPath || (packageJson.mitown || {}).mountPath || packageJson.name.replace('@mitech/', '');
     if (!packagePublishPath.startsWith('/')) packagePublishPath = '/' + packagePublishPath;
-
-    // progress message handler
-    let _debounceMessage = '';
-    const progressHandler = (percentage, message, ...args) => {
-        if ((percentage < 0.99) && (message !== _debounceMessage)) {
-            const p = (percentage * 100).toFixed(0);
-            _debounceMessage = message;
-            logger.warn('[WEBPACK] ' + componentName + ' build ' + p + '% ' + message);
-        }
-    };
 
     return {
         mode: 'development',
@@ -168,7 +157,7 @@ module.exports = (logger, context, config, packageJson) => {
 
             // show a compilation progress info
             new ProgressPlugin({
-                handler: progressHandler
+                handler: progressHandler(componentName, logger)
             }),
 
             // separate css from js files
