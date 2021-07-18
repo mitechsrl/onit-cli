@@ -24,15 +24,14 @@ OTHER DEALINGS IN THE SOFTWARE.
 */
 
 const path = require('path');
-const babelRcJs = require('./babel.config');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const ProgressBarPlugin = require('progress-bar-webpack-plugin');
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin');
-
-// some static config options
 const baseConfig = require('../../../../../configFiles/1.0.0/shared/options');
+const babelConfig = require('../../../../../configFiles/1.0.0/shared/babel.config');
+const mixinFromFile = require('../../../../../lib/webpack/mixinFromFile');
 
 /**
  * Webpack build config factory.
@@ -43,12 +42,14 @@ const baseConfig = require('../../../../../configFiles/1.0.0/shared/options');
  * @param {*} packageJson the package.json content (js object) of the project to be webpacke'd.
  */
 module.exports = (context, config, packageJson) => {
+    const env = 'production';
+
     // this packagePublishPathValue must match the one from the package (whic is calculated wit the same logic)
     let packagePublishPath = packageJson.mountPath || (packageJson.mitown || {}).mountPath || packageJson.name.replace('@mitech/', '');
     if (!packagePublishPath.startsWith('/')) packagePublishPath = '/' + packagePublishPath;
 
-    return {
-        mode: 'production',
+    let _config = {
+        mode: env,
         context: context,
         watch: false,
 
@@ -99,7 +100,7 @@ module.exports = (context, config, packageJson) => {
                     test: /\.jsx$/,
                     use: {
                         loader: require.resolve('babel-loader'),
-                        options: babelRcJs
+                        options: babelConfig(env)
                     }
                 },
                 // https://webpack.js.org/loaders/file-loader/
@@ -208,4 +209,11 @@ module.exports = (context, config, packageJson) => {
         // see https://webpack.js.org/configuration/stats/#stats-presets
         stats: 'verbose'
     };
+
+    // merge this default config with the one from the current project directory.
+    // the merge is skipped if no config can be found.
+    // The file must export a function accepting one parameter, the default config, and return a new configuration:
+    // (conf) => { conf.myOptions = 1; return conf;}
+    _config = mixinFromFile(_config, path.resolve(process.cwd(), './webpack.config.js'));
+    return _config;
 };

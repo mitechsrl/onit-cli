@@ -66,6 +66,7 @@ module.exports.cmd = async function (basepath, params, logger) {
     } catch (e) {
         logger.error(e.message);
         logger.error('Serve interrotto');
+        // eslint-disable-next-line no-process-exit
         process.exit(-1);
     }
 };
