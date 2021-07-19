@@ -29,6 +29,8 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const ProgressBarPlugin = require('progress-bar-webpack-plugin');
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin');
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
+const { SubresourceIntegrityPlugin } = require('webpack-subresource-integrity');
 const baseConfig = require('../../../../../configFiles/1.0.0/shared/options');
 const babelConfig = require('../../../../../configFiles/1.0.0/shared/babel.config');
 const mixinFromFile = require('../../../../../lib/webpack/mixinFromFile');
@@ -42,7 +44,7 @@ const mixinFromFile = require('../../../../../lib/webpack/mixinFromFile');
  * @param {*} packageJson the package.json content (js object) of the project to be webpacke'd.
  */
 module.exports = (context, config, packageJson) => {
-    const env = 'production';
+    const env = /* process.env.NODE_ENV || */'production';
 
     // this packagePublishPathValue must match the one from the package (whic is calculated wit the same logic)
     let packagePublishPath = packageJson.mountPath || (packageJson.mitown || {}).mountPath || packageJson.name.replace('@mitech/', '');
@@ -124,7 +126,11 @@ module.exports = (context, config, packageJson) => {
         optimization: {
             splitChunks: {
                 chunks: 'all'
-            }
+            },
+            minimizer: [
+                // minimize css: https://github.com/webpack-contrib/css-minimizer-webpack-plugin
+                new CssMinimizerPlugin()
+            ]
         },
 
         // The list of entry points is calculated dynamically before starting the webpack process
@@ -170,11 +176,7 @@ module.exports = (context, config, packageJson) => {
                 // create a plugin instance
                 // see https://github.com/jantimon/html-webpack-plugin#options
                 return new HtmlWebpackPlugin({
-                    // we need just the list of tags. Position in the page is managed by onit render
-                    templateContent: ({ htmlWebpackPlugin }) => `
-                        ${htmlWebpackPlugin.tags.headTags}
-                        ${htmlWebpackPlugin.tags.bodyTags}
-                    `,
+                    template: path.resolve(__dirname, './htmlWebpackPluginTemplate.ejs'),
                     inject: false, // do not add other tags than the ones from templateContent
                     filename: filename + '.chunks.ejs',
                     // this will make the public path by package: dist/mitown, dist/mit-ask etc...
@@ -182,6 +184,12 @@ module.exports = (context, config, packageJson) => {
                     // this particular instance will add (js chunk files) dependencies for this entrypoint
                     chunks: [entryPoint]
                 });
+            }),
+
+            // https://github.com/waysact/webpack-subresource-integrity
+            new SubresourceIntegrityPlugin({
+                hashFuncNames: ['sha256', 'sha384'],
+                enabled: env === 'production'
             })
         ],
 
@@ -189,7 +197,8 @@ module.exports = (context, config, packageJson) => {
         // see https://webpack.js.org/configuration/output/
         output: {
             path: path.join(context, config.buildPath, baseConfig.outputPath),
-            filename: '[contenthash].js'
+            filename: '[contenthash].js',
+            crossOriginLoading: 'anonymous' // needed for SubresourceIntegrityPlugin
         },
 
         // these libs are loaded manually in the browser (some of them are standard, some others are custom made)
