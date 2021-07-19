@@ -31,8 +31,8 @@ const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const { SubresourceIntegrityPlugin } = require('webpack-subresource-integrity');
-const baseConfig = require('../../../../../configFiles/1.0.0/shared/options');
-const babelConfig = require('../../../../../configFiles/1.0.0/shared/babel.config');
+const baseConfig = require('../../../../../shared/1.0.0/configFiles/options');
+const babelConfig = require('../../../../../shared/1.0.0/configFiles/babel.config');
 const mixinFromFile = require('../../../../../lib/webpack/mixinFromFile');
 
 /**

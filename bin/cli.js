@@ -46,6 +46,7 @@ npmVersionCheck();
     try {
         await command.command(__dirname, process.argv.slice(2));
     } catch (e) {
+        console.error(e);
         logger.error(e);
     }
     // eslint-disable-next-line no-process-exit

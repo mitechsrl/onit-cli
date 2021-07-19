@@ -26,7 +26,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 const pm2Dev = require('./lib/pm2');
 const nodemon = require('./lib/nodemon');
 const webpack = require('./lib/webpack');
-const links = require('./lib/link');
+const links = require('../../../../shared/1.0.0/lib/link');
 
 module.exports.start = async function (onitServeFile, version, basepath, params, logger) {
     const minusW = params.get('-w').found;

@@ -24,7 +24,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 */
 const path = require('path');
 const fs = require('fs').promises;
-const spawn = require('../../../../../lib/spawn');
+const spawn = require('../../../lib/spawn');
 
 // windows being windows.. need a ".cmd" extension
 const isWindows = (process.env.OS || '').toUpperCase().includes('WIN');

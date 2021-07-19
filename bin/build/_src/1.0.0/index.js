@@ -28,6 +28,7 @@ const inquirer = require('inquirer');
 const build = require('./_src/build');
 const extraStepRunner = require('./_src/lib/extraStepRunner');
 const versionManagement = require('./_src/lib/versionManagement');
+const links = require('../../../../shared/1.0.0/lib/link');
 
 module.exports.start = async function (onitBuildFile, builderVersion, basepath, params, logger) {
     // geth the package component at the current path
@@ -93,6 +94,9 @@ module.exports.start = async function (onitBuildFile, builderVersion, basepath, 
         const answers = await inquirer.prompt(list);
         extraSteps = extraSteps.filter((step, index) => answers['step_' + index]);
     }
+
+    logger.log('Verifico links...');
+    await links.start(logger, onitBuildFile);
 
     // update the package.json and package-lock.json versions if needed
     if (packageVersion && packageVersion.before) {
