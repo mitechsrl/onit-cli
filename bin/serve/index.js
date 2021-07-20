@@ -41,14 +41,14 @@ module.exports.help = [
 module.exports.cmd = async function (basepath, params, logger) {
     try {
         // check for manual serve file specifed
-        const manualSeveFile = params.get('-c');
+        const manualConfigFile = params.get('-c');
 
         // load the buildFile
-        const onitServeFile = await onitFileLoader.load('serve', process.cwd(), manualSeveFile.found ? manualSeveFile.value : null);
-        logger.warn('Uso files serve ' + onitServeFile.sources.join(', '));
+        const onitConfigFile = await onitFileLoader.load(process.cwd(), manualConfigFile.found ? manualConfigFile.value : null);
+        logger.warn('Uso file(s) config ' + onitConfigFile.sources.join(', '));
 
         // lock to the required builder version or get the most recent one
-        const requiredVersion = onitServeFile.json.serveVersion || '*';
+        const requiredVersion = onitConfigFile.json.serveVersion || '*';
 
         // get a list of the available versions (each dir describe one version)
         const availableVersions = fs.readdirSync(path.join(__dirname, './_src'));
@@ -62,7 +62,7 @@ module.exports.cmd = async function (basepath, params, logger) {
         logger.info('Uso serve V' + version);
         const serve = require(path.join(__dirname, './_src/' + version + '/index.js'));
 
-        await serve.start(onitServeFile, version, basepath, params, logger);
+        await serve.start(onitConfigFile, version, basepath, params, logger);
     } catch (e) {
         logger.error(e.message);
         logger.error('Serve interrotto');

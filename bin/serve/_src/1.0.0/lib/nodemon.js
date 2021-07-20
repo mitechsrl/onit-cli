@@ -26,7 +26,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 const nodemon = require('nodemon');
 const path = require('path');
 
-module.exports.start = async (logger, onitServeFile, debug, reload, timeout) => {
+module.exports.start = async (logger, onitConfigFile, debug, reload, timeout) => {
     return new Promise(resolve => {
         // add this to a delay so we give some time to other process to start without being too much cpu-heavy
         let delay = setTimeout(() => {
@@ -35,20 +35,17 @@ module.exports.start = async (logger, onitServeFile, debug, reload, timeout) => 
             // serve: devo calcolare la config di nodemon prima di lanciarlo a partire dal file di config onitserve.config.[js,json]
             const nodemonConfig = require(path.join(__dirname, '../configFiles/nodemon.js'));
 
-            // aggiungo watch su moduli caricati così cambiamenti in quelle cartelle rilanciano nodemon!
-            const enabledModulesPaths = (onitServeFile.json.loadComponents || [])
-                .filter(c => c.enabled) // watch on enabled only
-                .filter(c => c.path.indexOf('node_modules') < 0) // don't watch on node_modules dirs
-                .map(c => c.path);
+            // list of paths to be watched
+            const enabledModulesPaths = [];
 
-            nodemonConfig.watch = [process.cwd(), ...(nodemonConfig.watch || []), ...enabledModulesPaths];
+            nodemonConfig.watch = [process.cwd(), ...(nodemonConfig.watch || [])];
 
             // if you want to develop a single component and run it you can use the same
             // onitRun file but with a property "component:true".
             // This will make the serve utility to launch the dependency onit loading this component
-            if (onitServeFile.json.component === true) {
+            if (onitConfigFile.json.component === true) {
                 // FIXME: questo diventerà @mitech/onit
-                nodemonConfig.script = onitServeFile.json.main || './node_modules/@mitech/mitown/server/server.js';
+                nodemonConfig.script = (onitConfigFile.json.serve || {}).main || './node_modules/@mitech/mitown/server/server.js';
                 enabledModulesPaths.push('.');
             }
 
@@ -63,11 +60,11 @@ module.exports.start = async (logger, onitServeFile, debug, reload, timeout) => 
             }
 
             // Adding environment stuff (see https://github.com/remy/nodemon/blob/master/doc/sample-nodemon.md)
-            const env = onitServeFile.json.environment || {};
+            const env = (onitConfigFile.json.serve || {}).environment || {};
             Object.keys(env).forEach(key => {
                 if (typeof env[key] === 'object') { env[key] = JSON.stringify(env[key]); }
             });
-            const _env = Object.assign({ ONIT_RUN_FILE: onitServeFile.filename }, nodemonConfig.env || {}, env);
+            const _env = Object.assign({ ONIT_RUN_FILE: onitConfigFile.sources[0] }, nodemonConfig.env || {}, env);
             if (Object.keys(_env).length > 0) nodemonConfig.env = _env;
 
             // inject in the env the list of directories of components to be loaded (additionally to the node_modules ones)

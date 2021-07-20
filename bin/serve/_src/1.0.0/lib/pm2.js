@@ -35,9 +35,9 @@ module.exports.stop = async function () {
     return spawn(pm2exec, ['stop', 'all'], true);
 };
 
-module.exports.start = async function (onitServeFile) {
+module.exports.start = async function (onitConfigFile) {
     // preparo ecosystem file temporaneo
-    let pm2Ecosystem = onitServeFile.json['pm2-dev-ecosystem'];
+    let pm2Ecosystem = (onitConfigFile.json.serve || {})['pm2-dev-ecosystem'];
     if (!pm2Ecosystem) {
         pm2Ecosystem = { apps: [] };
     }
@@ -62,7 +62,7 @@ module.exports.start = async function (onitServeFile) {
         return 0;
     }
 
-    const temporaryEcosystemFile = onitServeFile.filename + '-pm2-ecosystem.json';
+    const temporaryEcosystemFile = onitConfigFile.sources[0] + '-pm2-ecosystem.json';
     fs.writeFileSync(temporaryEcosystemFile, JSON.stringify(pm2Ecosystem, null, 4));
 
     // rimuovo ecosystem caricato in precedenza prima di rilanciare tutto

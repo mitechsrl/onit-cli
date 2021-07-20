@@ -27,7 +27,7 @@ const path = require('path');
 const webpack = require('webpack');
 
 // create a list of promises, each one will launch a webpack watcher managing one single config.
-module.exports = (webpackConfigs, logger) => webpackConfigs.map(webpackConfig => {
+module.exports = (webpackConfig, logger) => {
     return new Promise(resolve => {
         // watcher callback
         const componentName = path.basename(webpackConfig.context);
@@ -92,4 +92,4 @@ module.exports = (webpackConfigs, logger) => webpackConfigs.map(webpackConfig =>
             }
         });
     });
-});
+};

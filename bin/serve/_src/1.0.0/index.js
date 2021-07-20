@@ -28,41 +28,35 @@ const nodemon = require('./lib/nodemon');
 const webpack = require('./lib/webpack');
 const links = require('../../../../shared/1.0.0/lib/link');
 
-module.exports.start = async function (onitServeFile, version, basepath, params, logger) {
+module.exports.start = async function (onitConfigFile, version, basepath, params, logger) {
     const minusW = params.get('-w').found;
     const minusN = params.get('-n').found;
     const debug = params.get('-debug').found;
     const reload = params.get('-reload').found;
-    try {
-        logger.log('Verifico links...');
-        await links.start(logger, onitServeFile);
 
-        // pre-serve: run sequentially waiting for each async resolve
-        logger.log('Eseguo <Nodemon startup>...');
-        const launchedCount = await pm2Dev.start(onitServeFile);
+    logger.log('Verifico links...');
+    await links.start(logger, onitConfigFile);
 
-        // tempo di lanciare il serve effettivo
-        const message = [(!minusN ? 'webpack' : ''), (!minusW ? 'nodemon' : '')].filter(m => !!m).join(' e ');
-        logger.log('Lancio ' + message + '...');
+    // pre-serve: run sequentially waiting for each async resolve
+    logger.log('Eseguo <Nodemon startup>...');
+    const launchedCount = await pm2Dev.start(onitConfigFile);
 
-        await Promise.all([
-            (!minusN) ? webpack.start(logger, onitServeFile) : Promise.resolve(), // -n cause only webpack to be run live
-            (!minusW) ? nodemon.start(logger, onitServeFile, debug, reload, minusN ? 0 : 10000) : Promise.resolve() // -w cause only webpack to be run live
-        ]);
+    // tempo di lanciare il serve effettivo
+    const message = [(!minusN ? 'webpack' : ''), (!minusW ? 'nodemon' : '')].filter(m => !!m).join(' e ');
+    logger.log('Lancio ' + message + '...');
 
-        if (launchedCount > 0) {
-            // after-serve: run sequentially waiting for each async resolve
-            logger.log('Eseguo <Nodemon shutdown>...');
-            await pm2Dev.stop();
-        }
-        // bye!
-        logger.error('Exit serve...');
-        // eslint-disable-next-line no-process-exit
-        process.exit(0);
-    } catch (e) {
-        logger.error(e.message);
-        logger.error('Run interrotto');
-        // eslint-disable-next-line no-process-exit
-        process.exit(-1);
+    await Promise.all([
+        (!minusN) ? webpack.start(logger, onitConfigFile) : Promise.resolve(), // -n cause only webpack to be run live
+        (!minusW) ? nodemon.start(logger, onitConfigFile, debug, reload, minusN ? 0 : 10000) : Promise.resolve() // -w cause only webpack to be run live
+    ]);
+
+    if (launchedCount > 0) {
+        // after-serve: run sequentially waiting for each async resolve
+        logger.log('Eseguo <Nodemon shutdown>...');
+        await pm2Dev.stop();
     }
+    // bye!
+    logger.error('Exit serve...');
+    // eslint-disable-next-line no-process-exit
+    process.exit(0);
 };
