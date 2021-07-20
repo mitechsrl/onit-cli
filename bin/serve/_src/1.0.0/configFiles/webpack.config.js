@@ -31,8 +31,8 @@ const CleanWebpackPlugin = require('clean-webpack-plugin').CleanWebpackPlugin;
 const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin');
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 const progressHandler = require('../../../../../lib/webpack/progressHandler');
-const baseConfig = require('../../../../../configFiles/1.0.0/shared/options');
-const babelConfig = require('../../../../../configFiles/1.0.0/shared/babel.config');
+const baseConfig = require('../../../../../shared/1.0.0/configFiles/options');
+const babelConfig = require('../../../../../shared/1.0.0/configFiles/babel.config');
 const mixinFromFile = require('../../../../../lib/webpack/mixinFromFile');
 
 /**
