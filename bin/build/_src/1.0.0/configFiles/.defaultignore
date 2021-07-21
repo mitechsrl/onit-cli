@@ -3,6 +3,7 @@
 
 # Dev stuff
 node_modules
+.husky
 .git*
 .npmrc*
 .eslintrc*

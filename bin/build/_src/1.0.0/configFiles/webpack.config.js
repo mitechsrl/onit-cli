@@ -31,6 +31,7 @@ const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const { SubresourceIntegrityPlugin } = require('webpack-subresource-integrity');
+const TerserPlugin = require('terser-webpack-plugin');
 const baseConfig = require('../../../../../shared/1.0.0/configFiles/options');
 const babelConfig = require('../../../../../shared/1.0.0/configFiles/babel.config');
 const mixinFromFile = require('../../../../../lib/webpack/mixinFromFile');
@@ -124,12 +125,16 @@ module.exports = (context, config, packageJson) => {
         // this will create shared modules between pages.
         // https://webpack.js.org/plugins/split-chunks-plugin/#splitchunkschunks
         optimization: {
+            minimize: env === 'production', // enable minimization for production builds
             splitChunks: {
                 chunks: 'all'
             },
             minimizer: [
                 // minimize css: https://github.com/webpack-contrib/css-minimizer-webpack-plugin
-                new CssMinimizerPlugin()
+                new CssMinimizerPlugin(),
+
+                // minimize js: https://webpack.js.org/plugins/terser-webpack-plugin/
+                new TerserPlugin()
             ]
         },
 
@@ -145,11 +150,12 @@ module.exports = (context, config, packageJson) => {
         // https://webpack.js.org/plugins/
         plugins: [
 
-            // force case sensitive to be correct (thanks windows)
+            // force case sensitive to be correct (thanks windows!)
             // https://www.npmjs.com/package/case-sensitive-paths-webpack-plugin
             new CaseSensitivePathsPlugin(),
 
             // show human readable errors
+            // https://github.com/geowarin/friendly-errors-webpack-plugin#readme
             new FriendlyErrorsWebpackPlugin({
                 clearConsole: false
             }),
@@ -186,6 +192,7 @@ module.exports = (context, config, packageJson) => {
                 });
             }),
 
+            // Enable SRI for compiled files
             // https://github.com/waysact/webpack-subresource-integrity
             new SubresourceIntegrityPlugin({
                 hashFuncNames: ['sha256', 'sha384'],

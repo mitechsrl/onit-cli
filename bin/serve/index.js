@@ -35,7 +35,6 @@ module.exports.help = [
     ['-c serveFile', 'Utilizza il file di serve specificato'],
     ['-debug', 'Avvia il processo node con il flag --inspact'],
     ['-reload', 'Abbinato a -debug, avvia il processo node con watch&reload.']
-
 ];
 
 module.exports.cmd = async function (basepath, params, logger) {
@@ -64,9 +63,7 @@ module.exports.cmd = async function (basepath, params, logger) {
 
         await serve.start(onitConfigFile, version, basepath, params, logger);
     } catch (e) {
-        logger.error(e.message);
         logger.error('Serve interrotto');
-        // eslint-disable-next-line no-process-exit
-        process.exit(-1);
+        throw e;
     }
 };

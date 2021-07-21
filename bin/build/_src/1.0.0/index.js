@@ -30,16 +30,17 @@ const extraStepRunner = require('./_src/lib/extraStepRunner');
 const versionManagement = require('./_src/lib/versionManagement');
 const links = require('../../../../shared/1.0.0/lib/link');
 
-module.exports.start = async function (onitBuildFile, builderVersion, basepath, params, logger) {
+module.exports.start = async function (onitConfigFile, builderVersion, basepath, params, logger) {
     // geth the package component at the current path
     const cwdPackageJsonFileName = path.join(process.cwd(), 'package.json');
 
     const cwdPackageJson = require(cwdPackageJsonFileName);
 
     // check for buildTargets existence
-    const buildTargets = onitBuildFile.json.buildTargets || {};
+    // FIXME: 21-07-2021 buildTarget is deprecated. Use targets
+    const buildTargets = (onitConfigFile.json.build || {}).targets || (onitConfigFile.json.build || {}).buildTargets || {};
     if (Object.keys(buildTargets).length === 0) {
-        logger.error('Nessun build target definito in ' + onitBuildFile.filename);
+        logger.error('Nessun build target definito. Verifica di aver definitio la proprietà <build.targets> nel tuoi file di conigurazione: ' + onitConfigFile.sources.join(', '));
         return;
     }
 
@@ -96,7 +97,7 @@ module.exports.start = async function (onitBuildFile, builderVersion, basepath, 
     }
 
     logger.log('Verifico links...');
-    await links.start(logger, onitBuildFile);
+    await links.start(logger, onitConfigFile);
 
     // update the package.json and package-lock.json versions if needed
     if (packageVersion && packageVersion.before) {
@@ -104,7 +105,7 @@ module.exports.start = async function (onitBuildFile, builderVersion, basepath, 
     }
 
     // effective build
-    await build.build(cwdPackageJson, logger, buildTarget, targetDir, onitBuildFile);
+    await build.build(cwdPackageJson, logger, buildTarget, targetDir, onitConfigFile);
 
     // set build dir in the vars
     vars.$_BUILD_DIR = targetDir;

@@ -30,14 +30,14 @@ const spawn = require('../../../lib/spawn');
 const isWindows = (process.env.OS || '').toUpperCase().includes('WIN');
 const npmExec = isWindows ? 'npm.cmd' : 'npm';
 
-async function start (logger, onitServeFile) {
+async function start (logger, onitConfigFile) {
     // do we have links to be checked?
-    if (!onitServeFile.json.link || onitServeFile.json.link.length === 0) {
+    if (!onitConfigFile.json.link || onitConfigFile.json.link.length === 0) {
         return null;
     }
 
     // if we have some links definitions iterate over them and check each one
-    for await (const l of onitServeFile.json.link) {
+    for await (const l of onitConfigFile.json.link) {
         const p = path.resolve(process.cwd(), './node_modules', './' + l.link);
         let stat = null;
         let error = null;

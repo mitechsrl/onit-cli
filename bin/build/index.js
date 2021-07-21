@@ -33,12 +33,15 @@ module.exports.help = [];
 
 module.exports.cmd = async function (basepath, params, logger) {
     try {
+        // check for manual serve file specifed
+        const manualConfigFile = params.get('-c');
+
         // load the buildFile
-        const onitBuildFile = await onitFileLoader.load('build');
-        logger.warn('Uso file build ' + onitBuildFile.filename);
+        const onitConfigFile = await onitFileLoader.load(process.cwd(), manualConfigFile.found ? manualConfigFile.value : null);
+        logger.warn('Uso file(s) config ' + onitConfigFile.sources.join(', '));
 
         // lock to the required builder version or get the most recent one
-        const requiredVersion = onitBuildFile.json.builderVersion || '*';
+        const requiredVersion = onitConfigFile.json.builderVersion || '*';
 
         // load the available build versions
         const availableVersions = fs.readdirSync(path.join(__dirname, './_src'));
@@ -52,10 +55,9 @@ module.exports.cmd = async function (basepath, params, logger) {
         logger.info('Uso builder V' + version);
         const builder = require(path.join(__dirname, './_src/' + version + '/index.js'));
 
-        await builder.start(onitBuildFile, version, basepath, params, logger);
+        await builder.start(onitConfigFile, version, basepath, params, logger);
     } catch (e) {
-        logger.error(e.message);
         logger.error('Build interrotto');
-        process.exit(-1);
+        throw e;
     }
 };

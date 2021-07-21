@@ -25,36 +25,32 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 const path = require('path');
 const _ = require('lodash');
-const onitFileLoader = require('../../../../../lib/onitFileLoader');
 const webpackUtils = require('../../../../../lib/webpack/utils');
 const fs = require('fs');
-const webpackWatcherPromiseGenerator = require('./webpackWatcherPromiseGenerator');
+const webpackWatcher = require('./webpackWatcher');
 
 module.exports.start = async (logger, onitConfigFile) => {
     // load the default config
     const webpackConfigFactory = require('../configFiles/webpack.config');
 
-    // create a webpack config for the current directory and
-    // add dynamic entry points to the webpack config for the current directory
+    // search all entry points for the current run directory (they are spread over in webpack.json files)
     const entryPoints = webpackUtils.searchEntryPoints(process.cwd());
 
-    // read the web exports from
+    // Build the webpack exports for the project at the current dir and node_modules
     const thisProjectWebpackExports = await webpackUtils.buildWebpackConfig(process.cwd(), onitConfigFile);
 
-    // console.log(thisProjectWebpackExports);
-    // check if we have a component at the current path. If true, auto add it as loadable module.
-    let cwdPackageJson = path.join(process.cwd(), 'package.json');
-
     // get the package json in the current directory
+    let cwdPackageJson = path.join(process.cwd(), 'package.json');
     cwdPackageJson = JSON.parse(fs.readFileSync(cwdPackageJson).toString());
+
     // create a webpack config for the current path project
     let webpackConfig = webpackConfigFactory(logger, process.cwd(), {
         entryPoints: entryPoints
     }, cwdPackageJson);
 
-    // merge the webpack exports if any
+    // merge the base webpack config with exports
     webpackConfig = _.mergeWith(webpackConfig, thisProjectWebpackExports, webpackUtils.webpackMergeFn);
 
-    // generate the array of webpack watcher instances and run'em all
-    return webpackWatcherPromiseGenerator(webpackConfig, logger);
+    // generate a webpack watcher instance and run it
+    return webpackWatcher(webpackConfig, logger);
 };

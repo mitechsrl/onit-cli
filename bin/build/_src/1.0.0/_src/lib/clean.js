@@ -68,7 +68,7 @@ const removeFiles = (logger, files) => {
         }
     });
 };
-module.exports = async (logger, targetDir, onitBuildFile, buildMode) => {
+module.exports = async (logger, targetDir, onitConfigFile, buildMode) => {
     logger.info('[CLEAN] Eseguo clean finale...');
 
     const originalPath = process.cwd();

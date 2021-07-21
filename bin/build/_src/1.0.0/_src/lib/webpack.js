@@ -29,10 +29,9 @@ const webpackUtils = require('../../../../../../lib/webpack/utils');
 const util = require('util');
 const webpack = util.promisify(_webpack);
 const path = require('path');
-const onitFileLoader = require('../../../../../../lib/onitFileLoader');
 const fs = require('fs');
 
-module.exports = async function (logger, distTargetDir, onitBuildFile, buildMode, injectBuildOptions = null) {
+module.exports = async function (logger, distTargetDir, onitConfigFile, buildMode, injectBuildOptions = null) {
     logger.info('[WEBPACK] Eseguo build webpack ' + (injectBuildOptions ? 'con configurazione extra ' + JSON.stringify(injectBuildOptions) : 'standard'));
 
     // load the default config
@@ -41,50 +40,40 @@ module.exports = async function (logger, distTargetDir, onitBuildFile, buildMode
     // const originalPath = process.cwd();
     const context = process.cwd();
 
-    // change the working directory in the build path
-
     // create a webpack config for the current directory and
     // add dynamic entry points to the webpack config for the current directory
     const entryPoints = webpackUtils.searchEntryPoints(context);
 
-    // geth the package component at the current path
-    const cwdPackageJson = JSON.parse(fs.readFileSync(path.join(context, 'package.json')).toString());
+    // Build the webpack exports for the project at the current dir and node_modules
+    const thisProjectWebpackExports = await webpackUtils.buildWebpackConfig(context, onitConfigFile);
+
+    // get the package json in the current directory
+    let cwdPackageJson = path.join(context, 'package.json');
+    cwdPackageJson = JSON.parse(fs.readFileSync(cwdPackageJson).toString());
 
     // create a webpack config for the current path project
-    let cwdWebpackConfig = webpackConfigFactory(context, {
+    let webpackConfig = webpackConfigFactory(context, {
         entryPoints: entryPoints,
         buildPath: 'build/' + distTargetDir
     }, cwdPackageJson);
 
     // webpack build is either development or production.
     // everything non-development is translated to roduction (even out 'test' mode)
-    cwdWebpackConfig.mode = (buildMode !== 'development') ? 'production' : 'development';
+    webpackConfig.mode = (buildMode !== 'development') ? 'production' : 'development';
 
-    // if the current project path is a module, we auto-inject required dependency: mitown
-    if (onitBuildFile.json.component) {
-        // on build-as component, mit-own is inherently a dependency. Removing from the manual added list
-        // to avoid later parses since one is done here manually.
-        onitBuildFile.json.dependencies = (onitBuildFile.json.dependencies || []).filter(d => d !== 'mit-own');
-
-        // load here mit-own data
-        const mitownPathAsDep = path.join(process.cwd(), './node_modules/@mitech/mitown');
-        const mitownBuildFile = await onitFileLoader.load('build', mitownPathAsDep);
-        const dependenciesData = await webpackUtils.getWebpackExportsFromDependencies(mitownPathAsDep, mitownBuildFile);
-        cwdWebpackConfig = _.mergeWith(cwdWebpackConfig, dependenciesData, webpackUtils.webpackMergeFn);
-    }
-
-    // load dependencies webpack exports
-    const webpackExported = await webpackUtils.getWebpackExportsFromDependencies(context, onitBuildFile);
-    cwdWebpackConfig = _.mergeWith(cwdWebpackConfig, webpackExported, webpackUtils.webpackMergeFn);
+    // merge the base webpack config with exports
+    webpackConfig = _.mergeWith(webpackConfig, thisProjectWebpackExports, webpackUtils.webpackMergeFn);
 
     // add externally-provided options if any
     if (injectBuildOptions) {
-        cwdWebpackConfig = _.mergeWith(cwdWebpackConfig, injectBuildOptions, webpackUtils.webpackMergeFn);
+        webpackConfig = _.mergeWith(webpackConfig, injectBuildOptions, webpackUtils.webpackMergeFn);
     }
+
+    console.log(webpackConfig);
 
     // TODO: aggiungere flag verbose per vedere piu info come questa?
     try {
-        const stats = await webpack(cwdWebpackConfig);
+        const stats = await webpack(webpackConfig);
 
         // do we had compile errors?
         if (stats) {
@@ -97,9 +86,6 @@ module.exports = async function (logger, distTargetDir, onitBuildFile, buildMode
         }
 
         console.info('[WEBPACK] Compile completato');
-
-        // change back to the original directory
-        // process.chdir(originalPath);
     } catch (err) {
         // do we had internal errors?
         logger.error('[WEBPACK] Errore di compilazione');
