@@ -33,14 +33,16 @@ module.exports.start = async function (onitConfigFile, version, basepath, params
     const minusN = params.get('-n').found;
     const debug = params.get('-debug').found;
     const reload = params.get('-reload').found;
+    let launchedCount = 0;
 
     logger.log('Verifico links...');
     await links.start(logger, onitConfigFile);
 
     // pre-serve: run sequentially waiting for each async resolve
-    logger.log('Eseguo <Nodemon startup>...');
-    const launchedCount = await pm2Dev.start(onitConfigFile);
-
+    if (minusW) {
+        logger.log('Verifico app da lanciare con pm2...');
+        launchedCount = await pm2Dev.start(onitConfigFile);
+    }
     // tempo di lanciare il serve effettivo
     const message = [(!minusN ? 'webpack' : ''), (!minusW ? 'nodemon' : '')].filter(m => !!m).join(' e ');
     logger.log('Lancio ' + message + '...');
@@ -52,9 +54,10 @@ module.exports.start = async function (onitConfigFile, version, basepath, params
 
     if (launchedCount > 0) {
         // after-serve: run sequentially waiting for each async resolve
-        logger.log('Eseguo <Nodemon shutdown>...');
+        logger.log('Eseguo shutdown pm2');
         await pm2Dev.stop();
     }
+
     // bye!
     logger.error('Exit serve...');
     // eslint-disable-next-line no-process-exit
