@@ -46,8 +46,11 @@ module.exports.cmd = async function (basepath, params, logger) {
         const onitConfigFile = await onitFileLoader.load(process.cwd(), manualConfigFile.found ? manualConfigFile.value : null);
         logger.warn('Uso file(s) config ' + onitConfigFile.sources.join(', '));
 
+        if (!onitConfigFile.json.serve) {
+            throw new Error('Il serve non è disponibile. Verifica di avere la proprietà <serve> nel file di configurazioen di onit.');
+        }
         // lock to the required builder version or get the most recent one
-        const requiredVersion = onitConfigFile.json.serveVersion || '*';
+        const requiredVersion = onitConfigFile.json.serve.version || '*';
 
         // get a list of the available versions (each dir describe one version)
         const availableVersions = fs.readdirSync(path.join(__dirname, './_src'));
@@ -55,7 +58,7 @@ module.exports.cmd = async function (basepath, params, logger) {
         // use npm semver to select the most recent usable version
         const version = semverMaxSatisfying(availableVersions, requiredVersion);
 
-        if (!version) throw new Error('Nessuna versione di serve compatibile con ' + requiredVersion + ' trovata. Verifica il valore serveVersion del tuo file onitserve oppure aggiorna onit-cli');
+        if (!version) throw new Error('Nessuna versione di serve compatibile con ' + requiredVersion + ' trovata. Verifica il valore serve.version del tuo file onitserve oppure aggiorna onit-cli');
 
         // version found: Load that builder and use it.
         logger.info('Uso serve V' + version);

@@ -30,9 +30,9 @@ I comandi **serve** e **build** necessitano di files di configurazione(vedi risp
 
 I files di configurazione possono esssere locali/globali:
 
-- globali: file nominato **something.config.[js,json]**, contenente configurazioni statiche e/o globali per la funzione richiesta, indipendenti dal sistema, il quale è previsto possa essere posto **in staging git**
+- globali: file nominato **onit.config.[js,json]**, contenente configurazioni statiche e/o globali per la funzione richiesta, indipendenti dal sistema, il quale è previsto possa essere posto **in staging git**
 
-- locali: file nominato **something.config.local.[js,json]**, contenente configurazioni specifiche del sistema corrente, come puntamenti a files esterni al progetto oppure configurazioni locali configurate dallo sviluppatore. Tale file **non è previsto venga messo in staging git**. Usa questo file per aggiungere comandi custom o dipendenti dalla struttura fs locale.
+- locali: file nominato **onit.config.local.[js,json]**, contenente configurazioni specifiche del sistema corrente, come puntamenti a files esterni al progetto oppure configurazioni locali configurate dallo sviluppatore. Tale file **non è previsto venga messo in staging git**. Usa questo file per aggiungere comandi custom o dipendenti dalla struttura fs locale.
 
 Il sistema legge automaticamente il file **.local** ed esegue un merge della sua configurazione con quella del file **non .local**.
 

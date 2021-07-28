@@ -1,40 +1,31 @@
 ## Onit build
 
-Permette il build del progetto e la creazione dei files destinati alla pacchettizzazione tramite npm. Richiede i files **onitbuild.config.[js|json]**
+Permette il build del progetto e la creazione dei files destinati alla pacchettizzazione tramite npm. 
 
-##### onitbuild.config.[js|json]
+##### onit.config.[js|json]
 
 ```
 
 module.exports = {
-    builderVersion: String, versione (in formato stile npm) del builder richiesto. 
-    dependencies: Array<String>, lista di dipendenze del progetto. Vedi Sezione **dipendenze build**
+    link: array, gestione automatica di npm link,
     export: {
         webpack: Object, configurazione webpack aggiuntiva iniettata da questo componente. Vedi **Export webpack**
     },
 
-    buildTargets: Object, configurazione targets di build. Deve essere definito almeno un build target. Vedi sezione **build target**
+    build:{
+        version: String, versione (in formato stile npm) del builder richiesto.      
+        targets: Object, configurazione targets di build. Deve essere definito almeno un build target. Vedi sezione **build target**
+    }
 
 };
 
 ```
-##### builderVersion
-Indica che il progetto richiede una specifica versione del builder di onit-cli. Se omesso usa l'ultima versione disponibile nella onit-cli, altrimenti risolve la versione utilizzabile tramite le logiche semver. Occorre pertanto fornire una stringa di versione in stile npm.
 
-Vedi https://semver.org/lang/it/
+##### Link
+Vedi [link in ONIT-SERVE.md](./ONIT-SERVE.md)
 
-##### Dipendenze build
-Le dipendenze di build sono definite dalla proprietà **dependencies: Array<String>**.
 
-L'array di dipendenze contiene la lista di nomi dei moduli da cui ottenere informazioni aggiuntive necessarie per il build. Ogni elemento di questo array deve essere definito in base a:
-
-- Link cartella componente: Se in precedenza era stato creato un tag tramite **onit link**, il primo tentativo di risoluzione verifica se la stringa inserita è presente come tag link. In caso affermativo, il componente alla directory rappresentata dal tag viene utilizzato, in caso contrario viene eseguita una ricerca per cartella come descritto nel punto successivo.
-
-- Nome cartella componente: la stringa "myComponent" causa la ricerca della cartella "myComponent" dal path corrente "in su". In particolare, il processo di build tenta la ricerca del modulo voluto in './myComponent', '../myComponent', '../../myComponent', '../../../myComponent' e così via.
-
-In caso nessuna ricerca vada a buon fine, il build viene interrotto.
-
-##### Export webpack
+##### Export
 
 La sezione export.webpack definisce un oggetto seguente la struttura della configurazione standard di webpack(vedi https://webpack.js.org/configuration/) il quale viene mergiato all'interno della configurazione standard di build. In particolare, questo oggetto rappresenta di fatto una configurazione aggiuntiva che il componente dichiara a webpack.
 
@@ -56,6 +47,11 @@ I componenti dipendenti da questo, possono utilizzare il seguente codice per imp
 ```
 import component from 'MitownReactComponents\component.jsx'
 ```
+
+##### Build version
+Indica che il progetto richiede una specifica versione del builder di onit-cli. Se omesso usa l'ultima versione disponibile nella onit-cli, altrimenti risolve la versione utilizzabile tramite le logiche semver. Occorre pertanto fornire una stringa di versione in stile npm.
+
+Vedi https://semver.org/lang/it/
 
 ##### Build targets
 

@@ -40,8 +40,12 @@ module.exports.cmd = async function (basepath, params, logger) {
         const onitConfigFile = await onitFileLoader.load(process.cwd(), manualConfigFile.found ? manualConfigFile.value : null);
         logger.warn('Uso file(s) config ' + onitConfigFile.sources.join(', '));
 
+        if (!onitConfigFile.json.build) {
+            throw new Error('Il build non è disponibile. Verifica di avere la proprietà <build> nel file di configurazioen di onit.');
+        }
+
         // lock to the required builder version or get the most recent one
-        const requiredVersion = onitConfigFile.json.builderVersion || '*';
+        const requiredVersion = onitConfigFile.json.build.version || '*';
 
         // load the available build versions
         const availableVersions = fs.readdirSync(path.join(__dirname, './_src'));
@@ -49,7 +53,7 @@ module.exports.cmd = async function (basepath, params, logger) {
         // use npm semver to select the most recent usable version
         const version = semverMaxSatisfying(availableVersions, requiredVersion);
 
-        if (!version) throw new Error('Nessuna versione builder compatibile con ' + requiredVersion + ' trovata. Verifica il valore buildVersion del tuo file onitBuild oppure aggiorna onit-cli');
+        if (!version) throw new Error('Nessuna versione builder compatibile con ' + requiredVersion + ' trovata. Verifica il valore build.version del tuo file onitBuild oppure aggiorna onit-cli');
 
         // version found: Load that builder and use it.
         logger.info('Uso builder V' + version);
