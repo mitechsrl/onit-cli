@@ -66,7 +66,7 @@ Vedi https://semver.org/lang/it/
                 cmd: 'npm view "$_PACKAGE_NAME" versions --json'
             }
         },
-        buildExtraSteps: [{
+        afterSteps: [{
             name: 'myCommand',
             cmd: 'cmd -param1 -param2 -param3',
             cwd: '$_BUILD_DIR'
@@ -104,7 +104,7 @@ $_BUILD_DIR: path assoluta alla cartella di build del progetto
 
 Sfruttando queste variabili, è possibile definire il comando additional come **npm view "$_PACKAGE_NAME" versions --json**, il quale verifica la versione pubblicata su repository npm e pertanto la voce di menu aggiuntiva presentata propone la versione successiva all'ultima versione presente nel repository npm.
 
-**buildExtraSteps** rappresenta un array di comandi eseguibili in automatico **DOPO** il termine del build del progetto. La console chiede conferma all'esecuzione dei comandi prima della build, in modo da dare maggiore controllo all'utente sulle operazioni post-build.
+**afterSteps** rappresenta un array di comandi eseguibili in automatico **DOPO** il termine del build del progetto. La console chiede conferma all'esecuzione dei comandi prima della build, in modo da dare maggiore controllo all'utente sulle operazioni post-build.
 
 Ogni comando deve essere nel formato:
 

@@ -84,7 +84,7 @@ module.exports.start = async function (onitConfigFile, builderVersion, basepath,
     const packageVersion = await versionManagement.prompt(buildTarget, vars, cwdPackageJson, targetDir);
 
     // selector for extra steps (if available)
-    let extraSteps = (buildTarget.buildExtraSteps || []);
+    let extraSteps = (buildTarget.afterSteps || []);
     if (extraSteps.length > 0) {
         logger.log('Selezione step aggiuntivi post-build:');
         const list = extraSteps.map((step, index) => ({
