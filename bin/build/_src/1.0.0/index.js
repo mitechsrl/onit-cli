@@ -77,7 +77,8 @@ module.exports.start = async function (onitConfigFile, builderVersion, basepath,
     // prepare some vars for next steps
     const vars = {
         $_PROJECT_DIR: process.cwd(),
-        $_PACKAGE_NAME: cwdPackageJson.name
+        $_PACKAGE_NAME: cwdPackageJson.name,
+        $_PACKAGE_VERSION: cwdPackageJson.version
     };
 
     // ask the user for version
@@ -102,6 +103,7 @@ module.exports.start = async function (onitConfigFile, builderVersion, basepath,
     // update the package.json and package-lock.json versions if needed
     if (packageVersion && packageVersion.before) {
         versionManagement.updateBefore(cwdPackageJson, cwdPackageJsonFileName, packageVersion.before);
+        vars.$_PACKAGE_VERSION = packageVersion.before;
     }
 
     // effective build
@@ -113,6 +115,7 @@ module.exports.start = async function (onitConfigFile, builderVersion, basepath,
     // update the package version after the build if needed
     if (packageVersion && packageVersion.after) {
         await versionManagement.updateAfter(targetDir, packageVersion.after);
+        vars.$_PACKAGE_VERSION = packageVersion.after;
     }
 
     // extra steps management

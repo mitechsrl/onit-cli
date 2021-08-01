@@ -69,8 +69,6 @@ module.exports = async function (logger, distTargetDir, onitConfigFile, buildMod
         webpackConfig = _.mergeWith(webpackConfig, injectBuildOptions, webpackUtils.webpackMergeFn);
     }
 
-    console.log(webpackConfig);
-
     // TODO: aggiungere flag verbose per vedere piu info come questa?
     try {
         const stats = await webpack(webpackConfig);
