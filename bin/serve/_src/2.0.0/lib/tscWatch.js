@@ -25,19 +25,40 @@ OTHER DEALINGS IN THE SOFTWARE.
 const TscWatchClient = require('tsc-watch/client');
 const { spawn } = require('child_process');
 const logger = require('../../../../../lib/logger');
+const readline = require('readline');
 // const path = require('path');
 
-function spawnNodeProcess (params = [], options = {}) {
-    let proc = spawn('node', ['./dist/index.js', ...params], Object.assign(options, { stdio: 'inherit' }));
-    let killing = false;
-    let exitCb = null;
+/**
+ * Spawn a node process for the app
+ * @param {*} onitConfigFile the onit configuration file
+ * @param {*} params the params to be added at the command line
+ * @param {*} options options for child_process.spawn
+ * @returns
+ */
+function spawnNodeProcess (onitConfigFile, params = [], options = {}) {
+    // some hardcoded parameters
+    const hardcodedParameters = ['--max-old-space-size=4096'];
+
+    // Prepare the env variables
+    let env = (onitConfigFile.json.serve || {}).environment || {};
+    // env vars must be strings
+    Object.keys(env).forEach(key => {
+        if (typeof env[key] === 'object') { env[key] = JSON.stringify(env[key]); }
+    });
+    env = Object.assign({ ONIT_RUN_FILE: onitConfigFile.sources[0] }, env);
+
+    let proc = spawn('node',
+        ['./dist/index.js', ...hardcodedParameters, ...params],
+        Object.assign(options, { stdio: 'inherit', env: env })
+    );
+
+    // attach a exit callback.
+    let afterKillCb = false; // valid only when the user kill the app (basically by reload)
     proc.on('exit', (code) => {
-        if (!killing) {
-            logger.error('Process exited with code ' + code);
+        if (typeof afterKillCb === 'function') {
+            afterKillCb();
         } else {
-            if (typeof exitCb === 'function') {
-                exitCb();
-            }
+            logger.error('Process exited with code ' + code);
         }
         proc = null;
     });
@@ -45,8 +66,8 @@ function spawnNodeProcess (params = [], options = {}) {
     return {
         kill: (cb) => {
             if (proc) {
-                exitCb = cb;
-                killing = true;
+                // we have a previous process. Set the proper cb and kill it.
+                afterKillCb = cb;
                 proc.kill();
             } else {
                 // process probably crashed before. Just call the cb
@@ -57,8 +78,33 @@ function spawnNodeProcess (params = [], options = {}) {
 }
 module.exports.start = async (logger, onitConfigFile, debug, reload, timeout) => {
     return new Promise(resolve => {
+        const rl = readline.createInterface({
+            input: process.stdin
+        });
+
         let nodeProcess = null;
         const watch = new TscWatchClient();
+
+        const launchOrReload = () => {
+            if (nodeProcess) {
+                // we have an already running node porcess. kill it and respawn
+                console.log('Reloading node app...');
+                nodeProcess.kill(() => {
+                    nodeProcess = spawnNodeProcess(onitConfigFile);
+                });
+            } else {
+                // no node processes already running . Spawn a new one
+                nodeProcess = spawnNodeProcess(onitConfigFile);
+            }
+        };
+
+        rl.on('line', (line) => {
+            // manual app restart
+            if (line.trim() === 'rs') {
+                logger.log('Launch or reload');
+                launchOrReload();
+            }
+        });
 
         watch.on('started', () => {
             console.log('Compilation started');
@@ -69,22 +115,15 @@ module.exports.start = async (logger, onitConfigFile, debug, reload, timeout) =>
         });
 
         watch.on('success', () => {
-            if (nodeProcess) {
-                // we have an already running node porcess. kill it and respawn
-                console.log('Reloading node app...');
-                nodeProcess.kill(() => {
-                    nodeProcess = spawnNodeProcess();
-                });
-            } else {
-                // no node processes already running . Spawn a new one
-                nodeProcess = spawnNodeProcess();
-            }
+            launchOrReload();
         });
 
         watch.on('compile_errors', () => {
             // Your code goes here...
         });
 
+        // start the watcher. adding --noClear because it's annoying that tsc clear the console
+        // when there's stuff from other processes (webpack mainly)!
         watch.start('--noClear');
 
         /*

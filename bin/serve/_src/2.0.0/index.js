@@ -49,7 +49,7 @@ module.exports.start = async function (onitConfigFile, version, basepath, params
 
     await Promise.all([
         (!minusT) ? webpack.start(logger, onitConfigFile) : Promise.resolve(), // -n cause only webpack to be run live
-        (!minusW) ? tsc.start(logger) : Promise.resolve() // -t cause only webpack to be run live
+        (!minusW) ? tsc.start(logger, onitConfigFile) : Promise.resolve() // -t cause only webpack to be run live
     ]);
 
     if (launchedCount > 0) {
