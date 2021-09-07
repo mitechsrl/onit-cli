@@ -26,6 +26,8 @@ const TscWatchClient = require('tsc-watch/client');
 const { spawn } = require('child_process');
 const logger = require('../../../../../lib/logger');
 const readline = require('readline');
+const copyExtraFiles = require('./copyExtraFiles');
+const path = require('path');
 // const path = require('path');
 
 /**
@@ -78,6 +80,8 @@ function spawnNodeProcess (onitConfigFile, params = [], options = {}) {
 }
 module.exports.start = async (logger, onitConfigFile, debug, reload, timeout) => {
     return new Promise(resolve => {
+        const fileCopy = copyExtraFiles(logger, onitConfigFile, path.join(process.cwd(), './dist'));
+
         const rl = readline.createInterface({
             input: process.stdin
         });
@@ -112,6 +116,7 @@ module.exports.start = async (logger, onitConfigFile, debug, reload, timeout) =>
 
         watch.on('first_success', () => {
             logger.info('First compilation success.');
+            fileCopy.start();
         });
 
         watch.on('success', () => {
@@ -187,8 +192,9 @@ module.exports.start = async (logger, onitConfigFile, debug, reload, timeout) =>
         /**
          * Catch SIGINT (ctrl+c from console) so we stop nodemon when the user ask for it
          */
-        process.on('SIGINT', () => {
+        process.on('SIGINT', async () => {
             logger.warn('Stop/reset tsc...');
+            await fileCopy.close();
             watch.kill();
             if (nodeProcess) {
                 logger.warn('Killing node process...');
