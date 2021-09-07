@@ -25,7 +25,6 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 const fse = require('fs-extra');
 const path = require('path');
-const ncp = require('ncp').ncp;
 const fs = require('fs');
 const chokidar = require('chokidar');
 
@@ -35,7 +34,6 @@ module.exports = (logger, onitConfigFile, targetDir) => {
     return {
         start: () => {
             if (copyFiles && copyFiles.glob && copyFiles.glob.length > 0) {
-                console.log('WATCH', targetDir);
                 const srcPath = path.join(process.cwd(), copyFiles.from);
                 const dstPath = path.join(process.cwd(), copyFiles.to);
 

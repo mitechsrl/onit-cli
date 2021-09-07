@@ -78,7 +78,7 @@ function spawnNodeProcess (onitConfigFile, params = [], options = {}) {
         }
     };
 }
-module.exports.start = async (logger, onitConfigFile, debug, reload, timeout) => {
+module.exports.start = async (logger, onitConfigFile, launchNode) => {
     return new Promise(resolve => {
         const fileCopy = copyExtraFiles(logger, onitConfigFile, path.join(process.cwd(), './dist'));
 
@@ -90,6 +90,8 @@ module.exports.start = async (logger, onitConfigFile, debug, reload, timeout) =>
         const watch = new TscWatchClient();
 
         const launchOrReload = () => {
+            if (!launchNode) return;
+
             if (nodeProcess) {
                 // we have an already running node porcess. kill it and respawn
                 console.log('Reloading node app...');
@@ -198,10 +200,10 @@ module.exports.start = async (logger, onitConfigFile, debug, reload, timeout) =>
             watch.kill();
             if (nodeProcess) {
                 logger.warn('Killing node process...');
-                nodeProcess.kill();
+                nodeProcess.kill(() => { resolve(); });
+            } else {
+                resolve();
             }
-
-            resolve();
         });
     });
 };

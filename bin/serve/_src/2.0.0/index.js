@@ -30,7 +30,9 @@ const links = require('../../../../shared/1.0.0/lib/link');
 
 module.exports.start = async function (onitConfigFile, version, basepath, params, logger) {
     const minusW = params.get('-w').found;
+    const minusN = params.get('-n').found;
     const minusT = params.get('-t').found;
+
     const debug = params.get('-debug').found;
     const reload = params.get('-reload').found;
     let launchedCount = 0;
@@ -39,18 +41,24 @@ module.exports.start = async function (onitConfigFile, version, basepath, params
     await links.start(logger, onitConfigFile);
 
     // pre-serve: run sequentially waiting for each async resolve
-    if (minusW) {
+    if (!(minusW || minusT)) {
         logger.log('Verifico app da lanciare con pm2...');
         launchedCount = await pm2Dev.start(onitConfigFile);
     }
-    // tempo di lanciare il serve effettivo
-    const message = [(!minusT ? 'webpack' : ''), (!minusW ? 'tsc' : '')].filter(m => !!m).join(' e ');
-    logger.log('Lancio ' + message + '...');
 
-    await Promise.all([
-        (!minusT) ? webpack.start(logger, onitConfigFile) : Promise.resolve(), // -n cause only webpack to be run live
-        (!minusW) ? tsc.start(logger, onitConfigFile) : Promise.resolve() // -t cause only webpack to be run live
-    ]);
+    if (minusW) {
+        logger.log('Lancio webpack...');
+        await webpack.start(logger, onitConfigFile);
+    } else if (minusT) {
+        logger.log('Lancio tsc...');
+        await tsc.start(logger, onitConfigFile, !minusN);
+    } else {
+        logger.log('Lancio webpack e tsc...');
+        await Promise.all([
+            webpack.start(logger, onitConfigFile),
+            tsc.start(logger, onitConfigFile, true)
+        ]);
+    }
 
     if (launchedCount > 0) {
         // after-serve: run sequentially waiting for each async resolve
