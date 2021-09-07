@@ -184,7 +184,7 @@ module.exports = (logger, context, config, packageJson) => {
                         ${htmlWebpackPlugin.tags.bodyTags}
                     `,
                     inject: false, // do not add other tags than the ones from templateContent
-                    filename: filename + '.chunks.ejs',
+                    filename: filename.toLowerCase() + '.chunks.ejs',
                     // this will make the public path by package: dist/mitown, dist/mit-ask etc...
                     publicPath: '/dist-fe' + packagePublishPath,
                     // this particular instance will add (js chunk files) dependencies for this entrypoint
