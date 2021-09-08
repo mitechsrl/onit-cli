@@ -31,7 +31,6 @@ const CleanWebpackPlugin = require('clean-webpack-plugin').CleanWebpackPlugin;
 const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin');
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 const progressHandler = require('../../../../../lib/webpack/progressHandler');
-const baseConfig = require('../../../../../shared/1.0.0/configFiles/options');
 const babelConfig = require('../../../../../shared/1.0.0/configFiles/babel.config');
 const mixinFromFile = require('../../../../../lib/webpack/mixinFromFile');
 
@@ -46,6 +45,7 @@ const mixinFromFile = require('../../../../../lib/webpack/mixinFromFile');
 module.exports = (logger, context, config, packageJson) => {
     const env = 'development';
     const componentName = path.basename(context);
+
 
     // this packagePublishPathValue must match the one from the package (whic is calculated wit the same logic)
     let packagePublishPath = packageJson.mountPath || (packageJson.mitown || {}).mountPath || packageJson.name.replace('@mitech/', '');
@@ -171,6 +171,9 @@ module.exports = (logger, context, config, packageJson) => {
                 // the output filename is just the input filename without the directory slashes.
                 // this will make a file in the dist directory directly having a name which will remember us his origin location
                 let filename = entryPoint;
+                while (filename.indexOf('..' + path.sep) >= 0) {
+                    filename = filename.replace('..' + path.sep, 'up_');
+                }
                 while (filename.indexOf(path.sep) >= 0) {
                     filename = filename.replace(path.sep, '_');
                 }
@@ -196,7 +199,7 @@ module.exports = (logger, context, config, packageJson) => {
         // where to put final stuff.
         // see https://webpack.js.org/configuration/output/
         output: {
-            path: path.join(context, baseConfig.outputPath),
+            path: path.join(context, config.outputPath),
             filename: '[contenthash].js'
         },
 

@@ -71,6 +71,11 @@ module.exports.cmd = async function (basepath, params, logger) {
         logger.info('Uso serve V' + version);
         const serve = require(path.join(__dirname, './_src/' + version + '/index.js'));
 
+        // autoset the hardcoded params
+        if (Array.isArray(onitConfigFile.json.serve.params)) {
+            params.push(...onitConfigFile.json.serve.params);
+        }
+
         await serve.start(onitConfigFile, version, basepath, params, logger);
     } catch (e) {
         logger.error('Serve interrotto');

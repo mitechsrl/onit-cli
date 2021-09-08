@@ -28,6 +28,7 @@ const logger = require('../../../../../lib/logger');
 const readline = require('readline');
 const copyExtraFiles = require('./copyExtraFiles');
 const path = require('path');
+const _ = require('lodash');
 // const path = require('path');
 
 /**
@@ -78,6 +79,36 @@ function spawnNodeProcess (onitConfigFile, params = [], options = {}) {
         }
     };
 }
+
+function spawnSubprocess (config) {
+    let proc = spawn(
+        config.cmd,
+        {
+            stdio: [null, 'inherit', 'inherit'],
+            shell: true,
+            cwd: config.cwd
+        }
+    );
+
+    let killCb = null;
+    proc.on('exit', (code) => {
+        proc = null;
+        if (killCb) killCb();
+    });
+
+    return {
+        kill: (cb) => {
+            if (proc) {
+                killCb = cb;
+                proc.kill();
+            } else {
+                cb();
+            }
+        }
+    };
+}
+const subProcesses = [];
+
 module.exports.start = async (logger, onitConfigFile, launchNode) => {
     return new Promise(resolve => {
         const fileCopy = copyExtraFiles(logger, onitConfigFile, path.join(process.cwd(), './dist'));
@@ -119,6 +150,14 @@ module.exports.start = async (logger, onitConfigFile, launchNode) => {
         watch.on('first_success', () => {
             logger.info('First compilation success.');
             fileCopy.start();
+
+            const _subProcesses = _.get(onitConfigFile, 'json.serve.onFirstTscCompilationSuccess', []);
+            _subProcesses.forEach(sp => {
+                if (sp.cmd) {
+                    logger.info('Launch ' + sp.name);
+                    subProcesses.push(spawnSubprocess(sp));
+                }
+            });
         });
 
         watch.on('success', () => {
@@ -191,19 +230,32 @@ module.exports.start = async (logger, onitConfigFile, launchNode) => {
             // nodemon.on('stderr', v => console.log(v));
         }, timeout);
 */
-        /**
-         * Catch SIGINT (ctrl+c from console) so we stop nodemon when the user ask for it
-         */
+
+        // kill all the eventually launched subprocesses
+        const killSubProcesses = (cb) => {
+            if (subProcesses.length > 0) {
+                const sp = subProcesses.shift();
+                sp.kill(() => {
+                    killSubProcesses(cb);
+                });
+            } else {
+                cb();
+            }
+        };
+
+        // Catch SIGINT (ctrl+c from console) so we stop nodemon when the user ask for it
         process.on('SIGINT', async () => {
             logger.warn('Stop/reset tsc...');
             await fileCopy.close();
             watch.kill();
-            if (nodeProcess) {
-                logger.warn('Killing node process...');
-                nodeProcess.kill(() => { resolve(); });
-            } else {
-                resolve();
-            }
+            killSubProcesses(() => {
+                if (nodeProcess) {
+                    logger.warn('Killing node process...');
+                    nodeProcess.kill(() => { resolve(); });
+                } else {
+                    resolve();
+                }
+            });
         });
     });
 };

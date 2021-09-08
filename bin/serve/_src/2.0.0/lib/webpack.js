@@ -46,7 +46,8 @@ module.exports.start = async (logger, onitConfigFile) => {
 
     // create a webpack config for the current path project
     let webpackConfig = webpackConfigFactory(logger, process.cwd(), {
-        entryPoints: entryPoints
+        entryPoints: entryPoints,
+        outputPath: _.get(onitConfigFile, 'json.webpack.outputPath', './dist-fe')
     }, cwdPackageJson);
 
     // merge the base webpack config with exports
