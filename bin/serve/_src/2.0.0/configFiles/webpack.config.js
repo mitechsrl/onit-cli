@@ -46,7 +46,6 @@ module.exports = (logger, context, config, packageJson) => {
     const env = 'development';
     const componentName = path.basename(context);
 
-
     // this packagePublishPathValue must match the one from the package (whic is calculated wit the same logic)
     let packagePublishPath = packageJson.mountPath || (packageJson.mitown || {}).mountPath || packageJson.name.replace('@mitech/', '');
     if (!packagePublishPath.startsWith('/')) packagePublishPath = '/' + packagePublishPath;
@@ -168,16 +167,6 @@ module.exports = (logger, context, config, packageJson) => {
 
             // these plugin instances will create an html file(for chunck dependency inclusion) for each entry point
             ...Object.keys(config.entryPoints).map(entryPoint => {
-                // the output filename is just the input filename without the directory slashes.
-                // this will make a file in the dist directory directly having a name which will remember us his origin location
-                let filename = entryPoint;
-                while (filename.indexOf('..' + path.sep) >= 0) {
-                    filename = filename.replace('..' + path.sep, 'up_');
-                }
-                while (filename.indexOf(path.sep) >= 0) {
-                    filename = filename.replace(path.sep, '_');
-                }
-
                 // create a plugin instance
                 // see https://github.com/jantimon/html-webpack-plugin#options
                 return new HtmlWebpackPlugin({
@@ -187,7 +176,8 @@ module.exports = (logger, context, config, packageJson) => {
                         ${htmlWebpackPlugin.tags.bodyTags}
                     `,
                     inject: false, // do not add other tags than the ones from templateContent
-                    filename: filename.toLowerCase() + '.chunks.ejs',
+                    // the output filename is just the entry point. Make sure you have unique identified entry points
+                    filename: entryPoint.toLowerCase() + '.chunks.ejs',
                     // this will make the public path by package: dist/mitown, dist/mit-ask etc...
                     publicPath: '/dist-fe' + packagePublishPath,
                     // this particular instance will add (js chunk files) dependencies for this entrypoint

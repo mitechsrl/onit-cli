@@ -28,6 +28,7 @@ const _ = require('lodash');
 const webpackUtils = require('../../../../../lib/webpack/utils');
 const fs = require('fs');
 const webpackWatcher = require('./webpackWatcher');
+const { searchEntryPoints } = require('./searchEntryPoints');
 
 module.exports.start = async (logger, onitConfigFile) => {
     // load the default config
@@ -35,7 +36,7 @@ module.exports.start = async (logger, onitConfigFile) => {
 
     // search all entry points for the current run directory (they are spread over in webpack.json files)
     // FIXME: the reactPath parameter is just a temporary solution to allow alternative paths for entry points
-    const entryPoints = webpackUtils.searchEntryPoints(process.cwd(), onitConfigFile.json.reactPaths);
+    const entryPoints = searchEntryPoints(process.cwd(), onitConfigFile.json.reactPaths);
 
     // Build the webpack exports for the project at the current dir and node_modules
     const thisProjectWebpackExports = await webpackUtils.buildWebpackConfig(process.cwd(), onitConfigFile);
