@@ -29,56 +29,8 @@ const readline = require('readline');
 const copyExtraFiles = require('./copyExtraFiles');
 const path = require('path');
 const _ = require('lodash');
+const { spawnNodeProcess } = require('./spawnNodeProcess');
 // const path = require('path');
-
-/**
- * Spawn a node process for the app
- * @param {*} onitConfigFile the onit configuration file
- * @param {*} params the params to be added at the command line
- * @param {*} options options for child_process.spawn
- * @returns
- */
-function spawnNodeProcess (onitConfigFile, params = [], options = {}) {
-    // some hardcoded parameters
-    const hardcodedParameters = ['--max-old-space-size=4096'];
-
-    // Prepare the env variables
-    let env = (onitConfigFile.json.serve || {}).environment || {};
-    // env vars must be strings
-    Object.keys(env).forEach(key => {
-        if (typeof env[key] === 'object') { env[key] = JSON.stringify(env[key]); }
-    });
-    env = Object.assign({ ONIT_RUN_FILE: onitConfigFile.sources[0] }, env);
-
-    let proc = spawn('node',
-        ['./dist/index.js', ...hardcodedParameters, ...params],
-        Object.assign(options, { stdio: 'inherit', env: env })
-    );
-
-    // attach a exit callback.
-    let afterKillCb = false; // valid only when the user kill the app (basically by reload)
-    proc.on('exit', (code) => {
-        if (typeof afterKillCb === 'function') {
-            afterKillCb();
-        } else {
-            logger.error('Process exited with code ' + code);
-        }
-        proc = null;
-    });
-
-    return {
-        kill: (cb) => {
-            if (proc) {
-                // we have a previous process. Set the proper cb and kill it.
-                afterKillCb = cb;
-                proc.kill();
-            } else {
-                // process probably crashed before. Just call the cb
-                cb();
-            }
-        }
-    };
-}
 
 function spawnSubprocess (config) {
     let proc = spawn(
@@ -109,8 +61,10 @@ function spawnSubprocess (config) {
 }
 const subProcesses = [];
 
-module.exports.start = async (logger, onitConfigFile, launchNode) => {
+module.exports.start = async (onitConfigFile, exitAfterTsc, launchNode) => {
     return new Promise(resolve => {
+        const nodeParams = [];
+
         const fileCopy = copyExtraFiles(logger, onitConfigFile, path.join(process.cwd(), './dist'));
 
         const rl = readline.createInterface({
@@ -127,11 +81,11 @@ module.exports.start = async (logger, onitConfigFile, launchNode) => {
                 // we have an already running node porcess. kill it and respawn
                 console.log('Reloading node app...');
                 nodeProcess.kill(() => {
-                    nodeProcess = spawnNodeProcess(onitConfigFile);
+                    nodeProcess = spawnNodeProcess(onitConfigFile, nodeParams);
                 });
             } else {
                 // no node processes already running . Spawn a new one
-                nodeProcess = spawnNodeProcess(onitConfigFile);
+                nodeProcess = spawnNodeProcess(onitConfigFile, nodeParams);
             }
         };
 
@@ -149,87 +103,38 @@ module.exports.start = async (logger, onitConfigFile, launchNode) => {
 
         watch.on('first_success', () => {
             logger.info('First compilation success.');
-            fileCopy.start();
+            if (!exitAfterTsc) {
+                fileCopy.start();
 
-            const _subProcesses = _.get(onitConfigFile, 'json.serve.onFirstTscCompilationSuccess', []);
-            _subProcesses.forEach(sp => {
-                if (sp.cmd) {
-                    logger.info('Launch ' + sp.name);
-                    subProcesses.push(spawnSubprocess(sp));
-                }
-            });
+                const _subProcesses = _.get(onitConfigFile, 'json.serve.onFirstTscCompilationSuccess', []);
+                _subProcesses.forEach(sp => {
+                    if (sp.cmd) {
+                        logger.info('Launch ' + sp.name);
+                        subProcesses.push(spawnSubprocess(sp));
+                    }
+                });
+            }
         });
 
         watch.on('success', () => {
-            launchOrReload();
+            if (!exitAfterTsc) {
+                launchOrReload();
+            } else {
+                // eslint-disable-next-line no-process-exit
+                process.exit(0);
+            }
         });
 
         watch.on('compile_errors', () => {
-            // Your code goes here...
+            if (exitAfterTsc) {
+                // eslint-disable-next-line no-process-exit
+                process.exit(-1);
+            }
         });
 
         // start the watcher. adding --noClear because it's annoying that tsc clear the console
         // when there's stuff from other processes (webpack mainly)!
         watch.start('--noClear');
-
-        /*
-        // add this to a delay so we give some time to other process to start without being too much cpu-heavy
-        let delay = setTimeout(() => {
-            delay = null;
-
-            // serve: devo calcolare la config di nodemon prima di lanciarlo a partire dal file di config onitserve.config.[js,json]
-            const nodemonConfig = require(path.join(__dirname, '../configFiles/nodemon.js'));
-
-            // list of paths to be watched
-            const enabledModulesPaths = [];
-
-            nodemonConfig.watch = [process.cwd(), ...(nodemonConfig.watch || [])];
-
-            // if you want to develop a single component and run it you can use the same
-            // onitRun file but with a property "component:true".
-            // This will make the serve utility to launch the dependency onit loading this component
-            if (onitConfigFile.json.component === true) {
-                // FIXME: questo diventerà @mitech/onit
-                nodemonConfig.script = (onitConfigFile.json.serve || {}).main || './node_modules/@mitech/mitown/server/server.js';
-                enabledModulesPaths.push('.');
-            }
-
-            if (debug) {
-                logger.warn('Modalità debug abilitata');
-                // nodemonConfig.exec = 'node';
-                nodemonConfig.nodeArgs = nodemonConfig.nodeArgs || [];
-                nodemonConfig.nodeArgs.push('--inspect');
-                if (!reload) {
-                    nodemonConfig.ignore = ['*'];
-                }
-            }
-
-            // Adding environment stuff (see https://github.com/remy/nodemon/blob/master/doc/sample-nodemon.md)
-            const env = (onitConfigFile.json.serve || {}).environment || {};
-            Object.keys(env).forEach(key => {
-                if (typeof env[key] === 'object') { env[key] = JSON.stringify(env[key]); }
-            });
-            const _env = Object.assign({ ONIT_RUN_FILE: onitConfigFile.sources[0] }, nodemonConfig.env || {}, env);
-            if (Object.keys(_env).length > 0) nodemonConfig.env = _env;
-
-            // inject in the env the list of directories of components to be loaded (additionally to the node_modules ones)
-            nodemonConfig.env.ONIT_COMPONENTS = JSON.stringify(enabledModulesPaths.map(p => path.resolve(process.cwd(), p)));
-
-            // Finally launch nodemon
-            nodemon(nodemonConfig);
-
-            nodemon.on('quit', function () {
-                logger.warn('App terminata');
-                resolve(0);
-            });
-            nodemon.on('log', function (log) {
-                console.log(log.colour);
-            });
-
-            // nodemon.on('stdout', v => console.log(v));
-            // nodemon.on('stderr', v => console.log(v));
-        }, timeout);
-*/
 
         // kill all the eventually launched subprocesses
         const killSubProcesses = (cb) => {

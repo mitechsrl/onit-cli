@@ -27,11 +27,13 @@ const pm2Dev = require('./lib/pm2');
 const webpack = require('./lib/webpack');
 const tsc = require('./lib/tscWatch.js');
 const links = require('../../../../shared/1.0.0/lib/link');
+const { spawnNodeProcessPromise } = require('./lib/spawnNodeProcess');
 
 module.exports.start = async function (onitConfigFile, version, basepath, params, logger) {
     const minusW = params.get('-w').found;
-    const minusN = params.get('-n').found;
     const minusT = params.get('-t').found;
+    const minusN = params.get('-n').found;
+    const exitAfterTsc = params.get('-exit').found;
 
     const debug = params.get('-debug').found;
     const reload = params.get('-reload').found;
@@ -40,8 +42,7 @@ module.exports.start = async function (onitConfigFile, version, basepath, params
     logger.log('Verifico links...');
     await links.start(logger, onitConfigFile);
 
-    // pre-serve: run sequentially waiting for each async resolve
-    if (!(minusW || minusT)) {
+    if (minusN || (!(minusW || minusT))) {
         logger.log('Verifico app da lanciare con pm2...');
         launchedCount = await pm2Dev.start(onitConfigFile);
     }
@@ -51,12 +52,20 @@ module.exports.start = async function (onitConfigFile, version, basepath, params
         await webpack.start(logger, onitConfigFile);
     } else if (minusT) {
         logger.log('Lancio tsc...');
-        await tsc.start(logger, onitConfigFile, !minusN);
+        await tsc.start(onitConfigFile, exitAfterTsc, true);
+    } else if (minusN) {
+        logger.warn('Lancio node...');
+        const nodeParams = [];
+        if (debug) {
+            logger.warn('Modalità debug abilitata');
+            nodeParams.push('--inspect');
+        }
+        await spawnNodeProcessPromise(onitConfigFile, nodeParams);
     } else {
         logger.log('Lancio webpack e tsc...');
         await Promise.all([
             webpack.start(logger, onitConfigFile),
-            tsc.start(logger, onitConfigFile, true)
+            tsc.start(onitConfigFile, exitAfterTsc, true)
         ]);
     }
 

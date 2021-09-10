@@ -31,16 +31,17 @@ const semverMaxSatisfying = require('semver/ranges/max-satisfying');
 module.exports.info = 'Dev Run/serve utility. Lancia il progetto in ambiente di sviluppo';
 module.exports.help = [
 
-    'serve V^1.0.0',
+    'Serve V^1.0.0',
     ['-n', 'Esegui solo nodemon, skip webpack'],
-    '', 'serve V^2.0.0',
-    ['-t', 'Esegui solo tsc e node, skip webpack'],
-    ['-n', 'Non lanciare node al termine di tsc (necessita di -t)'],
-    '', 'comuni',
-    ['-w', 'Esegui solo webpack, skip tsc e node'],
+    ['-reload', 'Abbinato a -debug, avvia il processo node con watch&reload.'],
+    '', 'Serve V^2.0.0',
+    ['-t', 'Esegui tsc e node'],
+    ['-n', 'Esegui solo il processo node (Necessita di tsc eseguito almeno una volta)'],
+    ['-exit', 'Abbinato a -t esce subito dopo aver terminato tsc'],
+    '', 'Comuni',
+    ['-w', 'Esegui solo webpack'],
     ['-c serveFile', 'Utilizza il file di serve specificato'],
-    ['-debug', 'Avvia il processo node con il flag --inspact'],
-    ['-reload', 'Abbinato a -debug, avvia il processo node con watch&reload.']
+    ['-debug', 'Avvia il processo node con il flag --inspact']
 
 ];
 
