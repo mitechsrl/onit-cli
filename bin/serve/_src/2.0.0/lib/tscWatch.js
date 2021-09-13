@@ -89,6 +89,11 @@ module.exports.start = async (onitConfigFile, exitAfterTsc, launchNode) => {
             }
         };
 
+        // the function to run on compilation success
+        // by default it does nothing, this will be valorized after some initial
+        // steps
+        let onSuccess = () => {};
+
         rl.on('line', (line) => {
             // manual app restart
             if (line.trim() === 'rs') {
@@ -103,9 +108,15 @@ module.exports.start = async (onitConfigFile, exitAfterTsc, launchNode) => {
 
         watch.on('first_success', () => {
             logger.info('First compilation success.');
-            if (!exitAfterTsc) {
-                fileCopy.start();
 
+            if (exitAfterTsc) {
+                // eslint-disable-next-line no-process-exit
+                process.exit(0);
+            }
+
+            // run this callback after the first file copy is successful
+            const onFilesCopied = () => {
+                logger.log("Files scan & copy completed");
                 const _subProcesses = _.get(onitConfigFile, 'json.serve.onFirstTscCompilationSuccess', []);
                 _subProcesses.forEach(sp => {
                     if (sp.cmd) {
@@ -113,16 +124,21 @@ module.exports.start = async (onitConfigFile, exitAfterTsc, launchNode) => {
                         subProcesses.push(spawnSubprocess(sp));
                     }
                 });
-            }
+
+                // set the onSuccess function to a function
+                // which effectively do something
+                onSuccess = () => {
+                    launchOrReload();
+                };
+
+                process.nextTick(launchOrReload);
+            };
+
+            fileCopy.start(onFilesCopied);
         });
 
         watch.on('success', () => {
-            if (!exitAfterTsc) {
-                launchOrReload();
-            } else {
-                // eslint-disable-next-line no-process-exit
-                process.exit(0);
-            }
+            onSuccess();
         });
 
         watch.on('compile_errors', () => {

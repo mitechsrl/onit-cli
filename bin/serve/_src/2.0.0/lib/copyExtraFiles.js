@@ -32,7 +32,7 @@ module.exports = (logger, onitConfigFile, targetDir) => {
     let watcher = null;
     const copyFiles = onitConfigFile.json.copyFiles;
     return {
-        start: () => {
+        start: (onReady) => {
             if (copyFiles && copyFiles.glob && copyFiles.glob.length > 0) {
                 const srcPath = path.join(process.cwd(), copyFiles.from);
                 const dstPath = path.join(process.cwd(), copyFiles.to);
@@ -51,11 +51,17 @@ module.exports = (logger, onitConfigFile, targetDir) => {
 
                 // watch for delete
                 const unlink = async (filePath) => {
+                    console.log("unlink ", filePath);
                     const srcFileFullPath = path.join(process.cwd(), filePath);
                     const dstFileFullPath = srcFileFullPath.replace(srcPath, dstPath);
                     await fs.promises.unlink(dstFileFullPath);
                 };
                 watcher.on('unlink', unlink);
+
+                // initial scan finished
+                watcher.on('ready', onReady);
+            } else {
+                onReady();
             }
         },
         close: async () => {
