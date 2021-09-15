@@ -23,49 +23,21 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
 const TscWatchClient = require('tsc-watch/client');
-const { spawn } = require('child_process');
+
 const logger = require('../../../../../lib/logger');
 const readline = require('readline');
 const copyExtraFiles = require('./copyExtraFiles');
-const path = require('path');
 const _ = require('lodash');
 const { spawnNodeProcess } = require('./spawnNodeProcess');
-// const path = require('path');
+const { spawnSubprocess } = require('./spawnSubprocess');
 
-function spawnSubprocess (config) {
-    let proc = spawn(
-        config.cmd,
-        {
-            stdio: [null, 'inherit', 'inherit'],
-            shell: true,
-            cwd: config.cwd
-        }
-    );
-
-    let killCb = null;
-    proc.on('exit', (code) => {
-        proc = null;
-        if (killCb) killCb();
-    });
-
-    return {
-        kill: (cb) => {
-            if (proc) {
-                killCb = cb;
-                proc.kill();
-            } else {
-                cb();
-            }
-        }
-    };
-}
 const subProcesses = [];
 
 module.exports.start = async (onitConfigFile, exitAfterTsc, launchNode) => {
     return new Promise(resolve => {
         const nodeParams = [];
 
-        const fileCopy = copyExtraFiles(logger, onitConfigFile, path.join(process.cwd(), './dist'));
+        const fileCopy = copyExtraFiles(onitConfigFile);
 
         const rl = readline.createInterface({
             input: process.stdin
@@ -116,7 +88,7 @@ module.exports.start = async (onitConfigFile, exitAfterTsc, launchNode) => {
 
             // run this callback after the first file copy is successful
             const onFilesCopied = () => {
-                logger.log("Files scan & copy completed");
+                logger.log('Files scan & copy completed');
                 const _subProcesses = _.get(onitConfigFile, 'json.serve.onFirstTscCompilationSuccess', []);
                 _subProcesses.forEach(sp => {
                     if (sp.cmd) {

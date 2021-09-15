@@ -28,18 +28,28 @@ const path = require('path');
 const fs = require('fs');
 const chokidar = require('chokidar');
 
-module.exports = (logger, onitConfigFile, targetDir) => {
+module.exports = (onitConfigFile) => {
     let watcher = null;
     const copyFiles = onitConfigFile.json.copyFiles;
+
     return {
+
+        /**
+         * Launch the file change watcher
+         * @param {*} onReady callback called after the initial scan has completed
+         */
         start: (onReady) => {
             if (copyFiles && copyFiles.glob && copyFiles.glob.length > 0) {
+                const to = copyFiles.to || path.join(process.cwd(), './dist');
                 const srcPath = path.join(process.cwd(), copyFiles.from);
-                const dstPath = path.join(process.cwd(), copyFiles.to);
+                const dstPath = path.join(process.cwd(), to);
 
                 watcher = chokidar.watch(copyFiles.glob);
 
                 // watch for add & chenges
+                // NOTE: the add will be triggered at any start, so when this function is launched,
+                // a fisto copy of all the files will be triggered.
+                // subsequential copies are performed on change.
                 const addChange = async (filePath) => {
                     const srcFileFullPath = path.join(process.cwd(), filePath);
                     const dstFileFullPath = srcFileFullPath.replace(srcPath, dstPath);
@@ -51,7 +61,7 @@ module.exports = (logger, onitConfigFile, targetDir) => {
 
                 // watch for delete
                 const unlink = async (filePath) => {
-                    console.log("unlink ", filePath);
+                    console.log('unlink ', filePath);
                     const srcFileFullPath = path.join(process.cwd(), filePath);
                     const dstFileFullPath = srcFileFullPath.replace(srcPath, dstPath);
                     await fs.promises.unlink(dstFileFullPath);
@@ -61,9 +71,14 @@ module.exports = (logger, onitConfigFile, targetDir) => {
                 // initial scan finished
                 watcher.on('ready', onReady);
             } else {
-                onReady();
+                // no stuff to be copied. Just launch the callback
+                process.nextTick(onReady);
             }
         },
+
+        /**
+         * Stop and close the watcher.
+         */
         close: async () => {
             if (watcher) {
                 await watcher.close();
