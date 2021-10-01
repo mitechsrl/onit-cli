@@ -30,6 +30,24 @@ const spawn = require('../../../lib/spawn');
 const isWindows = (process.env.OS || '').toUpperCase().includes('WIN');
 const npmExec = isWindows ? 'npm.cmd' : 'npm';
 
+/**
+ * Create the link. Based on the provided target, it either uses the standard npm link or a custom one
+ * @param {*} l
+ */
+async function createLink (l, logger) {
+    if (!l.target) {
+        // providing just the "link" property uses the standard npm link
+        logger.log('Eseguo <npm link ' + l.link + '>');
+        await spawn(npmExec, ['link', l.link], true, { shell: true });
+    } else {
+        // providing target will make this utility to create the link to the target directory
+        logger.log('Creo symlink ' + l.link + ' verso ' + l.target);
+
+        const p = path.resolve(process.cwd(), './node_modules', './' + l.link);
+        await fs.symlink(l.target, p, 'junction');
+    }
+}
+
 async function start (logger, onitConfigFile) {
     // do we have links to be checked?
     if (!onitConfigFile.json.link || onitConfigFile.json.link.length === 0) {
@@ -51,14 +69,13 @@ async function start (logger, onitConfigFile) {
 
         // does the  file exists? If not, create it
         if (error && error.code === 'ENOENT') {
-            logger.warn(p + ' does not exists. Adding with <npm link ' + l.link + '>');
-            const exit = await spawn(npmExec, ['link', l.link], true, { shell: true });
-            if (exit.exitCode !== 0) throw new Error(exit.data);
+            logger.warn(p + ' non esiste.');
+            await createLink(l, logger);
 
         // is this a symlink?
         } else if (stat && !stat.isSymbolicLink()) {
-            logger.warn(p + ' non è un symlink. eseguo <npm link ' + l.link + '>');
-            await spawn(npmExec, ['link', l.link], true, { shell: true });
+            logger.warn(p + ' non è un symlink.');
+            await createLink(l, logger);
 
         // got some other error
         } else if (error) {
