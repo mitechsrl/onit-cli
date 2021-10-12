@@ -26,6 +26,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 module.exports = {
     plugins: [
         require.resolve('@babel/plugin-proposal-class-properties'),
+        require.resolve('@babel/plugin-transform-runtime'),
         [
             // https://www.npmjs.com/package/babel-plugin-transform-react-remove-prop-types
             require.resolve('babel-plugin-transform-react-remove-prop-types'),

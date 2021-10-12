@@ -29,6 +29,7 @@ module.exports = {
     plugins: [
         //  https://babeljs.io/docs/en/babel-plugin-proposal-class-properties
         // require.resolve('@babel/plugin-proposal-class-properties')
+        require.resolve('@babel/plugin-transform-runtime')
     ],
     presets: [
         // https://babeljs.io/docs/en/babel-preset-react
