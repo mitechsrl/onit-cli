@@ -78,7 +78,7 @@ const resolveSourceIncludes = (block, str) => {
  * @param {*} chapters
  * @returns
  */
-const resolveInternalReferences = (str, chapters) => {
+const resolveInternalReferences = (str, configFile) => {
     // resolve reference links
     const regex = /\[@onitChapter +([0-9.]+)(#[^\]]+)?\](\([^)]+\))?/gm;
     let m;
@@ -97,15 +97,21 @@ const resolveInternalReferences = (str, chapters) => {
         if (text.endsWith(')')) text = text.substr(0, text.length - 1);
 
         const referenceChapter = m[1].replace(/\./g, '/');
-        const referenceTitle = ((chapters[chapter] || {}).title || '').replace(/ /g, '-');
+        let referencePath = '';
 
-        // build the link. We must build it as we need on the final page because jackill is not going to process it
-        const referencePath = '/docs/' + referenceChapter + '/' + referenceTitle + '.html' + anchor;
+        // build the link path. Note that pages with the index properties have links like '/1/2', while standard pages have links like '/1/2/Title.html'
+        if (!configFile.chapters[chapter].index) {
+            // build the link. We must build it as we need on the final page because jackill is not going to process it
+            const referenceTitle = ((configFile.chapters[chapter] || {}).title || '').replace(/ /g, '-');
+            referencePath = (configFile.baseUrl || '') + '/docs/' + referenceChapter + '/' + referenceTitle + '.html' + anchor;
+        } else {
+            referencePath = (configFile.baseUrl || '') + '/docs/' + referenceChapter + anchor;
+        }
         if (!text) text = referencePath;
 
         // this is a markdown link format
         const replace = '[' + text + '](' + referencePath + ')';
-
+        console.log('Generate link ' + replace);
         // console.log('Resolved', found, 'to', replace);
         str = str.replace(found, replace);
     }
@@ -118,7 +124,7 @@ const resolveInternalReferences = (str, chapters) => {
  * @param {*} block
  * @returns
  */
-const generateBlock = (block, chapters) => {
+const generateBlock = (block, configFile) => {
     let str = '';
 
     block.doc = block.doc.trim();
@@ -153,7 +159,7 @@ const generateBlock = (block, chapters) => {
     });
 
     // resolve the internal links for better navigation
-    str = resolveInternalReferences(str, chapters);
+    str = resolveInternalReferences(str, configFile);
 
     // resolve source include tags
     str = resolveSourceIncludes(block, str);
@@ -184,13 +190,13 @@ function createFile (filename, header, content = '') {
  * @param {*} chapterKey
  * @returns
  */
-function buildContent (blocks, chapterKey, chapters) {
+function buildContent (blocks, chapterKey, configFile) {
     // add extracted blocks markdown
     if (blocks.chapters[chapterKey]) {
         // sort them
         blocks.chapters[chapterKey].sort((a, b) => a.priority - b.priority);
         // merge all the blocks for this chapter into a "mega arkdown text"
-        return blocks.chapters[chapterKey].map(block => generateBlock(block, chapters)).join('\n\n');
+        return blocks.chapters[chapterKey].map(block => generateBlock(block, configFile)).join('\n\n');
     }
 
     return '';
@@ -244,7 +250,7 @@ const writeFile = function (configFile, blocks, scanTargetDir, outDir) {
             if (grandParentChapterConfig) chapterConfig.index.grand_parent = grandParentChapterConfig.title;
 
             // create the index content
-            const chapterFileContent = buildContent(blocks, chapterKey, configFile.chapters);
+            const chapterFileContent = buildContent(blocks, chapterKey, configFile);
 
             // write the file out
             createFile(indexFullPath, chapterConfig.index, '\n\n\n' + chapterFileContent);
@@ -266,7 +272,7 @@ const writeFile = function (configFile, blocks, scanTargetDir, outDir) {
             if (grandParentChapterConfig) chapterConfig.page.grand_parent = grandParentChapterConfig.title;
 
             // create the page content
-            const generatedFileContent = buildContent(blocks, chapterKey, configFile.chapters);
+            const generatedFileContent = buildContent(blocks, chapterKey, configFile);
 
             // h4 must not appear on file toc
             const regex = /^(####.+)$/gm;
