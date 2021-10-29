@@ -39,7 +39,7 @@ module.exports.start = async function (onitConfigFile, version, basepath, params
     await links.start(logger, onitConfigFile);
 
     // pre-serve: run sequentially waiting for each async resolve
-    if (minusW) {
+    if (!minusW) {
         logger.log('Verifico app da lanciare con pm2...');
         launchedCount = await pm2Dev.start(onitConfigFile);
     }
