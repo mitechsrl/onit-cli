@@ -54,6 +54,8 @@ module.exports.start = async (logger, onitConfigFile, debug, reload, timeout) =>
                 // nodemonConfig.exec = 'node';
                 nodemonConfig.nodeArgs = nodemonConfig.nodeArgs || [];
                 nodemonConfig.nodeArgs.push('--inspect');
+                nodemonConfig.nodeArgs.push('--preserve-symlinks');
+
                 if (!reload) {
                     nodemonConfig.ignore = ['*'];
                 }
