@@ -30,8 +30,9 @@ const webpack = require('./lib/webpack');
 const clean = require('./lib/clean');
 const fs = require('fs');
 const makeReadme = require('./lib/makeReadme');
+const logger = require('../../../../../lib/logger');
 
-module.exports.build = async function (cwdPackageJson, logger, buildTarget, targetDir, onitConfigFile) {
+module.exports.build = async function (cwdPackageJson, buildTarget, targetDir, onitConfigFile) {
     const buildMode = buildTarget.mode || 'production';
 
     let defaultIgnoreFile = path.join(__dirname, '../configFiles/.defaultignore.' + buildMode);
@@ -45,13 +46,13 @@ module.exports.build = async function (cwdPackageJson, logger, buildTarget, targ
     ]);
 
     // create a copy of the project into the build path
-    await copy(logger, targetDir, ig);
+    await copy(targetDir, ig);
 
     // launch webpack build
-    await webpack(logger, buildTarget.key || buildMode, onitConfigFile, buildMode);
+    await webpack(buildTarget.key || buildMode, onitConfigFile, buildMode);
 
     // clean the build directory
-    await clean(logger, targetDir, onitConfigFile, buildMode);
+    await clean(targetDir, onitConfigFile, buildMode);
 
     // build a basic readme file
     await makeReadme(cwdPackageJson, targetDir);

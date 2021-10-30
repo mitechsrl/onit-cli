@@ -23,6 +23,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
 
+const logger = require('../../../lib/logger');
 const checker = require('./_src/duplicate');
 
 module.exports.info = 'Utility verifica duplicazione e correzione labels.';
@@ -31,8 +32,8 @@ module.exports.help = [
     'Esegue rimozione in-place verificando che non esistano duplicati sia intra-json, che cross-json'
 ];
 
-module.exports.cmd = async function (basepath, params, logger) {
+module.exports.cmd = async function (basepath, params) {
     logger.info('Verifica directory corrente');
 
-    checker.checkDirectory(process.cwd(), logger);
+    checker.checkDirectory(process.cwd());
 };

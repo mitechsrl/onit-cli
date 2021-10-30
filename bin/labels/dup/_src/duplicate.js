@@ -25,8 +25,9 @@ OTHER DEALINGS IN THE SOFTWARE.
 const find = require('find');
 const fs = require('fs');
 const _ = require('lodash');
+const logger = require('../../../../lib/logger');
 
-module.exports.checkDirectory = function (dir, logger) {
+module.exports.checkDirectory = function (dir) {
     const files = find.fileSync(dir);
 
     files.sort();

@@ -27,11 +27,12 @@ const onitFileLoader = require('../../lib/onitFileLoader');
 const path = require('path');
 const fs = require('fs');
 const semverMaxSatisfying = require('semver/ranges/max-satisfying');
+const logger = require('../../lib/logger');
 
 module.exports.info = 'Build utility. Compila il progetto in un pacchetto pronto per il deploy';
 module.exports.help = [];
 
-module.exports.cmd = async function (basepath, params, logger) {
+module.exports.cmd = async function (basepath, params) {
     try {
         // check for manual serve file specifed
         const manualConfigFile = params.get('-c');
@@ -59,7 +60,7 @@ module.exports.cmd = async function (basepath, params, logger) {
         logger.info('Uso builder V' + version);
         const builder = require(path.join(__dirname, './_src/' + version + '/index.js'));
 
-        await builder.start(onitConfigFile, version, basepath, params, logger);
+        await builder.start(onitConfigFile, version, basepath, params);
     } catch (e) {
         logger.error('Build interrotto');
         throw e;

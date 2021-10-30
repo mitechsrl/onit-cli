@@ -28,8 +28,9 @@ const webpack = require('./lib/webpack');
 const tsc = require('./lib/tscWatch.js');
 const links = require('../../../../shared/1.0.0/lib/link');
 const { spawnNodeProcessPromise } = require('./lib/spawnNodeProcess');
+const logger = require('../../../../lib/logger');
 
-module.exports.start = async function (onitConfigFile, version, basepath, params, logger) {
+module.exports.start = async function (onitConfigFile, version, basepath, params) {
     const minusW = params.get('-w').found;
     const minusT = params.get('-t').found;
     const minusN = params.get('-n').found;
@@ -40,7 +41,7 @@ module.exports.start = async function (onitConfigFile, version, basepath, params
     let launchedCount = 0;
 
     logger.log('Verifico links...');
-    await links.start(logger, onitConfigFile);
+    await links.start(onitConfigFile);
 
     if (minusN || (!(minusW || minusT))) {
         logger.log('Verifico app da lanciare con pm2...');
@@ -49,7 +50,7 @@ module.exports.start = async function (onitConfigFile, version, basepath, params
 
     if (minusW) {
         logger.log('Lancio webpack...');
-        await webpack.start(logger, onitConfigFile);
+        await webpack.start(onitConfigFile);
     } else if (minusT) {
         logger.log('Lancio tsc...');
         await tsc.start(onitConfigFile, exitAfterTsc, true);
@@ -64,7 +65,7 @@ module.exports.start = async function (onitConfigFile, version, basepath, params
     } else {
         logger.log('Lancio webpack e tsc...');
         await Promise.all([
-            webpack.start(logger, onitConfigFile),
+            webpack.start(onitConfigFile),
             tsc.start(onitConfigFile, exitAfterTsc, true)
         ]);
     }

@@ -30,8 +30,9 @@ const util = require('util');
 const webpack = util.promisify(_webpack);
 const path = require('path');
 const fs = require('fs');
+const logger = require('../../../../../../lib/logger');
 
-module.exports = async function (logger, distTargetDir, onitConfigFile, buildMode, injectBuildOptions = null) {
+module.exports = async function (distTargetDir, onitConfigFile, buildMode, injectBuildOptions = null) {
     logger.info('[WEBPACK] Eseguo build webpack ' + (injectBuildOptions ? 'con configurazione extra ' + JSON.stringify(injectBuildOptions) : 'standard'));
 
     // load the default config

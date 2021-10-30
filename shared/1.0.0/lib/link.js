@@ -25,6 +25,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 const path = require('path');
 const fs = require('fs').promises;
 const spawn = require('../../../lib/spawn');
+const logger = require('../../../lib/logger');
 
 // windows being windows.. need a ".cmd" extension
 const isWindows = (process.env.OS || '').toUpperCase().includes('WIN');
@@ -34,7 +35,7 @@ const npmExec = isWindows ? 'npm.cmd' : 'npm';
  * Create the link. Based on the provided target, it either uses the standard npm link or a custom one
  * @param {*} l
  */
-async function createLink (l, logger) {
+async function createLink (l) {
     if (!l.target) {
         // providing just the "link" property uses the standard npm link
         logger.log('Eseguo <npm link ' + l.link + '>');
@@ -48,7 +49,7 @@ async function createLink (l, logger) {
     }
 }
 
-async function start (logger, onitConfigFile) {
+async function start (onitConfigFile) {
     // do we have links to be checked?
     if (!onitConfigFile.json.link || onitConfigFile.json.link.length === 0) {
         return null;
@@ -70,12 +71,12 @@ async function start (logger, onitConfigFile) {
         // does the  file exists? If not, create it
         if (error && error.code === 'ENOENT') {
             logger.warn(p + ' non esiste.');
-            await createLink(l, logger);
+            await createLink(l);
 
         // is this a symlink?
         } else if (stat && !stat.isSymbolicLink()) {
             logger.warn(p + ' non è un symlink.');
-            await createLink(l, logger);
+            await createLink(l);
 
         // got some other error
         } else if (error) {

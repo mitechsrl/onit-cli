@@ -25,9 +25,10 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 const path = require('path');
 const webpack = require('webpack');
+const logger = require('../../../../../lib/logger');
 
 // create a list of promises, each one will launch a webpack watcher managing one single config.
-module.exports = (webpackConfig, logger) => {
+module.exports = (webpackConfig) => {
     return new Promise(resolve => {
         // watcher callback
         const componentName = path.basename(webpackConfig.context);

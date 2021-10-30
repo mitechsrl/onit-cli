@@ -27,8 +27,9 @@ const pm2Dev = require('./lib/pm2');
 const nodemon = require('./lib/nodemon');
 const webpack = require('./lib/webpack');
 const links = require('../../../../shared/1.0.0/lib/link');
+const logger = require('../../../../lib/logger');
 
-module.exports.start = async function (onitConfigFile, version, basepath, params, logger) {
+module.exports.start = async function (onitConfigFile, version, basepath, params) {
     const minusW = params.get('-w').found;
     const minusN = params.get('-n').found;
     const debug = params.get('-debug').found;
@@ -36,7 +37,7 @@ module.exports.start = async function (onitConfigFile, version, basepath, params
     let launchedCount = 0;
 
     logger.log('Verifico links...');
-    await links.start(logger, onitConfigFile);
+    await links.start(onitConfigFile);
 
     // pre-serve: run sequentially waiting for each async resolve
     if (!minusW) {
@@ -48,8 +49,8 @@ module.exports.start = async function (onitConfigFile, version, basepath, params
     logger.log('Lancio ' + message + '...');
 
     await Promise.all([
-        (!minusN) ? webpack.start(logger, onitConfigFile) : Promise.resolve(), // -n cause only webpack to be run live
-        (!minusW) ? nodemon.start(logger, onitConfigFile, debug, reload, minusN ? 0 : 10000) : Promise.resolve() // -w cause only webpack to be run live
+        (!minusN) ? webpack.start( onitConfigFile) : Promise.resolve(), // -n cause only webpack to be run live
+        (!minusW) ? nodemon.start(onitConfigFile, debug, reload, minusN ? 0 : 10000) : Promise.resolve() // -w cause only webpack to be run live
     ]);
 
     if (launchedCount > 0) {

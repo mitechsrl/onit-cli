@@ -27,12 +27,12 @@ const path = require('path');
 const fs = require('fs');
 const fse = require('fs-extra');
 const loadIgnore = require('../../../../../../lib/loadIgnore');
+const logger = require('../../../../../../lib/logger');
 /**
  *
- * @param {*} logger
  * @param {*} localPath
  */
-const removePath = (logger, localPath) => {
+const removePath = (localPath) => {
     if (fse.pathExistsSync(localPath)) {
         logger.log('Rimuovo ' + localPath);
         fse.removeSync(localPath);
@@ -41,10 +41,9 @@ const removePath = (logger, localPath) => {
 
 /**
  *
- * @param {*} logger
  * @param {*} buildMode
  */
-const cleanPackageJson = (logger, buildMode) => {
+const cleanPackageJson = (buildMode) => {
     logger.log('Rimuovo valori non voluti da package.json');
     const json = JSON.parse(fs.readFileSync('package.json'));
     const start = json.scripts.start;
@@ -60,7 +59,7 @@ const cleanPackageJson = (logger, buildMode) => {
 /**
  *
  */
-const removeFiles = (logger, files) => {
+const removeFiles = (files) => {
     files.forEach(f => {
         if (fs.existsSync(f)) {
             logger.log('Rimuovo ' + f);
@@ -68,7 +67,7 @@ const removeFiles = (logger, files) => {
         }
     });
 };
-module.exports = async (logger, targetDir, onitConfigFile, buildMode) => {
+module.exports = async (targetDir, onitConfigFile, buildMode) => {
     logger.info('[CLEAN] Eseguo clean finale...');
 
     const originalPath = process.cwd();
@@ -77,14 +76,14 @@ module.exports = async (logger, targetDir, onitConfigFile, buildMode) => {
     process.chdir(targetDir);
 
     // clean stages
-    removePath(logger, 'node_modules');
-    removePath(logger, 'dev-utils');
+    removePath('node_modules');
+    removePath('dev-utils');
 
-    cleanPackageJson(logger, buildMode);
+    cleanPackageJson(buildMode);
 
     // on development we must propagate the exports to be able later to use it for build other components
     if (buildMode !== 'development') {
-        removeFiles(logger, [
+        removeFiles([
             'onitbuild.config.js',
             'onitbuild.config.json'
         ]);

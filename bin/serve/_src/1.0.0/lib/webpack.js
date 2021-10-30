@@ -29,7 +29,7 @@ const webpackUtils = require('../../../../../lib/webpack/utils');
 const fs = require('fs');
 const webpackWatcher = require('./webpackWatcher');
 
-module.exports.start = async (logger, onitConfigFile) => {
+module.exports.start = async (onitConfigFile) => {
     // load the default config
     const webpackConfigFactory = require('../configFiles/webpack.config');
 
@@ -44,7 +44,7 @@ module.exports.start = async (logger, onitConfigFile) => {
     cwdPackageJson = JSON.parse(fs.readFileSync(cwdPackageJson).toString());
 
     // create a webpack config for the current path project
-    let webpackConfig = webpackConfigFactory(logger, process.cwd(), {
+    let webpackConfig = webpackConfigFactory(process.cwd(), {
         entryPoints: entryPoints
     }, cwdPackageJson);
 
@@ -52,5 +52,5 @@ module.exports.start = async (logger, onitConfigFile) => {
     webpackConfig = _.mergeWith(webpackConfig, thisProjectWebpackExports, webpackUtils.webpackMergeFn);
 
     // generate a webpack watcher instance and run it
-    return webpackWatcher(webpackConfig, logger);
+    return webpackWatcher(webpackConfig);
 };

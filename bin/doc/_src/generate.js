@@ -28,8 +28,9 @@ const fs = require('fs');
 const writeFile = require('./writeFile');
 const path = require('path');
 const copyImages = require('./copyImages');
+const logger = require('../../../lib/logger');
 
-module.exports.generate = function (config, outputPath, logger) {
+module.exports.generate = function (config, outputPath) {
     const scanTargetDir = process.cwd();
 
     return new Promise((resolve, reject) => {

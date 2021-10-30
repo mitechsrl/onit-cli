@@ -42,7 +42,7 @@ const mixinFromFile = require('../../../../../lib/webpack/mixinFromFile');
  * @param {*} config
  * @param {*} packageJson the package.json content (js object) of the project to be webpacke'd.
  */
-module.exports = (logger, context, config, packageJson) => {
+module.exports = (context, config, packageJson) => {
     const env = 'development';
     const componentName = path.basename(context);
 
@@ -156,7 +156,7 @@ module.exports = (logger, context, config, packageJson) => {
 
             // show a compilation progress info
             new ProgressPlugin({
-                handler: progressHandler(componentName, logger)
+                handler: progressHandler(componentName)
             }),
 
             // separate css from js files

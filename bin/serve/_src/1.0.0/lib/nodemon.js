@@ -25,8 +25,9 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 const nodemon = require('nodemon');
 const path = require('path');
+const logger = require('../../../../../lib/logger');
 
-module.exports.start = async (logger, onitConfigFile, debug, reload, timeout) => {
+module.exports.start = async (onitConfigFile, debug, reload, timeout) => {
     return new Promise(resolve => {
         // add this to a delay so we give some time to other process to start without being too much cpu-heavy
         let delay = setTimeout(() => {

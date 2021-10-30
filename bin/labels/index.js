@@ -23,9 +23,11 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
 
+const logger = require('../../lib/logger');
+
 module.exports.info = 'Utility gestione labels';
 module.exports.help = [];
 
-module.exports.cmd = async function (basepath, params, logger) {
+module.exports.cmd = async function (basepath, params) {
     logger.warn('Niente da fare qui. Vedi comandi disponibili con -h');
 };

@@ -23,6 +23,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
 
+const logger = require('../../lib/logger');
 const onitFileLoader = require('../../lib/onitFileLoader');
 const { generate } = require('./_src/generate');
 
@@ -32,7 +33,7 @@ module.exports.help = [
     ['-o', 'Output path. Default ./onit-docs']
 ];
 
-module.exports.cmd = async function (basepath, params, logger) {
+module.exports.cmd = async function (basepath, params) {
     try {
         // check for manual serve file specifed
         const outputPath = params.get('-o');
@@ -42,7 +43,7 @@ module.exports.cmd = async function (basepath, params, logger) {
         if (!config) throw new Error('File onitdocumentation.config.[js|json] non trovato');
         logger.warn('Uso file configurazione ' + config.filename);
 
-        await generate(config.json, outputPath, logger);
+        await generate(config.json, outputPath);
     } catch (e) {
         logger.error(e.message);
         // eslint-disable-next-line no-process-exit

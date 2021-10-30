@@ -23,10 +23,11 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
 
+const logger = require('../../../../../../lib/logger');
 const spawn = require('../../../../../../lib/spawn');
 const replace = require('./replace').replace;
 
-module.exports = (logger, step, vars) => {
+module.exports = (step, vars) => {
     logger.log('Eseguo step <' + step.name + '>...');
     step = replace(step, vars);
     let originalCwd = null;

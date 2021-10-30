@@ -29,7 +29,7 @@ const path = require('path');
 module.exports.info = 'Build clean utility. Pulisce la directory di build';
 module.exports.help = [];
 
-module.exports.cmd = async function (basepath, params, logger) {
+module.exports.cmd = async function (basepath, params) {
     const _p = path.join(process.cwd(), './build');
     fse.removeSync(_p);
     fse.ensureDirSync(_p);

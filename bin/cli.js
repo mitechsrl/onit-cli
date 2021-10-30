@@ -47,7 +47,11 @@ npmVersionCheck();
         await command.command(__dirname, process.argv.slice(2));
     } catch (e) {
         // -vv print verbose errors
-        if (process.argv.find(arg => arg === '-vv')) { logger.error(e); } else { logger.error(e); }
+        if (process.argv.find(arg => arg === '-vv')) {
+            logger.error(e);
+        } else {
+            logger.error(e);
+        }
     }
     // eslint-disable-next-line no-process-exit
     process.exit();

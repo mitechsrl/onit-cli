@@ -23,12 +23,13 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
 
+const logger = require('../../../../../../lib/logger');
 const fse = require('fs-extra');
 const path = require('path');
 const ncp = require('ncp').ncp;
 const fs = require('fs');
 
-module.exports = (logger, targetDir, ignoreFilter) => {
+module.exports = (targetDir, ignoreFilter) => {
     return new Promise((resolve, reject) => {
         logger.info('[COPY] Copio progetto nella directory di build ' + targetDir + ' in corso...');
 

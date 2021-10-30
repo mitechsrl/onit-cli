@@ -23,6 +23,8 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
 
+const logger = require('../../../lib/logger');
+
 // const extract = require('./_src/extract');
 
 module.exports.info = 'Utility estrazione labels';
@@ -30,7 +32,7 @@ module.exports.help = [
     ['-f filename', 'File da processare']
 ];
 module.exports.catchUnimplementedParams = true;
-module.exports.cmd = async function (basepath, params, logger) {
+module.exports.cmd = async function (basepath, params) {
     logger.info('Verifica directory corrente');
 
     // get the input file: the one marked from -f or the first param

@@ -30,7 +30,7 @@ const extraStepRunner = require('./_src/lib/extraStepRunner');
 const versionManagement = require('./_src/lib/versionManagement');
 const links = require('../../../../shared/1.0.0/lib/link');
 
-module.exports.start = async function (onitConfigFile, builderVersion, basepath, params, logger) {
+module.exports.start = async function (onitConfigFile, builderVersion, basepath, params) {
     // geth the package component at the current path
     const cwdPackageJsonFileName = path.join(process.cwd(), 'package.json');
 
@@ -98,7 +98,7 @@ module.exports.start = async function (onitConfigFile, builderVersion, basepath,
     }
 
     logger.log('Verifico links...');
-    await links.start(logger, onitConfigFile);
+    await links.start(onitConfigFile);
 
     // update the package.json and package-lock.json versions if needed
     if (packageVersion && packageVersion.before) {
@@ -107,7 +107,7 @@ module.exports.start = async function (onitConfigFile, builderVersion, basepath,
     }
 
     // effective build
-    await build.build(cwdPackageJson, logger, buildTarget, targetDir, onitConfigFile);
+    await build.build(cwdPackageJson, buildTarget, targetDir, onitConfigFile);
 
     // set build dir in the vars
     vars.$_BUILD_DIR = targetDir;
@@ -122,6 +122,6 @@ module.exports.start = async function (onitConfigFile, builderVersion, basepath,
     if (extraSteps.length > 0) {
         logger.log('');
         logger.log('Avvio esecuzione steps post-build');
-        for (const step of extraSteps) await extraStepRunner(logger, step, vars);
+        for (const step of extraSteps) await extraStepRunner(step, vars);
     }
 };
