@@ -29,6 +29,7 @@ const build = require('./_src/build');
 const extraStepRunner = require('./_src/lib/extraStepRunner');
 const versionManagement = require('./_src/lib/versionManagement');
 const links = require('../../../../shared/1.0.0/lib/link');
+const logger = require('../../../../lib/logger');
 
 module.exports.start = async function (onitConfigFile, builderVersion, basepath, params) {
     // geth the package component at the current path
