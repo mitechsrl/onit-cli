@@ -45,11 +45,16 @@ async function createLink (l) {
         logger.log('Creo symlink ' + l.link + ' verso ' + l.target);
 
         const p = path.resolve(process.cwd(), './node_modules', './' + l.link);
-        await fs.symlink(l.target, p, 'junction');
+        try {
+            await fs.symlink(l.target, p, 'junction');
+        } catch (e) {
+            logger.error("Symlink creation failed. Please check You don't have this module installed as standard dependency");
+            throw e;
+        }
     }
 }
 
-async function start (onitConfigFile) {
+async function start(onitConfigFile) {
     // do we have links to be checked?
     if (!onitConfigFile.json.link || onitConfigFile.json.link.length === 0) {
         return null;
@@ -73,12 +78,12 @@ async function start (onitConfigFile) {
             logger.warn(p + ' non esiste.');
             await createLink(l);
 
-        // is this a symlink?
+            // is this a symlink?
         } else if (stat && !stat.isSymbolicLink()) {
             logger.warn(p + ' non è un symlink.');
             await createLink(l);
 
-        // got some other error
+            // got some other error
         } else if (error) {
             throw error;
         }
