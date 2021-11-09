@@ -1,5 +1,7 @@
 const { spawn } = require('child_process');
 const logger = require('../../../../../lib/logger');
+const path = require('path');
+const fs = require('fs');
 
 /**
  * Spawn a node process for the app
@@ -9,23 +11,43 @@ const logger = require('../../../../../lib/logger');
  * @param {*} options options for child_process.spawn
  * @returns
  */
-function spawnNodeProcess (onitConfigFile, params = [], options = {}) {
+function spawnNodeProcess(onitConfigFile, params = [], options = {}) {
     // some hardcoded parameters
     const hardcodedParameters = ['--max-old-space-size=4096'];
 
     // Prepare the env variables
     let env = (onitConfigFile.json.serve || {}).environment || {};
-    // env vars must be strings
+
+    // check whatever we need to launch the app as component 
+    let mainJsFile = './dist/index.js';
+    if (onitConfigFile.json.component) {
+        // in case of component, set a different main js file and
+        // add in the environment a variable to enable this directory as compoennt
+        env.ONIT_COMPONENTS = [path.resolve(process.cwd(), './')];
+        mainJsFile = (onitConfigFile.json.serve || {}).main;
+        if (!mainJsFile){
+            // now is onit-next, this will save us in future when a rename to onit will be done
+            mainJsFile = ['onit','onit-next'].map(n => './node_modules/@mitech/'+n+'/dist/index.js').find(p => {
+                return fs.existsSync(p);
+            })
+        }
+    }
+
+    // env vars must be strings, so check and convert them.
     Object.keys(env).forEach(key => {
         if (typeof env[key] === 'object') { env[key] = JSON.stringify(env[key]); }
     });
     env = Object.assign({ ONIT_RUN_FILE: onitConfigFile.sources[0] }, env);
+    // merge the generated env (from serve file) with the standard one from the OS
+    // this allow the usage of system-wide vars.
+    env = Object.assign({}, process.env, env)
 
+    // finally launch the node process
     let proc = spawn('node',
-        [...hardcodedParameters, ...params, './dist/index.js'],
+        [...hardcodedParameters, ...params, mainJsFile],
         Object.assign(options, {
             stdio: ['pipe', process.stdout, process.stderr],
-            env: Object.assign({}, process.env, env)
+            env: env
         })
     );
 
@@ -61,7 +83,7 @@ function spawnNodeProcess (onitConfigFile, params = [], options = {}) {
  * @param {*} nodeParams
  * @returns
  */
-function spawnNodeProcessPromise (onitConfigFile, nodeParams) {
+function spawnNodeProcessPromise(onitConfigFile, nodeParams) {
     return new Promise(resolve => {
         const nodeProcess = spawnNodeProcess(onitConfigFile, nodeParams);
 
