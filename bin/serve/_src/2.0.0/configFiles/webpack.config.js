@@ -47,7 +47,7 @@ module.exports = (context, config, packageJson) => {
     const componentName = path.basename(context);
 
     // this packagePublishPathValue must match the one from the package (whic is calculated wit the same logic)
-    let packagePublishPath = packageJson.mountPath || (packageJson.mitown || {}).mountPath || packageJson.name.replace('@mitech/', '');
+    let packagePublishPath = packageJson.name.split('/').pop(); /*packageJson.mountPath || (packageJson.mitown || {}).mountPath || packageJson.name.replace('@mitech/', '') */
     if (!packagePublishPath.startsWith('/')) packagePublishPath = '/' + packagePublishPath;
 
     let _config = {
