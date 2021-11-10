@@ -21,8 +21,8 @@
     "homepage": "https://github.com/mitechsrl/onit-cli",
     "dependencies": {
         "@babel/core": "^7.15.5",
-        "@babel/preset-env": "^7.15.4",
         "@babel/plugin-transform-runtime": "^7.15.8",
+        "@babel/preset-env": "^7.15.4",
         "@babel/preset-react": "^7.14.5",
         "babel-loader": "^8.2.2",
         "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
@@ -51,6 +51,7 @@
         "sass": "^1.39.0",
         "sass-loader": "^10.2.0",
         "semver": "^7.3.5",
+        "source-map-loader": "^3.0.0",
         "strip-comments": "^2.0.1",
         "style-loader": "^2.0.0",
         "terser-webpack-plugin": "^5.2.3",

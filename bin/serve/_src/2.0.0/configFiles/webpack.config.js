@@ -55,13 +55,21 @@ module.exports = (context, config, packageJson) => {
         context: context,
 
         // see https://webpack.js.org/configuration/devtool/ for available devtools
-        devtool: 'source-map',
+        devtool: 'eval-source-map', // prodution: source-map
 
         // babel files loader
         module: {
             rules: [
                 {
                     test: /\.m?js/,
+                    enforce: 'pre',
+                    // https://webpack.js.org/loaders/source-map-loader/
+                    // this extract the source-maps from included files and add it to the current build
+                    // On dev, this is extremely useful since we can eventually debug our own packages
+                    use: [{
+                        loader: require.resolve('source-map-loader'),
+                        options: {}
+                    }],
                     resolve: {
                         fullySpecified: false
                     }
