@@ -35,8 +35,8 @@ module.exports.start = async (onitConfigFile) => {
     const webpackConfigFactory = require('../configFiles/webpack.config');
 
     // search all entry points for the current run directory (they are spread over in webpack.json files)
-    // FIXME: the reactPath parameter is just a temporary solution to allow alternative paths for entry points
-    const entryPoints = searchEntryPoints(process.cwd(), onitConfigFile.json.reactPaths);
+    const customPaths = onitConfigFile.json.reactPaths || onitConfigFile.json.webpackEntryPointPaths;
+    const entryPoints = searchEntryPoints(process.cwd(), customPaths);
 
     // Build the webpack exports for the project at the current dir and node_modules
     const thisProjectWebpackExports = await webpackUtils.buildWebpackConfig(process.cwd(), onitConfigFile);

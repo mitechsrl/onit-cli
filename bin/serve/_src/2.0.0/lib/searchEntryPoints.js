@@ -11,7 +11,7 @@ const find = require('find');
  */
 const searchEntryPoints = (context, searchSubDirs) => {
     // search in these subdirs of the provided one.
-    searchSubDirs = searchSubDirs || ['./src/client'];
+    searchSubDirs = ['./src/client', ...searchSubDirs || []];
 
     // search for webpack entry points: files from context/config.path/.../react/webpack.json
     const entryPoints = {};
