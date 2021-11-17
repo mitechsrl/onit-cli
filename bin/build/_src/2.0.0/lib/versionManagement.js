@@ -23,41 +23,39 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
 
-const spawn = require('../../../../../../lib/spawn');
+const spawn = require('../../../../../lib/spawn');
 const semverInc = require('semver/functions/inc');
 const semverSort = require('semver/functions/sort');
-const replace = require('../../../../../../shared/1.0.0/lib/replace').replace;
+const replace = require('../../../../../shared/1.0.0/lib/replace').replace;
 const inquirer = require('inquirer');
 const path = require('path');
 const fs = require('fs');
 
-module.exports.prompt = async (buildTarget, vars, cwdPackageJson, targetDir) => {
+module.exports.prompt = async (buildTarget, vars, cwdPackageJson) => {
     const versionManagement = buildTarget.version;
     let increaseLevel = null; // how to calculate next version
     let increaseLevelPreminor = null; // another way to calculate versions but only for test and dev
-    let when = null;
-
     let append = '';
     let additionalMatch = null;
     switch (buildTarget.mode) {
-    case 'production':
-        append = '';
-        additionalMatch = /^[0-9.]+$/;
-        increaseLevel = ['patch'];
-        increaseLevelPreminor = null;
-        when = 'before'; break;
-    case 'development':
-        append = '-dev.0';
-        additionalMatch = /^[0-9.]+-dev\.[0-9]+$/;
-        increaseLevel = ['prerelease', 'dev'];
-        increaseLevelPreminor = ['preminor', 'dev'];
-        when = 'after'; break;
-    case 'test':
-        append = '-beta.0';
-        additionalMatch = /^[0-9.]+-beta\.[0-9]+$/;
-        increaseLevel = ['prerelease', 'beta'];
-        increaseLevelPreminor = ['preminor', 'beta'];
-        when = 'after'; break;
+        case 'production':
+            append = '';
+            additionalMatch = /^[0-9.]+$/;
+            increaseLevel = ['patch'];
+            increaseLevelPreminor = null;
+            break;
+        case 'development':
+            append = '-dev.0';
+            additionalMatch = /^[0-9.]+-dev\.[0-9]+$/;
+            increaseLevel = ['prerelease', 'dev'];
+            increaseLevelPreminor = ['preminor', 'dev'];
+            break;
+        case 'test':
+            append = '-beta.0';
+            additionalMatch = /^[0-9.]+-beta\.[0-9]+$/;
+            increaseLevel = ['prerelease', 'beta'];
+            increaseLevelPreminor = ['preminor', 'beta'];
+            break;
     }
 
     let version = null;
@@ -76,7 +74,7 @@ module.exports.prompt = async (buildTarget, vars, cwdPackageJson, targetDir) => 
         if (append) {
             list[0].choices.push({
                 name: 'Passa a ' + cwdPackageJson.version + append,
-                value: { after: cwdPackageJson.version + append }
+                value: cwdPackageJson.version + append
             });
         }
 
@@ -84,28 +82,14 @@ module.exports.prompt = async (buildTarget, vars, cwdPackageJson, targetDir) => 
             const v = semverInc(cwdPackageJson.version, ...increaseLevelPreminor);
             list[0].choices.push({
                 name: 'Prossima minor ' + v,
-                value: { [when]: v }
+                value: v
             });
         }
 
         list[0].choices.push({
             name: 'Incrementa a ' + semverInc(cwdPackageJson.version, ...increaseLevel),
-            value: { [when]: semverInc(cwdPackageJson.version, ...increaseLevel) }
+            value: semverInc(cwdPackageJson.version, ...increaseLevel)
         });
-        const oldBuildPackageJson = path.join(targetDir, 'package.json');
-        if (fs.existsSync(oldBuildPackageJson)) {
-            const oldPackageJson = JSON.parse(fs.readFileSync(oldBuildPackageJson).toString());
-            list[0].choices.push({
-                name: 'Build precedente ' + oldPackageJson.version + ', mantieni ' + oldPackageJson.version,
-                value: { [when]: oldPackageJson.version }
-            });
-
-            const v = semverInc(oldPackageJson.version, ...increaseLevel);
-            list[0].choices.push({
-                name: 'Build precedente ' + oldPackageJson.version + ', incrementa a ' + v,
-                value: { [when]: v }
-            });
-        }
 
         if (versionManagement.additional) {
             const _additional = replace(versionManagement.additional, vars);
@@ -135,7 +119,7 @@ module.exports.prompt = async (buildTarget, vars, cwdPackageJson, targetDir) => 
             if (v) {
                 list[0].choices.push({
                     name: versionManagement.additional.name + ' ' + v,
-                    value: { [when]: v }
+                    value: v
                 });
             }
         }
@@ -150,7 +134,7 @@ module.exports.prompt = async (buildTarget, vars, cwdPackageJson, targetDir) => 
  *
  * @param {*} version
  */
-module.exports.updateBefore = async (cwdPackageJson, cwdPackageJsonFileName, version) => {
+module.exports.update = async (cwdPackageJson, cwdPackageJsonFileName, version) => {
     cwdPackageJson.version = version;
     const cwdPackageLockJsonFileName = path.join(process.cwd(), 'package-lock.json');
     const cwdPackageLockJson = require(cwdPackageLockJsonFileName);
@@ -159,18 +143,3 @@ module.exports.updateBefore = async (cwdPackageJson, cwdPackageJsonFileName, ver
     fs.writeFileSync(cwdPackageLockJsonFileName, JSON.stringify(cwdPackageLockJson, null, 4));
 };
 
-/**
- * Update the package version after the build, in detail the version is applied only to the compiled package
- *
- * @param {*} version
- */
-module.exports.updateAfter = async (targetDir, version) => {
-    const packageJsonFileName = path.join(targetDir, 'package.json');
-    const packageLockJsonFileName = path.join(targetDir, 'package-lock.json');
-    const packageJson = JSON.parse(fs.readFileSync(packageJsonFileName).toString());
-    const packageLockJson = JSON.parse(fs.readFileSync(packageLockJsonFileName).toString());
-    packageJson.version = version;
-    packageLockJson.version = version;
-    fs.writeFileSync(packageJsonFileName, JSON.stringify(packageJson, null, 4));
-    fs.writeFileSync(packageLockJsonFileName, JSON.stringify(packageLockJson, null, 4));
-};

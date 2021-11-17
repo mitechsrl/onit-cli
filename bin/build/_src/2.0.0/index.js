@@ -25,9 +25,9 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 const path = require('path');
 const inquirer = require('inquirer');
-const build = require('./_src/build');
+const build = require('./lib/build');
 const extraStepRunner = require('../../../../shared/1.0.0/lib/extraStepRunner');
-const versionManagement = require('./_src/lib/versionManagement');
+const versionManagement = require('./lib/versionManagement');
 const links = require('../../../../shared/1.0.0/lib/link');
 const logger = require('../../../../lib/logger');
 
@@ -39,7 +39,7 @@ module.exports.start = async function (onitConfigFile, builderVersion, basepath,
 
     // check for buildTargets existence
     // FIXME: 21-07-2021 buildTarget is deprecated. Use targets
-    const buildTargets = (onitConfigFile.json.build || {}).targets || (onitConfigFile.json.build || {}).buildTargets || {};
+    const buildTargets = (onitConfigFile.json.build || {}).targets || {};
     if (Object.keys(buildTargets).length === 0) {
         logger.error('Nessun build target definito. Verifica di aver definitio la proprietà <build.targets> nel tuoi file di conigurazione: ' + onitConfigFile.sources.join(', '));
         return;
@@ -73,8 +73,6 @@ module.exports.start = async function (onitConfigFile, builderVersion, basepath,
         throw new Error('Build mode ' + buildTarget.mode + ' non supportato. Usa uno tra ' + supportedBuildModes.join(', '));
     }
 
-    const targetDir = path.resolve(process.cwd(), './build/' + (buildTarget.key || buildTarget.mode));
-
     // prepare some vars for next steps
     const vars = {
         $_PROJECT_DIR: process.cwd(),
@@ -83,7 +81,7 @@ module.exports.start = async function (onitConfigFile, builderVersion, basepath,
     };
 
     // ask the user for version
-    const packageVersion = await versionManagement.prompt(buildTarget, vars, cwdPackageJson, targetDir);
+    const newPackageVersion = await versionManagement.prompt(buildTarget, vars, cwdPackageJson);
 
     // selector for extra steps (if available)
     let extraSteps = (buildTarget.afterSteps || []);
@@ -102,22 +100,13 @@ module.exports.start = async function (onitConfigFile, builderVersion, basepath,
     await links.start(onitConfigFile);
 
     // update the package.json and package-lock.json versions if needed
-    if (packageVersion && packageVersion.before) {
-        versionManagement.updateBefore(cwdPackageJson, cwdPackageJsonFileName, packageVersion.before);
-        vars.$_PACKAGE_VERSION = packageVersion.before;
+    if (newPackageVersion) {
+        versionManagement.update(cwdPackageJson, cwdPackageJsonFileName, newPackageVersion);
+        vars.$_PACKAGE_VERSION = newPackageVersion;
     }
 
     // effective build
-    await build.build(cwdPackageJson, buildTarget, targetDir, onitConfigFile);
-
-    // set build dir in the vars
-    vars.$_BUILD_DIR = targetDir;
-
-    // update the package version after the build if needed
-    if (packageVersion && packageVersion.after) {
-        await versionManagement.updateAfter(targetDir, packageVersion.after);
-        vars.$_PACKAGE_VERSION = packageVersion.after;
-    }
+    await build.build(cwdPackageJson, buildTarget, onitConfigFile);
 
     // extra steps management
     if (extraSteps.length > 0) {

@@ -33,7 +33,9 @@ const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 const progressHandler = require('../../../../../lib/webpack/progressHandler');
 const babelConfig = require('../../../../../shared/1.0.0/configFiles/babel.config');
 const mixinFromFile = require('../../../../../lib/webpack/mixinFromFile');
-
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
+const { SubresourceIntegrityPlugin } = require('webpack-subresource-integrity');
+const TerserPlugin = require('terser-webpack-plugin');
 /**
  * Webpack serve config factory.
  * Some values may be changed at runtime (especially entry points and/or mode)
@@ -43,7 +45,7 @@ const mixinFromFile = require('../../../../../lib/webpack/mixinFromFile');
  * @param {*} packageJson the package.json content (js object) of the project to be webpacke'd.
  */
 module.exports = (context, config, packageJson) => {
-    const env = 'development';
+    const env = 'production';
     const componentName = path.basename(context);
 
     // this packagePublishPathValue must match the one from the package (whic is calculated wit the same logic)
@@ -62,14 +64,6 @@ module.exports = (context, config, packageJson) => {
             rules: [
                 {
                     test: /\.m?js/,
-                    // enforce: 'pre',
-                    // https://webpack.js.org/loaders/source-map-loader/
-                    // this extract the source-maps from included files and add it to the current build
-                    // On dev, this is extremely useful since we can eventually debug our own packages
-                    /*use: [{
-                        loader: require.resolve('source-map-loader'),
-                        options: {}
-                    }],*/
                     resolve: {
                         fullySpecified: false
                     }
@@ -131,9 +125,16 @@ module.exports = (context, config, packageJson) => {
         // this will create shared modules between pages.
         // https://webpack.js.org/plugins/split-chunks-plugin/#splitchunkschunks
         optimization: {
+            minimize: env === 'production', // enable minimization for production builds
             splitChunks: {
                 chunks: 'all'
-            }
+            },
+            minimizer: [
+                // minimize css: https://github.com/webpack-contrib/css-minimizer-webpack-plugin
+                new CssMinimizerPlugin(),
+                // minimize js: https://webpack.js.org/plugins/terser-webpack-plugin/
+                new TerserPlugin()
+            ]
         },
 
         // The list of entry points is calculated dynamically before starting the webpack process
@@ -153,6 +154,7 @@ module.exports = (context, config, packageJson) => {
             new CaseSensitivePathsPlugin(),
 
             // show human readable errors
+            // https://github.com/geowarin/friendly-errors-webpack-plugin#readme
             new FriendlyErrorsWebpackPlugin({
                 clearConsole: false
             }),
@@ -191,14 +193,22 @@ module.exports = (context, config, packageJson) => {
                     // this particular instance will add (js chunk files) dependencies for this entrypoint
                     chunks: [entryPoint]
                 });
+            }),
+
+            // Enable SRI for compiled files
+            // https://github.com/waysact/webpack-subresource-integrity
+            new SubresourceIntegrityPlugin({
+                hashFuncNames: ['sha256', 'sha384'],
+                enabled: env === 'production'
             })
         ],
 
         // where to put final stuff.
         // see https://webpack.js.org/configuration/output/
         output: {
-            path: path.join(context, config.outputPath),
-            filename: '[contenthash].js'
+            path: path.join(context, config.buildPath),
+            filename: '[contenthash].js',
+            crossOriginLoading: 'anonymous' // needed for SubresourceIntegrityPlugin
         },
 
         // these libs are loaded manually in the browser (some of them are standard, some others are custom made)

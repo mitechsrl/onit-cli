@@ -28,7 +28,7 @@ const _ = require('lodash');
 const webpackUtils = require('../../../../../lib/webpack/utils');
 const fs = require('fs');
 const webpackWatcher = require('./webpackWatcher');
-const { searchEntryPoints } = require('./searchEntryPoints');
+const { searchEntryPoints } = require('../../../../../shared/2.0.0/lib/searchEntryPoints');
 
 module.exports.start = async (onitConfigFile) => {
     // load the default config

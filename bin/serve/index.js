@@ -59,7 +59,7 @@ module.exports.cmd = async function (basepath, params) {
             throw new Error('Il serve non è disponibile. Verifica di avere la proprietà <serve> nel file di configurazioen di onit.');
         }
         // lock to the required builder version or get the most recent one
-        const requiredVersion = onitConfigFile.json.serve.version || '*';
+        const requiredVersion = onitConfigFile.json.serve.version || onitConfigFile.json.version || '*';
 
         // get a list of the available versions (each dir describe one version)
         const availableVersions = fs.readdirSync(path.join(__dirname, './_src'));

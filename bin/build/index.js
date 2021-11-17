@@ -46,7 +46,7 @@ module.exports.cmd = async function (basepath, params) {
         }
 
         // lock to the required builder version or get the most recent one
-        const requiredVersion = onitConfigFile.json.build.version || '*';
+        const requiredVersion = onitConfigFile.json.build.version || onitConfigFile.json.version || '*';
 
         // load the available build versions
         const availableVersions = fs.readdirSync(path.join(__dirname, './_src'));
