@@ -11,6 +11,7 @@ Il file contiene una serie di istruzioni per il lancio del progetto in ambiente 
     "component": boolean, se true avvia il progetto corrente in modalità "component",
     "link": utility helper allo sviluppo per la gestione automatica di npm link,
     serve:{
+        "nodeArgs": Array di aromenti da passare al processo node
         "environment": Object, oggetto iniettato in environment app
     }
 }

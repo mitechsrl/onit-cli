@@ -30,7 +30,7 @@ const logger = require('../../../../../lib/logger');
 module.exports = async function (onitConfigFile, cwdPackageJson) {
     logger.log('[TSC] Starting tsc build...');
 
-    // run the user build script if any, otherwise just run the loopback tsc compiler (which btw is 
+    // run the user build script if any, otherwise just run the loopback tsc compiler (which btw is
     // the default implementation of 'npm run build' for loopback 4 projects)
     if (typeof (cwdPackageJson.scripts || {}).build === 'string') {
         await spawn('npm', ['run', 'build'], true, { shell: true });

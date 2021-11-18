@@ -35,7 +35,6 @@ const subProcesses = [];
 
 module.exports.start = async (onitConfigFile, exitAfterTsc, launchNode) => {
     return new Promise(resolve => {
-        const nodeParams = [];
 
         const fileCopy = copyExtraFiles(onitConfigFile);
 
@@ -53,11 +52,11 @@ module.exports.start = async (onitConfigFile, exitAfterTsc, launchNode) => {
                 // we have an already running node porcess. kill it and respawn
                 console.log('Reloading node app...');
                 nodeProcess.kill(() => {
-                    nodeProcess = spawnNodeProcess(onitConfigFile, nodeParams);
+                    nodeProcess = spawnNodeProcess(onitConfigFile);
                 });
             } else {
                 // no node processes already running . Spawn a new one
-                nodeProcess = spawnNodeProcess(onitConfigFile, nodeParams);
+                nodeProcess = spawnNodeProcess(onitConfigFile);
             }
         };
 
