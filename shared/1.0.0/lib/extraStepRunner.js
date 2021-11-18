@@ -27,38 +27,40 @@ const logger = require('../../../lib/logger');
 const spawn = require('../../../lib/spawn');
 const replace = require('./replace').replace;
 
-module.exports = (step, vars) => {
+module.exports = async (step, vars) => {
     logger.log('Eseguo step <' + step.name + '>...');
     step = replace(step, vars);
+
+    // change cwd if needed
     let originalCwd = null;
     if (step.cwd) {
         originalCwd = process.cwd();
         process.chdir(step.cwd);
     }
 
-    return Promise.resolve()
-        .then(() => {
-            // handler for cmd-type step
-            if (step.cmd) {
-                const cmd = Array.isArray(step.cmd) ? step.cmd[0] : step.cmd;
-                const params = (Array.isArray(step.cmd) && (step.cmd.length > 1)) ? [step.cmd[1]] : [];
+    if (step.cmd) {
+        if (!Array.isArray(step.cmd)) {
+            step.cmd = [step.cmd];
+        }
+        // const cmd = Array.isArray(step.cmd) ? step.cmd[0] : step.cmd;
+        // const params = (Array.isArray(step.cmd) && (step.cmd.length > 1)) ? [step.cmd[1]] : [];
+        for (const cmd of step.cmd) {
+            logger.log('Eseguo <' + cmd + '>');
+            await spawn(cmd, [], true, {
+                // This allows to run command on windows without adding '.cmd' or '.bat'. See
+                // https://nodejs.org/api/child_process.html#child_process_spawning_bat_and_cmd_files_on_windows
+                shell: true,
 
-                return spawn(cmd, params, true, {
-                    // This allows to run command on windows without adding '.cmd' or '.bat'. See
-                    // https://nodejs.org/api/child_process.html#child_process_spawning_bat_and_cmd_files_on_windows
-                    shell: true,
+                // NOTE: this is inherithed from the current process(which already did the cwd!)
+                cwd: process.cwd()
+            });
+        }
+    }
 
-                    // NOTE: this is inherithed from the current process(which already did the cwd!)
-                    cwd: process.cwd()
-                });
-            }
-            return false;
-        }).then(() => {
-            if (originalCwd) {
-                process.chdir(originalCwd);
-            }
+    if (originalCwd) {
+        process.chdir(originalCwd);
+    }
 
-            logger.log('Step <' + step.name + '> completo!');
-            return 0;
-        });
+    logger.log('Step <' + step.name + '> completo!');
+    return 0;
 };

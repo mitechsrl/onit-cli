@@ -111,7 +111,7 @@ Ogni comando deve essere nel formato:
 ```
 {
     name: string, nome del comando poposto in console,
-    cmd: string, comando essettivo eseguito. E' possibile usare le variabili definite in precedenza per personalizzare il comando
+    cmd: string|array, comando (o array di comandi) da eseguire. E' possibile usare le variabili definite in precedenza per personalizzare il comando. Se viene passato un array di comandi, essi vengono eseguiti sequanzialmente.
     cwd: string, path di esecuzione del comando. E' possibile usare le variabili per personalizzare il path, ad esempio inserendo **'$_BUILD_DIR'** l'esecuzione avviene nella directory di build
 }
 ```
