@@ -23,20 +23,14 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
 
-const path = require('path');
 const webpack = require('./webpack');
 const clean = require('./clean');
-const fs = require('fs');
 const logger = require('../../../../../lib/logger');
 const tsc = require('./tsc');
 
 module.exports.build = async function (cwdPackageJson, buildTarget, onitConfigFile) {
+    // Do a production build as default
     const buildMode = buildTarget.mode || 'production';
-
-    let defaultIgnoreFile = path.join(__dirname, '../configFiles/.defaultignore.' + buildMode);
-    if (!fs.existsSync(defaultIgnoreFile)) {
-        defaultIgnoreFile = path.join(__dirname, '../configFiles/.defaultignore');
-    }
 
     // clean the build directory
     await clean(onitConfigFile, buildMode, cwdPackageJson);
@@ -49,6 +43,5 @@ module.exports.build = async function (cwdPackageJson, buildTarget, onitConfigFi
 
     logger.info('Build completato.');
 
-    return {
-    };
+    return {};
 };

@@ -34,14 +34,12 @@ const logger = require('../../../../lib/logger');
 module.exports.start = async function (onitConfigFile, builderVersion, basepath, params) {
     // geth the package component at the current path
     const cwdPackageJsonFileName = path.join(process.cwd(), 'package.json');
-
     const cwdPackageJson = require(cwdPackageJsonFileName);
 
     // check for buildTargets existence
-    // FIXME: 21-07-2021 buildTarget is deprecated. Use targets
     const buildTargets = (onitConfigFile.json.build || {}).targets || {};
     if (Object.keys(buildTargets).length === 0) {
-        logger.error('Nessun build target definito. Verifica di aver definitio la proprietà <build.targets> nel tuoi file di conigurazione: ' + onitConfigFile.sources.join(', '));
+        logger.error('Nessun build target definito. Verifica di aver definito la proprietà <build.targets> nel tuoi file di conigurazione: ' + onitConfigFile.sources.join(', '));
         return;
     }
 
@@ -55,17 +53,18 @@ module.exports.start = async function (onitConfigFile, builderVersion, basepath,
         const list = [{
             type: 'list',
             name: 'buildTarget',
-            message: 'Seleziona un build target',
+            message: 'Select build target',
             choices: Object.keys(buildTargets)
         }];
         const answers = await inquirer.prompt(list);
         buildTarget = buildTargets[answers.buildTarget];
         if (!buildTarget) {
-            throw new Error('Errore nella selezione del buildTarget');
+            throw new Error('Error selecting build target!');
         }
         buildTarget.key = answers.buildTarget;
     }
-    logger.info('Build target selezionato: ' + buildTarget.key);
+
+    logger.info('Selected build target: ' + buildTarget.key);
 
     const supportedBuildModes = ['production', 'development', 'test'];
 
@@ -86,7 +85,7 @@ module.exports.start = async function (onitConfigFile, builderVersion, basepath,
     // selector for extra steps (if available)
     let extraSteps = (buildTarget.afterSteps || []);
     if (extraSteps.length > 0) {
-        logger.log('Selezione step aggiuntivi post-build:');
+        logger.log('Select post-build steps:');
         const list = extraSteps.map((step, index) => ({
             type: 'confirm',
             name: 'step_' + index,
@@ -96,7 +95,7 @@ module.exports.start = async function (onitConfigFile, builderVersion, basepath,
         extraSteps = extraSteps.filter((step, index) => answers['step_' + index]);
     }
 
-    logger.log('Verifico links...');
+    logger.log('Checking links...');
     await links.start(onitConfigFile);
 
     // update the package.json and package-lock.json versions if needed
@@ -111,7 +110,7 @@ module.exports.start = async function (onitConfigFile, builderVersion, basepath,
     // extra steps management
     if (extraSteps.length > 0) {
         logger.log('');
-        logger.log('Avvio esecuzione steps post-build');
+        logger.log('Running post-build steps...');
         for (const step of extraSteps) await extraStepRunner(step, vars);
     }
 };

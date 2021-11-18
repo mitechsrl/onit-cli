@@ -28,7 +28,7 @@ const spawn = require('../../../../../lib/spawn');
 const logger = require('../../../../../lib/logger');
 
 module.exports = async function (onitConfigFile, cwdPackageJson) {
-    logger.log('[TSC] Lancio build tsc...');
+    logger.log('[TSC] Starting tsc build...');
 
     // run the user build script if any, otherwise just run the loopback tsc compiler (which btw is 
     // the default implementation of 'npm run build' for loopback 4 projects)
@@ -47,70 +47,5 @@ module.exports = async function (onitConfigFile, cwdPackageJson) {
         });
     });
 
-    logger.log('[TSC] Build tsc completata');
-
-    /*
-    return new Promise(resolve => {
-
-        const fileCopy = copyExtraFiles(onitConfigFile);
-
-
-
-        const watch = new TscWatchClient();
-
-        // the function to run on compilation success
-        // by default it does nothing, this will be valorized after some initial
-        // steps
-        let onSuccess = () => {};
-
-        watch.on('started', () => {
-            console.log('Compilation started');
-        });
-
-        watch.on('first_success', () => {
-            logger.info('First compilation success.');
-
-            if (exitAfterTsc) {
-                // eslint-disable-next-line no-process-exit
-                process.exit(0);
-            }
-
-            // run this callback after the first file copy is successful
-            const onFilesCopied = () => {
-                logger.log('Files scan & copy completed');
-                const _subProcesses = _.get(onitConfigFile, 'json.serve.onFirstTscCompilationSuccess', []);
-                _subProcesses.forEach(sp => {
-                    if (sp.cmd) {
-                        logger.info('Launch ' + sp.name);
-                        subProcesses.push(spawnSubprocess(sp));
-                    }
-                });
-
-                // set the onSuccess function to a function
-                // which effectively do something
-                onSuccess = () => {
-                    launchOrReload();
-                };
-
-                process.nextTick(launchOrReload);
-            };
-
-            fileCopy.start(onFilesCopied);
-        });
-
-        watch.on('success', () => {
-            onSuccess();
-        });
-
-        watch.on('compile_errors', () => {
-            if (exitAfterTsc) {
-                // eslint-disable-next-line no-process-exit
-                process.exit(-1);
-            }
-        });
-
-        // start the watcher. adding --noClear because it's annoying that tsc clear the console
-        // when there's stuff from other processes (webpack mainly)!
-        watch.start();
-    });*/
+    logger.log('[TSC] Tsc build finished');
 };

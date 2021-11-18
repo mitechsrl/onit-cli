@@ -33,7 +33,7 @@ const spawn = require('../../../../../lib/spawn');
  */
 const removePath = (localPath) => {
     if (fse.pathExistsSync(localPath)) {
-        logger.log('Rimuovo ' + localPath);
+        logger.log('Remove ' + localPath);
         fse.removeSync(localPath);
     }
 };
@@ -44,34 +44,29 @@ const removePath = (localPath) => {
 const removeFiles = (files) => {
     files.forEach(f => {
         if (fs.existsSync(f)) {
-            logger.log('Rimuovo ' + f);
+            logger.log('Remove ' + f);
             fs.unlinkSync(f);
         }
     });
 };
 
 module.exports = async (onitConfigFile, buildMode, cwdPackageJson) => {
-    logger.info('[CLEAN] Pulisco directory build...');
+    logger.info('[CLEAN] Cleaning directory...');
 
-
-    // clean stages
-    removePath('dist-fe');
-    removePath('dist');
-    removeFiles(['tsconfig.tsbuildinfo']);
-
+    // if defined, launch the clean script
     if ((cwdPackageJson.scripts || {}).clean) {
-        // launch the clean step from package
         await spawn('npm', ['run', 'clean'], true, {
-            // This allows to run command on windows without adding '.cmd' or '.bat'. See
-            // https://nodejs.org/api/child_process.html#child_process_spawning_bat_and_cmd_files_on_windows
             shell: true,
-
-            // NOTE: this is inherithed from the current process(which already did the cwd!)
             cwd: process.cwd()
         });
     }
 
-    logger.info('[CLEAN] completato');
+    // Also remove by default some of our own dir/files
+    removePath('dist-fe');
+    removePath('dist');
+    removeFiles(['tsconfig.tsbuildinfo']);
+
+    logger.info('[CLEAN] Directory cleaned!');
 
     return 0;
 };

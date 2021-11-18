@@ -38,24 +38,24 @@ module.exports.prompt = async (buildTarget, vars, cwdPackageJson) => {
     let append = '';
     let additionalMatch = null;
     switch (buildTarget.mode) {
-        case 'production':
-            append = '';
-            additionalMatch = /^[0-9.]+$/;
-            increaseLevel = ['patch'];
-            increaseLevelPreminor = null;
-            break;
-        case 'development':
-            append = '-dev.0';
-            additionalMatch = /^[0-9.]+-dev\.[0-9]+$/;
-            increaseLevel = ['prerelease', 'dev'];
-            increaseLevelPreminor = ['preminor', 'dev'];
-            break;
-        case 'test':
-            append = '-beta.0';
-            additionalMatch = /^[0-9.]+-beta\.[0-9]+$/;
-            increaseLevel = ['prerelease', 'beta'];
-            increaseLevelPreminor = ['preminor', 'beta'];
-            break;
+    case 'production':
+        append = '';
+        additionalMatch = /^[0-9.]+$/;
+        increaseLevel = ['patch'];
+        increaseLevelPreminor = null;
+        break;
+    case 'development':
+        append = '-dev.0';
+        additionalMatch = /^[0-9.]+-dev\.[0-9]+$/;
+        increaseLevel = ['prerelease', 'dev'];
+        increaseLevelPreminor = ['preminor', 'dev'];
+        break;
+    case 'test':
+        append = '-beta.0';
+        additionalMatch = /^[0-9.]+-beta\.[0-9]+$/;
+        increaseLevel = ['prerelease', 'beta'];
+        increaseLevelPreminor = ['preminor', 'beta'];
+        break;
     }
 
     let version = null;
