@@ -83,16 +83,29 @@ module.exports.start = async function (onitConfigFile, builderVersion, basepath,
     const newPackageVersion = await versionManagement.prompt(buildTarget, vars, cwdPackageJson);
 
     // selector for extra steps (if available)
-    let extraSteps = (buildTarget.afterSteps || []);
-    if (extraSteps.length > 0) {
-        logger.log('Select post-build steps:');
-        const list = extraSteps.map((step, index) => ({
+    let beforeSteps = (buildTarget.beforeSteps || []);
+    if (beforeSteps.length > 0) {
+        logger.log('Select pre-build steps:');
+        const list = beforeSteps.map((step, index) => ({
             type: 'confirm',
             name: 'step_' + index,
             message: 'Eseguire <' + step.name + '>?'
         }));
         const answers = await inquirer.prompt(list);
-        extraSteps = extraSteps.filter((step, index) => answers['step_' + index]);
+        beforeSteps = beforeSteps.filter((step, index) => answers['step_' + index]);
+    }
+
+    // selector for extra steps (if available)
+    let afterSteps = (buildTarget.afterSteps || []);
+    if (afterSteps.length > 0) {
+        logger.log('Select post-build steps:');
+        const list = afterSteps.map((step, index) => ({
+            type: 'confirm',
+            name: 'step_' + index,
+            message: 'Eseguire <' + step.name + '>?'
+        }));
+        const answers = await inquirer.prompt(list);
+        afterSteps = afterSteps.filter((step, index) => answers['step_' + index]);
     }
 
     logger.log('Checking links...');
@@ -104,13 +117,20 @@ module.exports.start = async function (onitConfigFile, builderVersion, basepath,
         vars.$_PACKAGE_VERSION = newPackageVersion;
     }
 
+    // extra steps management
+    if (beforeSteps.length > 0) {
+        logger.log('');
+        logger.log('Running pre-build steps...');
+        for (const step of beforeSteps) await extraStepRunner(step, vars);
+    }
+
     // effective build
     await build.build(cwdPackageJson, buildTarget, onitConfigFile);
 
     // extra steps management
-    if (extraSteps.length > 0) {
+    if (afterSteps.length > 0) {
         logger.log('');
         logger.log('Running post-build steps...');
-        for (const step of extraSteps) await extraStepRunner(step, vars);
+        for (const step of afterSteps) await extraStepRunner(step, vars);
     }
 };

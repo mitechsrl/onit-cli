@@ -43,8 +43,10 @@ module.exports = async function (distFeTargetDir, onitConfigFile, buildMode, inj
     const context = process.cwd();
 
     // create a webpack config for the current directory and
-    // add dynamic entry points to the webpack config for the current directory
-    const entryPoints = searchEntryPoints(context);
+    // add dynamic entry points to the webpack config for the current directory.
+    // search all entry points for the current run directory (they are spread over in webpack.json files)
+    const customPaths = onitConfigFile.json.reactPaths || onitConfigFile.json.webpackEntryPointPaths;
+    const entryPoints = searchEntryPoints(context, customPaths);
 
     // Build the webpack exports for the project at the current dir and node_modules
     const thisProjectWebpackExports = await webpackUtils.buildWebpackConfig(context, onitConfigFile);
