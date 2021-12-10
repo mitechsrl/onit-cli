@@ -38,9 +38,7 @@ module.exports.start = async (onitConfigFile, cwdPackageJson) => {
 
     // Build the webpack exports for the project at the current dir and node_modules
     const thisProjectWebpackExports = await webpackUtils.buildWebpackConfig(process.cwd(), onitConfigFile);
-
-    console.log(cwdPackageJson);
-    
+   
     // create a webpack config for the current path project
     let webpackConfig = webpackConfigFactory(process.cwd(), {
         entryPoints: entryPoints,
