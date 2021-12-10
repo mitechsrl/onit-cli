@@ -82,7 +82,7 @@ module.exports.start = async function (onitConfigFile, version, basepath, params
     } else {
         logger.log('Lancio webpack e tsc...');
         await Promise.all([
-            webpack.start(onitConfigFile),
+            webpack.start(onitConfigFile, cwdPackageJson),
             tsc.start(onitConfigFile, exitAfterTsc, true)
         ]);
     }
