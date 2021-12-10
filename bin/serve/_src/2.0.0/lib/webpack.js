@@ -23,14 +23,12 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
 
-const path = require('path');
 const _ = require('lodash');
 const webpackUtils = require('../../../../../lib/webpack/utils');
-const fs = require('fs');
 const webpackWatcher = require('./webpackWatcher');
 const { searchEntryPoints } = require('../../../../../shared/2.0.0/lib/searchEntryPoints');
 
-module.exports.start = async (onitConfigFile) => {
+module.exports.start = async (onitConfigFile, cwdPackageJson) => {
     // load the default config
     const webpackConfigFactory = require('../configFiles/webpack.config');
 
@@ -40,10 +38,6 @@ module.exports.start = async (onitConfigFile) => {
 
     // Build the webpack exports for the project at the current dir and node_modules
     const thisProjectWebpackExports = await webpackUtils.buildWebpackConfig(process.cwd(), onitConfigFile);
-
-    // get the package json in the current directory
-    let cwdPackageJson = path.join(process.cwd(), 'package.json');
-    cwdPackageJson = JSON.parse(fs.readFileSync(cwdPackageJson).toString());
 
     // create a webpack config for the current path project
     let webpackConfig = webpackConfigFactory(process.cwd(), {

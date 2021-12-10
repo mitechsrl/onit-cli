@@ -29,8 +29,25 @@ const tsc = require('./lib/tscWatch.js');
 const links = require('../../../../shared/1.0.0/lib/link');
 const { spawnNodeProcessPromise } = require('./lib/spawnNodeProcess');
 const logger = require('../../../../lib/logger');
+const path = require('path');
+const fs = require('fs');
+const semver = require('semver');
 
 module.exports.start = async function (onitConfigFile, version, basepath, params) {
+    // get the package json in the current directory
+    let cwdPackageJson = path.join(process.cwd(), 'package.json');
+    cwdPackageJson = JSON.parse(fs.readFileSync(cwdPackageJson).toString());
+
+    // check node run version
+    // as developers, we maintain different projects which uses different node versions
+    // Sometimes we forgot we are on oder versions which are incompatible.
+    // This at least save us to random errors which may appear on incompatible versions.
+    if ((cwdPackageJson.engines || {}).node) {
+        if (!semver.satisfies(process.version, cwdPackageJson.engines.node)) {
+            throw new Error('App requires node ' + cwdPackageJson.engines.node + ', but you are using ' + process.version);
+        }
+    }
+
     const minusW = params.get('-w').found;
     const minusT = params.get('-t').found;
     const minusN = params.get('-n').found;
@@ -50,7 +67,7 @@ module.exports.start = async function (onitConfigFile, version, basepath, params
 
     if (minusW) {
         logger.log('Lancio webpack...');
-        await webpack.start(onitConfigFile);
+        await webpack.start(onitConfigFile, cwdPackageJson);
     } else if (minusT) {
         logger.log('Lancio tsc...');
         await tsc.start(onitConfigFile, exitAfterTsc, true);
