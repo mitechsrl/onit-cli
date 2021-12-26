@@ -39,13 +39,13 @@ module.exports.cmd = async function (basepath, params) {
         const outputPath = params.get('-o');
 
         // load the buildFile
-        const config = await onitFileLoader.load('custom', process.cwd(), 'onitdocumentation.config');
+        const config = await onitFileLoader.load(process.cwd(), 'onitdocumentation.config');
         if (!config) throw new Error('File onitdocumentation.config.[js|json] non trovato');
-        logger.warn('Uso file configurazione ' + config.filename);
+        logger.warn('Uso file configurazione ' + config.sources.join(', '));
 
         await generate(config.json, outputPath);
     } catch (e) {
-        logger.error(e.message);
+        logger.error(e);
         // eslint-disable-next-line no-process-exit
         process.exit(-1);
     }

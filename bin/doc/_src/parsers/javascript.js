@@ -23,7 +23,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
 
-const { parse, stringify } = require('comment-parser/lib');
+const { parse, stringify } = require('comment-parser');
 const { priorityConverter } = require('../lib/priority');
 
 module.exports.parse = (fileContent, filePath, blocks) => {
@@ -34,6 +34,7 @@ module.exports.parse = (fileContent, filePath, blocks) => {
             filePath: filePath
         };
 
+        // do not process anything if this tag is not set.
         const onitDoc = block.tags.find(t => t.tag === 'onitDoc');
         if (!onitDoc) return;
 

@@ -8,10 +8,8 @@ Il comando **onit doc** richiede la definizione del file **onitdocumentation.con
 
 ```js
 module.export = {
-    ignore: [string], 
-    chapters: {
-        chapterNumber: chapterConfig
-    },
+    ignore: [string],
+    chapters:  [chapter],
 }
 ```
 
@@ -19,7 +17,7 @@ module.export = {
 Array di stringhe, descrive, utilizzando il formato [gitignore](https://git-scm.com/docs/gitignore), la lista dei files/directory da non scansionare per la ricerca di documentazione.
 
 E' vivamente consigliato l'inserimento dei seguenti valori di default: 
-```
+```js
     [
         './node_modules/**/*',
         './build/**/*',
@@ -32,20 +30,17 @@ E' vivamente consigliato l'inserimento dei seguenti valori di default:
 ```
 
 ##### chapters
-Chapters identifica la lista di capitoli e le loro proprietà
+Chapters identifica la lista di capitoli e le loro proprietà. *chapter* è un oggetto contenente le seguenti proprietà:
 
-- **chapterNumber**, *string* è un valore del tipo "n", "n1.n2", "n1.n2.n3", ad esempio "1", "1.1", "1.1.1", il quale identifica la numerazione del capitolo.
-    La numerazione identifica anche la gerarchia delle voci, settanto la voce "1.2.3" come figlia di "1.2", a sua volta figlia di "1".
-
-- **chapterConfig**, *object* è un oggetto contenente le seguenti proprietà
-
-    ```js
-    {
-        title: string, // titolo del capitolo
-        index: object, // se valorizzato, crea un file di indice per la voce corrente. Le coppie chiave-valore di object verranno inserite nell'header jackill del file index generato senza subire alterazioni. Il file di index viene automaticamente generto se esistono dei fligli della voce corrente (in base a chapterNumber)
-        page: object, // se valorizzato, crea un file di pagina per la voce corrente. Le coppie chiave-valore di object verranno inserite nell'header jackill del file generato senza subire alterazioni. Il file page viene automaticamente generato se la scansione del progetto rileva dei frammenti di codice-commento per la rispettiva chapterNumber 
-    },
-    ```
+```js
+chapter = {
+    title: string, // REQUIRED, titolo del capitolo
+    label: string // REQUIRED, label utilizzata per indirizzare i blocchi dei commenti,
+    index: object, // OPTIONAL, se valorizzato, crea un file di indice per la voce corrente. Le coppie chiave-valore di object verranno inserite nell'header jackill del file index generato senza subire alterazioni. Il file di index viene automaticamente generto se esistono dei fligli della voce corrente (in base a children)
+    page: object, // OPTIONAL, se valorizzato, crea un file di pagina per la voce corrente. Le coppie chiave-valore di object verranno inserite nell'header jackill del file generato senza subire alterazioni. Il file page viene automaticamente generato se la scansione del progetto rileva dei frammenti di codice-commento per la rispettiva label 
+    children: [chapter] // OPTIONAL, eventuali chapter figli
+}
+```
 
 ### Custom tags
 
@@ -55,7 +50,7 @@ Oltre ai tag di [JsDoc](https://jsdoc.app/), sono disponibili alcuni tag aggiunt
 **@onitTitle**
 Definisce il titolo della sezione di commento
 
-```
+```js
 /**
 * @onitTitle this is a title!
 */
@@ -63,7 +58,7 @@ Definisce il titolo della sezione di commento
 
 Aggiungere, subito dopo il tag @onitTitle, uno dei valori **h2, h3, h4** per pilotare la dimensione del titolo.
 
-```
+```js
 /**
 * @onitTitle h3 this is a title!
 */
@@ -71,18 +66,18 @@ Aggiungere, subito dopo il tag @onitTitle, uno dei valori **h2, h3, h4** per pil
 Il default di tale valore è **h2**
 
 **@onitChapter** 
-Definisce il capitolo di appartenenza della sezione di commento corrente. Accetta un unico valore, corrispondente ad una chiave come definita in *onitdocumentation.config.js -> chapters*
+Definisce il capitolo di appartenenza della sezione di commento corrente. Accetta un unico valore, corrispondente ad una label come definita in *onitdocumentation.config.js -> chapters*
 
-```
+```js
 /**
-* @onitChapter 1.2.3
+* @onitChapter label
 */
 ```
 
 **@onitPriority**
 Definisce l'ordinamento con cui inserire blocchi di codice referenti allo stesso capitolo. Accetta un solo parametro, il valore numerico dell'ordine.
 
-```
+```js
 /**
 * @onitPriority 2000
 */
@@ -93,7 +88,7 @@ Definisce l'inizio del blocco di testo contente la documentazione da estrapolare
 
 - Chiusura del blocco del commento
 
-    ```
+    ```js
     /**
     * @onitDoc 
     * testo
@@ -104,7 +99,7 @@ Definisce l'inizio del blocco di testo contente la documentazione da estrapolare
 
 - Occorrenza di un tag JSDoc
 
-    ```
+    ```js
     /**
     * @onitDoc 
     * testo estrapolato
@@ -138,7 +133,7 @@ Viene risolto con un link verso il capitolo *n1.n2.n3*, con anchor *#Info*. Il t
 **[@onitChapter n1.n2.n3]**
 Viene risolto con un link verso il capitolo *n1.n2.n3*. Il testo visualizzato è l'url web del capitolo selezionato.
 
-##### Include di codic sorgente
+##### Include di codice sorgente
 Utilizzare il tag 
 ```
 [@onitSrc path transformFunction]

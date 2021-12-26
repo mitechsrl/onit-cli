@@ -31,6 +31,19 @@ const copyImages = require('./copyImages');
 const logger = require('../../../lib/logger');
 
 module.exports.generate = function (config, outputPath) {
+
+    // set the indexes in the tree objects so later we can use them more easily
+    const _recurseSetIndex = (tree) => {
+        tree.forEach((t, i) => {
+            t.chapterIndex = ('' + i).padStart(3, '0');
+            if (t.children) {
+                _recurseSetIndex(t.children);
+            }
+        });
+    };
+    _recurseSetIndex(config.chapters);
+
+
     const scanTargetDir = process.cwd();
 
     return new Promise((resolve, reject) => {
@@ -45,6 +58,7 @@ module.exports.generate = function (config, outputPath) {
         // setup which files must be parsed and the relative parser. See https://en.wikipedia.org/wiki/Glob_(programming) for glob patterns
         const globList = [
             { extension: '.js', glob: ['./**/*.js', './**/*.JS'], parser: path.join(__dirname, './parsers/javascript.js') },
+            { extension: '.ts', glob: ['./**/*.ts', './**/*.TS'], parser: path.join(__dirname, './parsers/javascript.js') },
             { extension: '.jsx', glob: ['./**/*.jsx', './**/*.JSX'], parser: path.join(__dirname, './parsers/javascript.js') },
             { extension: '.md', glob: ['./**/*.md', './**/*.MD'], parser: path.join(__dirname, './parsers/markdown.js') },
             ...(config.globList || []) // add globs from config file
