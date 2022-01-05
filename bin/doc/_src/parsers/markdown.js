@@ -23,74 +23,47 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
 
-const javascriptParse = require('./javascript').parse;
+const { priorityConverter } = require('../lib/priority');
 
 module.exports.parse = (fileContent, filePath, blocks) => {
-    // just wrap the text as if it was a js comment and parse using js comment parser
-    const _fileContent = '/**\n' + fileContent + '\n*/';
-    return javascriptParse(_fileContent, filePath, blocks);
+    const onitBlock = {
+        type: '',
+        params: [],
+        title: '',
+        doc: '',
+        chapter: ''
+    };
 
-/*
-    const onitTitleLength = '@onitTitle'.length;
     const onitDocLength = '@onitDoc'.length;
-    let startFrom = 0;
-    while (true) {
-        const onitBlock = {
-            type: '',
-            params: [],
-            title: '',
-            doc: '',
-            chapter: ''
-        };
 
-        const onitTitlePos = fileContent.indexOf('@onitTitle', startFrom);
-        if (onitTitlePos < 0) {
-            break;
-        };
+    const onitDocIndex = fileContent.indexOf('@onitDoc');
+    if (onitDocIndex < 0) {
+        return blocks;
+    }
+    onitBlock.doc = fileContent.substr(onitDocIndex + onitDocLength).trim();
 
-        // search for end
-        let end = fileContent.indexOf('@onitTitle', onitTitlePos + onitTitleLength);
-        // not found, use the end of file
-        if (end < 0) end = fileContent.length;
+    // extract chapter
+    const onitChapterMatcher = fileContent.match(/^[^\n\ra-z@]*@onitChapter +(.+)$/mi);
+    if (!onitChapterMatcher) {
+        return blocks;
+    }
+    onitBlock.chapter = onitChapterMatcher[1].trim();
 
-        // section start from @OnitTitle and ends to
-        // - next @OnitTitle
-        // - end of file
-        const section = fileContent.substr(onitTitlePos, end - onitTitlePos);
-        const titleMatch = section.match(/^[^@]*@onitTitle +(.+)$/mi);
-        onitBlock.title = (titleMatch ? titleMatch[1] : '').trim();
-        if (!onitBlock.title) {
-            break;
-        }
+    // extract title
+    const titleMatch = fileContent.match(/^[^@]*@onitTitle +(.+)[\r\n]+$/mi);
+    onitBlock.title = (titleMatch ? titleMatch[1] : '').trim();
 
-        // extract chapter
-        const onitChapterMatcher = section.match(/^[^\n\ra-z@]*@onitChapter +(.+)$/mi);
-        onitBlock.chapter = (onitChapterMatcher ? onitChapterMatcher[1] : '').trim();
-        if (!onitBlock.chapter) {
-            break;
-        }
-
-        // extract priority
-        const onitPriorityMatcher = section.match(/^[^\n\ra-z@]*@onitPriority +(.+)$/mi);
-        if (onitPriorityMatcher) {
-            onitBlock.priority = priorityConverter(onitPriorityMatcher[1].trim());
-        } else {
-            onitBlock.priority = 10000;
-        }
-
-        // extract doc
-        const docStart = section.indexOf('@onitDoc');
-        if (docStart < 0) {
-            break;
-        }
-        onitBlock.doc = section.substr(docStart + onitDocLength).trim();
-
-        // append to the previous blocks
-        blocks.chapters[onitBlock.chapter] = blocks.chapters[onitBlock.chapter] || [];
-        blocks.chapters[onitBlock.chapter].push(onitBlock);
-
-        startFrom = onitTitlePos + onitTitleLength;
+    // extract priority
+    const onitPriorityMatcher = fileContent.match(/^[^\n\ra-z@]*@onitPriority +(.+)$/mi);
+    if (onitPriorityMatcher) {
+        onitBlock.priority = priorityConverter(onitPriorityMatcher[1].trim());
+    } else {
+        onitBlock.priority = 10000;
     }
 
-    return blocks; */
+    // append to the previous blocks
+    blocks.chapters[onitBlock.chapter] = blocks.chapters[onitBlock.chapter] || [];
+    blocks.chapters[onitBlock.chapter].push(onitBlock);
+
+    return blocks;
 };

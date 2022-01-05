@@ -9,7 +9,7 @@ Il comando **onit doc** richiede la definizione del file **onitdocumentation.con
 ```js
 module.export = {
     ignore: [string],
-    chapters:  [chapter],
+    chapters: [chapter],
 }
 ```
 
@@ -146,6 +146,11 @@ Esempi di **transformFunction** disponibili:
 
 - **model**: se path rappresenta un file **json** di modello, model ne esegue l'estrazione dei valori delle **properties** e delle **relazioni**
 
+##### Files processati
+
+*.js, *.md, *.jsx *.ts
+
+NOTA: Il supporto ai tag @onit è limitato nei files markdown. Utilizzare un unico @onitChapter per file markdown.
 ##### Esempio 
 
 **Codice commento**

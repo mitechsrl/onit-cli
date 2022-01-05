@@ -279,7 +279,9 @@ const writeFile = function (configFile, blocks, scanTargetDir, outDir) {
                 const chapterFileContent = buildContent(blocks, chapterConfig, configFile);
 
                 // write the file out
-                createFile(indexFullPath, chapterConfig.index, '\n\n\n' + chapterFileContent);
+                const headerData = chapterConfig.index || {};
+                headerData.nav_order = chapterConfig.chapterIndexNumber;
+                createFile(indexFullPath, headerData, '\n\n\n' + chapterFileContent);
             }
 
             // do not add page content for indexes
@@ -308,7 +310,9 @@ const writeFile = function (configFile, blocks, scanTargetDir, outDir) {
 
                     // write the file out
                     const fileFullPath = path.join(fileDir, chapterConfig.title.replace(/[^a-zA-Z0-9]/g, '-') + '.md');
-                    createFile(fileFullPath, chapterConfig.page, '\n\n\n' + chapterFileContent);
+                    const headerData = chapterConfig.page || {};
+                    headerData.nav_order = chapterConfig.chapterIndexNumber;
+                    createFile(fileFullPath, headerData, '\n\n\n' + chapterFileContent);
                 }
             }
 

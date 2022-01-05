@@ -42,7 +42,7 @@ module.exports.parse = (fileContent, filePath, blocks) => {
         let postDelimiter = '';
         onitDoc.source.forEach(s => {
             if (s.tokens.tag === '@onitDoc') {
-                // get the spacing of this tag and remove the spaces for alll the text based on this
+                // get the spacing of this tag and remove the spaces for all the text based on this
                 start = s.tokens.start;
                 postDelimiter = s.tokens.postDelimiter;
             }
