@@ -132,8 +132,10 @@ const resolveInternalReferences = (str, configFile) => {
         // build the link path. Note that pages with the index properties have links like '/LABEL1/LABEL2',
         // while standard pages have links like '/LABEL1/LABEL2/Title.html'
         const branch = getChapterBranchByLabel(configFile, label);
+        // this is a markdown link format
+        const replace = '[' + text + '](' + referencePath + ')';
         if (!branch) {
-            console.error(branch);
+            logger.warn('Link generation for ' + found + ' failed. ');
         } else {
             const filePath = branch.reduce((acc, b) => {
                 return [...acc, b.chapterIndex + '_' + b.label];
@@ -148,10 +150,8 @@ const resolveInternalReferences = (str, configFile) => {
             }
             if (!text) text = referencePath;
 
-            // this is a markdown link format
-            const replace = '[' + text + '](' + referencePath + ')';
+
             console.log('Generate link ' + replace);
-            // console.log('Resolved', found, 'to', replace);
             str = str.replace(found, replace);
         }
     }
