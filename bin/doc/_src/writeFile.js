@@ -26,7 +26,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 const fs = require('fs');
 const path = require('path');
 const fse = require('fs-extra');
-
+const logger = require('../../../lib/logger')
 /**
  * replace the [@onitSrc filePath] with the content of filepath, using proper code tags
  * @param {*} str
@@ -39,6 +39,7 @@ const resolveSourceIncludes = (block, str) => {
     let m;
 
     while ((m = regex.exec(str)) !== null) {
+
         // This is necessary to avoid infinite loops with zero-width matches
         if (m.index === regex.lastIndex) {
             regex.lastIndex++;
@@ -67,6 +68,8 @@ const resolveSourceIncludes = (block, str) => {
             }
 
             str = str.replace(found, replace);
+        } else {
+            logger.warn('@onitSrc file resolution error: file ' + file + ' not found')
         }
     }
     return str;
