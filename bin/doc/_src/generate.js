@@ -35,7 +35,6 @@ module.exports.generate = function (config, outputPath) {
     // set the indexes in the tree objects so later we can use them more easily
     const _recurseSetIndex = (tree) => {
         tree.forEach((t, i) => {
-            t.chapterIndex = ('' + i).padStart(3, '0');
             t.chapterIndexNumber = i;
             if (t.children) {
                 _recurseSetIndex(t.children);

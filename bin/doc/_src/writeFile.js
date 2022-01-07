@@ -26,7 +26,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 const fs = require('fs');
 const path = require('path');
 const fse = require('fs-extra');
-const logger = require('../../../lib/logger')
+const logger = require('../../../lib/logger');
 /**
  * replace the [@onitSrc filePath] with the content of filepath, using proper code tags
  * @param {*} str
@@ -39,7 +39,6 @@ const resolveSourceIncludes = (block, str) => {
     let m;
 
     while ((m = regex.exec(str)) !== null) {
-
         // This is necessary to avoid infinite loops with zero-width matches
         if (m.index === regex.lastIndex) {
             regex.lastIndex++;
@@ -69,7 +68,7 @@ const resolveSourceIncludes = (block, str) => {
 
             str = str.replace(found, replace);
         } else {
-            logger.warn('@onitSrc file resolution error: file ' + file + ' not found')
+            logger.warn('@onitSrc file resolution error: file ' + file + ' not found');
         }
     }
     return str;
@@ -81,7 +80,7 @@ const resolveSourceIncludes = (block, str) => {
  * @param {*} label
  * @returns
  */
-function getChapterBranchByLabel(config, label) {
+function getChapterBranchByLabel (config, label) {
     const _recurse = (n, branch) => {
         let _branch = null;
         n.some((chapter) => {
@@ -138,7 +137,7 @@ const resolveInternalReferences = (str, configFile) => {
             logger.warn('Link generation for ' + found + ' failed. Nothing found for the specified label.');
         } else {
             const filePath = branch.reduce((acc, b) => {
-                return [...acc, b.chapterIndex + '_' + b.label];
+                return [...acc, b.label];
             }, []).join('/');
 
             if (!branch[branch.length - 1].index) {
@@ -171,8 +170,8 @@ const generateBlock = (block, configFile, defaultTitle) => {
 
     if (!block.doc.startsWith('#')) {
         switch (block.titleFormat) {
-            case 'h3': str += '#'; break;
-            case 'h4': str += '##'; break;
+        case 'h3': str += '#'; break;
+        case 'h4': str += '##'; break;
         }
         str += '## ' + (block.title || defaultTitle) + '\n\n';
     }
@@ -207,13 +206,13 @@ const generateBlock = (block, configFile, defaultTitle) => {
     return str;
 };
 
-function reduceJekillHeader(acc, e) {
+function reduceJekillHeader (acc, e) {
     if (typeof e === 'string') acc = acc + '\n' + e;
     if (Array.isArray(e)) acc = acc + '\n' + e[0] + ': ' + e[1];
     return acc.trim();
 };
 
-function createFile(filename, header, content = '') {
+function createFile (filename, header, content = '') {
     const jekillHeader = [
         '---',
         ['layout', 'page'],
@@ -230,7 +229,7 @@ function createFile(filename, header, content = '') {
  * @param {*} chapterKey
  * @returns
  */
-function buildContent(blocks, chapterConfig, configFile) {
+function buildContent (blocks, chapterConfig, configFile) {
     // add extracted blocks markdown
     if (blocks.chapters[chapterConfig.label]) {
         const defaultTitle = chapterConfig.title;
@@ -255,9 +254,9 @@ const writeFile = function (configFile, blocks, scanTargetDir, outDir) {
 
             // calculate the destination directory
             const p = [
-                grandparent ? (grandparent.chapterIndex + "_" + (grandparent || {}).label) : null,
-                parent ? (parent.chapterIndex + "_" + (parent || {}).label) : null,
-                chapterConfig.chapterIndex + '_' + label
+                grandparent ? ((grandparent || {}).label) : null,
+                parent ? ((parent || {}).label) : null,
+                label
             ];
 
             const fileDir = path.resolve(outDir, './' + p.filter(l => !!l).join('/'));
