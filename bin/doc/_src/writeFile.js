@@ -133,9 +133,9 @@ const resolveInternalReferences = (str, configFile) => {
         // while standard pages have links like '/LABEL1/LABEL2/Title.html'
         const branch = getChapterBranchByLabel(configFile, label);
         // this is a markdown link format
-        const replace = '[' + text + '](' + referencePath + ')';
+
         if (!branch) {
-            logger.warn('Link generation for ' + found + ' failed. ');
+            logger.warn('Link generation for ' + found + ' failed. Nothing found for the specified label.');
         } else {
             const filePath = branch.reduce((acc, b) => {
                 return [...acc, b.chapterIndex + '_' + b.label];
@@ -150,7 +150,7 @@ const resolveInternalReferences = (str, configFile) => {
             }
             if (!text) text = referencePath;
 
-
+            const replace = '[' + text + '](' + referencePath + ')';
             console.log('Generate link ' + replace);
             str = str.replace(found, replace);
         }
