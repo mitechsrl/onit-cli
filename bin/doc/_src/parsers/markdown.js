@@ -27,6 +27,7 @@ const { priorityConverter } = require('../lib/priority');
 
 module.exports.parse = (fileContent, filePath, blocks) => {
     const onitBlock = {
+        filePath: filePath,
         type: '',
         params: [],
         title: '',
@@ -51,7 +52,18 @@ module.exports.parse = (fileContent, filePath, blocks) => {
 
     // extract title
     const titleMatch = fileContent.match(/^[^@]*@onitTitle +(.+)[\r\n]+$/mi);
-    onitBlock.title = (titleMatch ? titleMatch[1] : '').trim();
+    if (titleMatch) {
+        const split = titleMatch[1].trim().split(' ');
+        if (split[0].trim() && ['h2', 'h3', 'h4'].includes(split[0].trim())) {
+            onitBlock.titleFormat = split[0].trim();
+            onitBlock.title = split.slice(1).join(' ');
+        } else {
+            onitBlock.title = titleMatch[1].trim();
+        }
+    } else {
+        onitBlock.title = '';
+    }
+
 
     // extract priority
     const onitPriorityMatcher = fileContent.match(/^[^\n\ra-z@]*@onitPriority +(.+)$/mi);

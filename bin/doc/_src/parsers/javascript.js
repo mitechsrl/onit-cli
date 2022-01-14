@@ -67,7 +67,7 @@ module.exports.parse = (fileContent, filePath, blocks) => {
         // Parser for title. NOTE: This title is this page title, does not ends up into jekill.
         const onitTitle = block.tags.find(t => t.tag === 'onitTitle');
         if (onitTitle) {
-            if (['h2', 'h3', 'h4'].includes(onitTitle.name)) {
+            if (['h2', 'h3', 'h4'].includes(onitTitle.name.trim())) {
                 onitBlock.title = onitTitle.description;
                 onitBlock.titleFormat = onitTitle.name;
             } else {

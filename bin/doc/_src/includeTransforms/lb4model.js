@@ -7,7 +7,7 @@ module.exports = (src, params) => {
         ts.ScriptTarget.Latest // langugeVersion
     );
 
-    const content = ['### Model properties and relations'];
+    const content = ['## Model properties and relations'];
     node.forEachChild(child => {
         if (ts.SyntaxKind[child.kind] === 'ClassDeclaration') {
             child.members.forEach(n => {

@@ -113,11 +113,11 @@ module.exports = (src, params) => {
 
     const _final = [];
     if (properties.length) {
-        _final.push('### Properties', ...properties);
+        _final.push('## Properties', ...properties);
     }
 
     if (methods.length) {
-        _final.push('### Methods ', ...methods);
+        _final.push('## Methods ', ...methods);
     }
 
     return _final.join(NEWLINE);
