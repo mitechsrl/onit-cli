@@ -144,8 +144,12 @@ Per includere nel punto di chiamata un file esterno rappresentato da **path**.
 
 Esempi di **transformFunction** disponibili:
 
-- **model**: se path rappresenta un file **json** di modello, model ne esegue l'estrazione dei valori delle **properties** e delle **relazioni**
+- **lb4model**: se path rappresenta un file **json** di modello, model ne esegue l'estrazione dei valori delle **properties** e delle **relazioni**
 
+- **lb4repository**
+
+- **includeFullFile**
+  
 ##### Files processati
 
 *.js, *.md, *.jsx *.ts
