@@ -149,6 +149,8 @@ Esempi di **transformFunction** disponibili:
 - **lb4repository**
 
 - **includeFullFile**
+
+NOTA: la risoluzione delle inclusioni è ricorsiva, pertanto soggetta a dipendenza ciclica.
   
 ##### Files processati
 
@@ -161,7 +163,7 @@ NOTA: Il supporto ai tag @onit è limitato nei files markdown. Utilizzare un uni
 ```
 /**
 * @onitTitle This is a title
-* @onitChapter 1.2.3
+* @onitChapter LABEL
 * @onitDoc 
 * Hello, this is a markdown-formatted comment. If you want to go to chaper 1.2.3, [@onitChapter 1.2.3#hello](click here)
 * Some other text
@@ -171,6 +173,7 @@ NOTA: Il supporto ai tag @onit è limitato nei files markdown. Utilizzare un uni
 ```
 
 **onitdocumentation.config.js**
+Example config
 
 ```js
 const config = {
@@ -180,29 +183,24 @@ const config = {
         './build/**/*',
         './onit-doc/**/*',
     ],
-    chapters: {
-        '1': {
-            title: 'Backend',
+    chapters: [
+
+        {
+            label:'LABEL1', 
+            title:'title', 
+            children: [
+                {label:'LABEL2', title:'title'}
+            ]
+        },
+        {
+            label:'LABEL3', 
+            title:'title', 
             index: { nav_order: 1 }
-        },
-        '1.1': {
-            title: 'Database initialization',
-        },
-        '1.2': {
-            title: 'Mailer',
-        },
-        '2': {
-            title: 'Frontend',
-            index: { nav_order: 2 }
-        },
-        '2.1': {
-            title: 'React',
-            page: {} // automatically added if block codes for this chapter are found
-        },
-        '2.2': {
-            title: 'Render'
+            children: [
+                {label:'LABEL4', title:'title'}
+            ]
         }
-    }
+    ]
 }
 
 ```
