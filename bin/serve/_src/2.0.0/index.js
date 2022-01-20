@@ -77,6 +77,8 @@ module.exports.start = async function (onitConfigFile, version, basepath, params
         if (debug) {
             logger.warn('Modalità debug abilitata');
             nodeParams.push('--inspect');
+            nodeParams.push('--preserve-symlinks');
+            nodeParams.push('--preserve-symlinks-main');
         }
         await spawnNodeProcessPromise(onitConfigFile, nodeParams);
     } else {
