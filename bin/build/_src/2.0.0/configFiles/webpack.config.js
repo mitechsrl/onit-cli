@@ -108,7 +108,7 @@ module.exports = (context, config, packageJson) => {
                 },
                 // https://webpack.js.org/loaders/file-loader/
                 {
-                    test: /\.(png|jpe?g|gif)$/i,
+                    test: /\.(svg|png|jpe?g|gif)$/i,
                     use: [
                         {
                             loader: require.resolve('file-loader'),

@@ -66,10 +66,12 @@ module.exports = (context, config, packageJson) => {
                     // https://webpack.js.org/loaders/source-map-loader/
                     // this extract the source-maps from included files and add it to the current build
                     // On dev, this is extremely useful since we can eventually debug our own packages
-                    /*use: [{
+                    /*
+                    use: [{
                         loader: require.resolve('source-map-loader'),
                         options: {}
-                    }],*/
+                    }],
+                    */
                     resolve: {
                         fullySpecified: false
                     }
@@ -114,7 +116,7 @@ module.exports = (context, config, packageJson) => {
                 },
                 // https://webpack.js.org/loaders/file-loader/
                 {
-                    test: /\.(png|jpe?g|gif)$/i,
+                    test: /\.(svg|png|jpe?g|gif)$/i,
                     use: [
                         {
                             loader: require.resolve('file-loader'),
