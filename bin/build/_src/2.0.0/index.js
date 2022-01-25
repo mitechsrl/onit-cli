@@ -121,7 +121,9 @@ module.exports.start = async function (onitConfigFile, builderVersion, basepath,
     if (beforeSteps.length > 0) {
         logger.log('');
         logger.log('Running pre-build steps...');
-        for (const step of beforeSteps) await extraStepRunner(step, vars);
+        for (const step of beforeSteps) {
+            await extraStepRunner(step, vars);
+        }
     }
 
     // effective build
@@ -131,6 +133,8 @@ module.exports.start = async function (onitConfigFile, builderVersion, basepath,
     if (afterSteps.length > 0) {
         logger.log('');
         logger.log('Running post-build steps...');
-        for (const step of afterSteps) await extraStepRunner(step, vars);
+        for (const step of afterSteps) {
+            await extraStepRunner(step, vars);
+        }
     }
 };
