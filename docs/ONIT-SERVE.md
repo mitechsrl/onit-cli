@@ -61,7 +61,7 @@ Questo oggetto viene iniettato automaticamente nel **process.env** dell'istanza 
 
 **-reload** Abbinato a -debug, avvia il processo node con watch&reload.
 
-
+**-dangerouslyenablesmtpserver** Abilita la variabile di ambiente SMTP_SERVER, in caso contrario non viene inserita nell'environment. Questo è un flag per assicurarsi che nessuna mail venga mai inviata in sviluppo.
 
 ##### Debug
 

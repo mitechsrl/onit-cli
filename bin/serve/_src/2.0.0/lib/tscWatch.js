@@ -35,7 +35,6 @@ const subProcesses = [];
 
 module.exports.start = async (onitConfigFile, exitAfterTsc, launchNode) => {
     return new Promise(resolve => {
-
         const fileCopy = copyExtraFiles(onitConfigFile);
 
         const rl = readline.createInterface({

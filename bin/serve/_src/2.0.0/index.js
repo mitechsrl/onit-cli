@@ -48,6 +48,22 @@ module.exports.start = async function (onitConfigFile, version, basepath, params
         }
     }
 
+    if (process.argv.find(v => v.toLowerCase() === '-dangerouslyenablesmtpserver')) {
+        logger.error('----------------------------------------------------------------------------');
+        logger.error('--------------------------------- WARNING ----------------------------------');
+        logger.error('----------------------------------------------------------------------------');
+        logger.error('You have used the flag dangerouslyenablesmtpserver.');
+        logger.error('Smtp server evironment variable is now enabled. If you provided a valid smtp');
+        logger.error('server, mails can be sent for real!');
+        logger.error('');
+        logger.error('----------------------------------------------------------------------------');
+        logger.warn('Serve will resume in 5 seconds...');
+
+        await new Promise(resolve => {
+            setTimeout(resolve, 5000);
+        });
+    }
+
     const minusW = params.get('-w').found;
     const minusT = params.get('-t').found;
     const minusN = params.get('-n').found;

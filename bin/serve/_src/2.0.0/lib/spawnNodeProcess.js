@@ -23,6 +23,11 @@ function spawnNodeProcess (onitConfigFile, params = [], options = {}) {
     // Prepare the env variables
     let env = (onitConfigFile.json.serve || {}).environment || {};
 
+    if (!process.argv.find(v => v.toLowerCase() === '-dangerouslyenablesmtpserver')) {
+        env.EMAIL_SERVER = null;
+        delete env.EMAIL_SERVER;
+    };
+
     // check whatever we need to launch the app as component
     let mainJsFile = './dist/index.js';
     if (onitConfigFile.json.component) {
@@ -90,7 +95,7 @@ function spawnNodeProcess (onitConfigFile, params = [], options = {}) {
  * @param {*} nodeParams
  * @returns
  */
-function spawnNodeProcessPromise(onitConfigFile, nodeParams) {
+function spawnNodeProcessPromise (onitConfigFile, nodeParams) {
     return new Promise(resolve => {
         const nodeProcess = spawnNodeProcess(onitConfigFile, nodeParams);
 

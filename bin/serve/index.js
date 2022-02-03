@@ -39,6 +39,7 @@ module.exports.help = [
     ['-t', 'Esegui tsc e node'],
     ['-n', 'Esegui solo il processo node (Necessita di tsc eseguito almeno una volta)'],
     ['-exit', 'Abbinato a -t esce subito dopo aver terminato tsc'],
+    ['-dangerouslyenablesmtpserver', 'Abilita env EMAIL_SERVER. Usa con cautela'],
     '', 'Comuni',
     ['-w', 'Esegui solo webpack'],
     ['-c serveFile', 'Utilizza il file di serve specificato'],
