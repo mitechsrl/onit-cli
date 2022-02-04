@@ -48,19 +48,22 @@ module.exports.start = async function (onitConfigFile, version, basepath, params
         }
     }
 
+    // SMTP_SERVER warning
     if (process.argv.find(v => v.toLowerCase() === '-dangerouslyenablesmtpserver')) {
         logger.error('----------------------------------------------------------------------------');
         logger.error('--------------------------------- WARNING ----------------------------------');
         logger.error('----------------------------------------------------------------------------');
         logger.error('You have used the flag dangerouslyenablesmtpserver.');
-        logger.error('Smtp server evironment variable is now enabled. If you provided a valid smtp');
-        logger.error('server, mails can be sent for real!');
+        logger.error('Smtp server evironment variable is enabled. If you provided a valid server, ');
+        logger.error('queued and new mails can be sent for real.');
         logger.error('');
         logger.error('----------------------------------------------------------------------------');
-        logger.warn('Serve will resume in 5 seconds...');
+        logger.warn();
+        logger.warn('Resuming serve in 10 seconds. If you don\'t want this, press ctrl+c now!');
+        logger.warn();
 
         await new Promise(resolve => {
-            setTimeout(resolve, 5000);
+            setTimeout(resolve, 10000);
         });
     }
 
@@ -70,7 +73,7 @@ module.exports.start = async function (onitConfigFile, version, basepath, params
     const exitAfterTsc = params.get('-exit').found;
 
     const debug = params.get('-debug').found;
-    const reload = params.get('-reload').found;
+    // const reload = params.get('-reload').found;
     let launchedCount = 0;
 
     logger.log('Verifico links...');
