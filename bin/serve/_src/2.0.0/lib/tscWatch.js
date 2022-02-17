@@ -79,14 +79,14 @@ module.exports.start = async (onitConfigFile, exitAfterTsc, launchNode) => {
         watch.on('first_success', () => {
             logger.info('First compilation success.');
 
-            if (exitAfterTsc) {
-                // eslint-disable-next-line no-process-exit
-                process.exit(0);
-            }
-
             // run this callback after the first file copy is successful
             const onFilesCopied = () => {
-                logger.log('Files scan & copy completed');
+                logger.info('Files scan & copy completed');
+
+                if (exitAfterTsc) {
+                    // eslint-disable-next-line no-process-exit
+                    process.exit(0);
+                }
                 const _subProcesses = _.get(onitConfigFile, 'json.serve.onFirstTscCompilationSuccess', []);
                 _subProcesses.forEach(sp => {
                     if (sp.cmd) {
@@ -108,10 +108,13 @@ module.exports.start = async (onitConfigFile, exitAfterTsc, launchNode) => {
         });
 
         watch.on('success', () => {
-            onSuccess();
+            if (!exitAfterTsc) {
+                onSuccess();
+            }
         });
 
         watch.on('compile_errors', () => {
+            logger.log('Compilation errors');
             if (exitAfterTsc) {
                 // eslint-disable-next-line no-process-exit
                 process.exit(-1);
