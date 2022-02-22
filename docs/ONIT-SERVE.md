@@ -29,14 +29,15 @@ Nel caso sia settato a false, si assume che la cartella corrente contenga onit, 
 [
     {
         "link": "something",
-        "target":"Absolutepath"
+        "target":"Some path"
     }
 ]
 ```
 
 Questo array di oggetti viene utilizzato per verificare la presenza dei moduli citati come symlink locali. Ad esempio, se il componente **something** è presente nella directory **node_modules/something** ma **non è un symlink**, il serve eseguirà il comando **npm link something**. Questo tool è utilizzabile per mitigare la problematica di perdita dei symlink in npm@6 
 
-Se **target** è specificato, viene creato un symlink alla directory specificata. Il target è un path assoluto. Questo permette di avere diverse versioni in uso dello stesso pacchetto in diversi progetti (occorre clonare piu volte lo stesso progetto in path diversi e gestire da se le versioni)
+Se **target** è specificato, viene creato un symlink alla directory specificata. Se il target specificato è un path relativo, esso deve essere relativo al file *.onit.js in cui è definito. é possibile utilizzare path assoluti. 
+Questo permette di avere diverse versioni in uso dello stesso pacchetto in diversi progetti (occorre clonare piu volte lo stesso progetto in path diversi e gestire da se le versioni)
 ##### Environment
 
 Oggetto strutturato come 

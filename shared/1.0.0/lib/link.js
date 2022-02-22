@@ -35,7 +35,7 @@ const npmExec = isWindows ? 'npm.cmd' : 'npm';
  * Create the link. Based on the provided target, it either uses the standard npm link or a custom one
  * @param {*} l
  */
-async function createLink (l) {
+async function createLink (configFile, l) {
     if (!l.target) {
         // providing just the "link" property uses the standard npm link
         logger.log('Eseguo <npm link ' + l.link + '>');
@@ -46,7 +46,9 @@ async function createLink (l) {
 
         const p = path.resolve(process.cwd(), './node_modules', './' + l.link);
         try {
-            await fs.symlink(l.target, p, 'junction');
+            const resolveBase = configFile ? path.dirname(configFile) : process.cwd();
+            const resolvedTarget = path.resolve(resolveBase, l.target);
+            await fs.symlink(resolvedTarget, p, 'junction');
         } catch (e) {
             logger.error("Symlink creation failed. Please check You don't have this module installed as standard dependency");
             throw e;
@@ -54,7 +56,7 @@ async function createLink (l) {
     }
 }
 
-async function start(onitConfigFile) {
+async function start (onitConfigFile) {
     // do we have links to be checked?
     if (!onitConfigFile.json.link || onitConfigFile.json.link.length === 0) {
         return null;
@@ -76,7 +78,7 @@ async function start(onitConfigFile) {
         // does the  file exists? If not, create it
         if (error && error.code === 'ENOENT') {
             logger.warn(p + ' non esiste.');
-            await createLink(l);
+            await createLink(onitConfigFile.sources[0], l);
 
             // is this a symlink?
         } else if (stat && !stat.isSymbolicLink()) {
