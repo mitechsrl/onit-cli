@@ -71,12 +71,17 @@ module.exports.prompt = async (buildTarget, vars, cwdPackageJson) => {
         }];
 
         // this allow us to create a dev/distribution of the current version
-        if (append) {
+        if (append && !cwdPackageJson.version.endsWith(append)) {
             list[0].choices.push({
                 name: 'Passa a ' + cwdPackageJson.version + append,
                 value: cwdPackageJson.version + append
             });
         }
+
+        list[0].choices.push({
+            name: 'Incrementa a ' + semverInc(cwdPackageJson.version, ...increaseLevel),
+            value: semverInc(cwdPackageJson.version, ...increaseLevel)
+        });
 
         if (increaseLevelPreminor) {
             const v = semverInc(cwdPackageJson.version, ...increaseLevelPreminor);
@@ -85,11 +90,6 @@ module.exports.prompt = async (buildTarget, vars, cwdPackageJson) => {
                 value: v
             });
         }
-
-        list[0].choices.push({
-            name: 'Incrementa a ' + semverInc(cwdPackageJson.version, ...increaseLevel),
-            value: semverInc(cwdPackageJson.version, ...increaseLevel)
-        });
 
         if (versionManagement.additional) {
             const _additional = replace(versionManagement.additional, vars);

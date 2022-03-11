@@ -32,10 +32,16 @@ module.exports = async function (onitConfigFile, cwdPackageJson) {
 
     // run the user build script if any, otherwise just run the loopback tsc compiler (which btw is
     // the default implementation of 'npm run build' for loopback 4 projects)
+    let r = null;
     if (typeof (cwdPackageJson.scripts || {}).build === 'string') {
-        await spawn('npm', ['run', 'build'], true, { shell: true });
+        r = await spawn('npm', ['run', 'build'], true, { shell: true });
     } else {
-        await spawn('npx', ['lb-tsc'], true, { shell: true });
+        r = await spawn('npx', ['lb-tsc'], true, { shell: true });
+    }
+
+    // TODO: verificare se cambia qualcosa da powershell ad altre shells
+    if (r.exitCode !== 0) {
+        throw new Error('Build failed');
     }
 
     // tsc does not manage other files. Just copy them by ourselves

@@ -211,6 +211,12 @@ module.exports = (context, config, packageJson) => {
             crossOriginLoading: 'anonymous' // needed for SubresourceIntegrityPlugin
         },
 
+        // https://webpack.js.org/configuration/performance/
+        performance: {
+            // https://webpack.js.org/configuration/performance/#performancemaxentrypointsize
+            maxEntrypointSize: 512000
+        },
+
         // these libs are loaded manually in the browser (some of them are standard, some others are custom made)
         externals: {
             react: 'React',
