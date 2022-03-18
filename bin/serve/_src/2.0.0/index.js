@@ -70,7 +70,7 @@ module.exports.start = async function (onitConfigFile, version, basepath, params
     const minusW = params.get('-w').found;
     const minusT = params.get('-t').found;
     const minusN = params.get('-n').found;
-    const exitAfterTsc = params.get('-exit').found;
+    
 
     const debug = params.get('-debug').found;
     // const reload = params.get('-reload').found;
@@ -89,7 +89,7 @@ module.exports.start = async function (onitConfigFile, version, basepath, params
         await webpack.start(onitConfigFile, cwdPackageJson);
     } else if (minusT) {
         logger.log('Lancio tsc...');
-        await tsc.start(onitConfigFile, exitAfterTsc, true);
+        await tsc.start(onitConfigFile, params);
     } else if (minusN) {
         logger.warn('Lancio node...');
         const nodeParams = [];
@@ -104,7 +104,7 @@ module.exports.start = async function (onitConfigFile, version, basepath, params
         logger.log('Lancio webpack e tsc...');
         await Promise.all([
             webpack.start(onitConfigFile, cwdPackageJson),
-            tsc.start(onitConfigFile, exitAfterTsc, true)
+            tsc.start(onitConfigFile, params)
         ]);
     }
 

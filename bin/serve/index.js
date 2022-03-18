@@ -38,6 +38,7 @@ module.exports.help = [
     '', 'Serve V^2.0.0',
     ['-t', 'Esegui tsc e node'],
     ['-n', 'Esegui solo il processo node (Necessita di tsc eseguito almeno una volta)'],
+    ['-w', 'Abbinato a -t, esegue solo il watch&build senza lanciare node'],
     ['-exit', 'Abbinato a -t esce subito dopo aver terminato tsc'],
     ['-dangerouslyenablesmtpserver', 'Abilita env EMAIL_SERVER. Usa con cautela'],
     '', 'Comuni',

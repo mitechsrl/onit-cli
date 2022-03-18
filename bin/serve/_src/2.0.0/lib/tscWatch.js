@@ -33,7 +33,9 @@ const { spawnSubprocess } = require('./spawnSubprocess');
 
 const subProcesses = [];
 
-module.exports.start = async (onitConfigFile, exitAfterTsc, launchNode) => {
+module.exports.start = async (onitConfigFile, params) => {
+    const exitAfterTsc = params.get('-exit').found;
+    const launchNode = !params.get('-watch').found;
     return new Promise(resolve => {
         const fileCopy = copyExtraFiles(onitConfigFile);
 
