@@ -11,7 +11,7 @@ const fs = require('fs');
  * @param {*} options options for child_process.spawn
  * @returns
  */
-function spawnNodeProcess (onitConfigFile, params = [], options = {}) {
+function spawnNodeProcess(onitConfigFile, params = [], options = {}) {
     const paramsFromOnitConfigFile = (onitConfigFile.json.serve.nodeArgs || []);
 
     // some hardcoded parameters
@@ -33,7 +33,13 @@ function spawnNodeProcess (onitConfigFile, params = [], options = {}) {
     if (onitConfigFile.json.component) {
         // in case of component, set a different main js file and
         // add in the environment a variable to enable this directory as compoennt
-        env.ONIT_COMPONENTS = [path.resolve(process.cwd(), './')];
+        const components = [
+            path.resolve(process.cwd(), './')
+        ];
+
+        env.ONIT_COMPONENTS = components;
+        env.ONIT_COMPONENTS_SCANDIRS = ((onitConfigFile.json.serve || {}).componentsScanDirs || []).map(d => path.resolve(process.cwd(), d));
+
         mainJsFile = (onitConfigFile.json.serve || {}).main;
         if (!mainJsFile) {
             // now is onit-next, this will save us in future when a rename to onit will be done
@@ -95,7 +101,7 @@ function spawnNodeProcess (onitConfigFile, params = [], options = {}) {
  * @param {*} nodeParams
  * @returns
  */
-function spawnNodeProcessPromise (onitConfigFile, nodeParams) {
+function spawnNodeProcessPromise(onitConfigFile, nodeParams) {
     return new Promise(resolve => {
         const nodeProcess = spawnNodeProcess(onitConfigFile, nodeParams);
 

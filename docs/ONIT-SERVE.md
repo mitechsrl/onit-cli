@@ -13,6 +13,8 @@ Il file contiene una serie di istruzioni per il lancio del progetto in ambiente 
     serve:{
         "nodeArgs": Array di aromenti da passare al processo node
         "environment": Object, oggetto iniettato in environment app
+        "main": string, main js file to launch
+        "componentsScanDirs": directories to be scanned for components
     }
 }
 ```
