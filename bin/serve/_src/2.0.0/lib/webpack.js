@@ -28,7 +28,7 @@ const webpackUtils = require('../../../../../lib/webpack/utils');
 const webpackWatcher = require('./webpackWatcher');
 const { searchEntryPoints } = require('../../../../../shared/2.0.0/lib/searchEntryPoints');
 
-module.exports.start = async (onitConfigFile, cwdPackageJson) => {
+module.exports.start = async (onitConfigFile, cwdPackageJson, params) => {
     // load the default config
     const webpackConfigFactory = require('../configFiles/webpack.config');
 
@@ -49,5 +49,5 @@ module.exports.start = async (onitConfigFile, cwdPackageJson) => {
     webpackConfig = _.mergeWith(webpackConfig, thisProjectWebpackExports, webpackUtils.webpackMergeFn);
 
     // generate a webpack watcher instance and run it
-    return webpackWatcher(webpackConfig);
+    return webpackWatcher(webpackConfig, params);
 };

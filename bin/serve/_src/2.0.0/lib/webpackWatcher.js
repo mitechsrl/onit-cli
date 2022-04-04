@@ -28,7 +28,8 @@ const webpack = require('webpack');
 const logger = require('../../../../../lib/logger');
 
 // create a list of promises, each one will launch a webpack watcher managing one single config.
-module.exports = (webpackConfig) => {
+module.exports = (webpackConfig, params) => {
+    const exitAfterCompile = params.get('-exit').found;
     return new Promise(resolve => {
         // watcher callback
         const componentName = path.basename(webpackConfig.context);
@@ -65,6 +66,11 @@ module.exports = (webpackConfig) => {
 
             booting = false;
             logger.info('[WEBPACK] ' + componentName + ' - Compile completed');
+
+            if (exitAfterCompile) {
+                // eslint-disable-next-line no-process-exit
+                process.exit(0);
+            }
         };
 
         startsWatch = function () {

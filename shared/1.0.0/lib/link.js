@@ -36,6 +36,7 @@ const npmExec = isWindows ? 'npm.cmd' : 'npm';
  * @param {*} l
  */
 async function createLink (configFile, l) {
+    console.log(l);
     if (!l.target) {
         // providing just the "link" property uses the standard npm link
         logger.log('Eseguo <npm link ' + l.link + '>');
@@ -83,7 +84,7 @@ async function start (onitConfigFile) {
             // is this a symlink?
         } else if (stat && !stat.isSymbolicLink()) {
             logger.warn(p + ' non è un symlink.');
-            await createLink(l);
+            await createLink(onitConfigFile.sources[0], l);
 
             // got some other error
         } else if (error) {
