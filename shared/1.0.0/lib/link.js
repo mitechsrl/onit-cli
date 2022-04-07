@@ -36,7 +36,6 @@ const npmExec = isWindows ? 'npm.cmd' : 'npm';
  * @param {*} l
  */
 async function createLink (configFile, l) {
-    console.log(l);
     if (!l.target) {
         // providing just the "link" property uses the standard npm link
         logger.log('Eseguo <npm link ' + l.link + '>');

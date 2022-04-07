@@ -11,7 +11,7 @@ const fs = require('fs');
  * @param {*} options options for child_process.spawn
  * @returns
  */
-function spawnNodeProcess(onitConfigFile, params = [], options = {}) {
+function spawnNodeProcess (onitConfigFile, params = [], options = {}) {
     const paramsFromOnitConfigFile = (onitConfigFile.json.serve.nodeArgs || []);
 
     // some hardcoded parameters
@@ -28,26 +28,38 @@ function spawnNodeProcess(onitConfigFile, params = [], options = {}) {
         delete env.EMAIL_SERVER;
     };
 
+    env.ONIT_COMPONENTS = [];
+
     // check whatever we need to launch the app as component
     let mainJsFile = './dist/index.js';
     if (onitConfigFile.json.component) {
         // in case of component, set a different main js file and
         // add in the environment a variable to enable this directory as compoennt
-        const components = [
-            path.resolve(process.cwd(), './')
-        ];
-
-        env.ONIT_COMPONENTS = components;
+        env.ONIT_COMPONENTS.push(path.resolve(process.cwd(), './'));
         env.ONIT_COMPONENTS_SCANDIRS = ((onitConfigFile.json.serve || {}).componentsScanDirs || []).map(d => path.resolve(process.cwd(), d));
 
         mainJsFile = (onitConfigFile.json.serve || {}).main;
         if (!mainJsFile) {
             // now is onit-next, this will save us in future when a rename to onit will be done
-            mainJsFile = ['onit', 'onit-next'].map(n => './node_modules/@mitech/' + n + '/dist/index.js').find(p => {
+            mainJsFile = [
+                './node_modules/@mitech/onit-next/dist/index.js',
+                './node_modules/@mitech/onit/dist/index.js',
+                '../node_modules/@mitech/onit-next/dist/index.js',
+                '../node_modules/@mitech/onit/dist/index.js'
+            ].find(p => {
                 return fs.existsSync(p);
             });
         }
     }
+
+    // extra additional components to be loaded
+    const componentsPaths = (onitConfigFile.json.serve || {}).componentsPaths || [];
+    if (componentsPaths.length > 0) {
+        env.ONIT_COMPONENTS.push(...componentsPaths.map(p => path.resolve(process.cwd(), p)));
+    }
+
+    // remove duplicates
+    env.ONIT_COMPONENTS = env.ONIT_COMPONENTS.filter((item, index) => env.ONIT_COMPONENTS.indexOf(item) === index);
 
     // env vars must be strings, so check and convert them.
     Object.keys(env).forEach(key => {
@@ -101,7 +113,7 @@ function spawnNodeProcess(onitConfigFile, params = [], options = {}) {
  * @param {*} nodeParams
  * @returns
  */
-function spawnNodeProcessPromise(onitConfigFile, nodeParams) {
+function spawnNodeProcessPromise (onitConfigFile, nodeParams) {
     return new Promise(resolve => {
         const nodeProcess = spawnNodeProcess(onitConfigFile, nodeParams);
 
