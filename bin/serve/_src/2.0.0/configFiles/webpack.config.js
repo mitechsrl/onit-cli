@@ -33,7 +33,8 @@ const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 const progressHandler = require('../../../../../lib/webpack/progressHandler');
 const babelConfig = require('../../../../../shared/1.0.0/configFiles/babel.config');
 const mixinFromFile = require('../../../../../lib/webpack/mixinFromFile');
-
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 /**
  * Webpack serve config factory.
  * Some values may be changed at runtime (especially entry points and/or mode)
@@ -45,6 +46,8 @@ const mixinFromFile = require('../../../../../lib/webpack/mixinFromFile');
 module.exports = (context, config, packageJson) => {
     const env = 'development';
     const componentName = path.basename(context);
+
+    const minimize = config.minimize;
 
     // this packagePublishPathValue must match the one from the package (whic is calculated wit the same logic)
     let packagePublishPath = packageJson.name.split('/').pop();
@@ -132,11 +135,25 @@ module.exports = (context, config, packageJson) => {
 
         // this will create shared modules between pages.
         // https://webpack.js.org/plugins/split-chunks-plugin/#splitchunkschunks
-        optimization: {
-            splitChunks: {
-                chunks: 'all'
-            }
-        },
+        optimization: Object.assign(
+            {
+                splitChunks: {
+                    chunks: 'all'
+                }
+            },
+
+            minimize
+                ? {
+                    minimize: true,
+                    minimizer: [
+                        // minimize css: https://github.com/webpack-contrib/css-minimizer-webpack-plugin
+                        new CssMinimizerPlugin(),
+                        // minimize js: https://webpack.js.org/plugins/terser-webpack-plugin/
+                        new TerserPlugin()
+                    ]
+                }
+                : {}
+        ),
 
         // The list of entry points is calculated dynamically before starting the webpack process
         entry: config.entryPoints || {},
