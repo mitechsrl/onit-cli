@@ -40,6 +40,7 @@ module.exports.help = [
     ['-n', 'Esegui solo il processo node (Necessita di tsc eseguito almeno una volta)'],
     ['-watch', 'Abbinato a -t, esegue solo il watch&build senza lanciare node'],
     ['-minimize', 'Abbinato a -w, esegue build minificata'],
+    ['-prod', 'Abbinato a -w, esegue build con flag production anzichè development'],
     ['-exit', 'Abbinato a -t esce subito dopo aver terminato tsc'],
     ['-dangerouslyenablesmtpserver', 'Abilita env EMAIL_SERVER. Usa con cautela'],
     '', 'Comuni',

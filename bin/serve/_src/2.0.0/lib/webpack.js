@@ -43,6 +43,7 @@ module.exports.start = async (onitConfigFile, cwdPackageJson, params) => {
     let webpackConfig = webpackConfigFactory(process.cwd(), {
         entryPoints: entryPoints,
         minimize: params.get('-minimize').found,
+        production: params.get('-prod').found,
         outputPath: _.get(onitConfigFile, 'json.webpack.outputPath', './dist-fe')
     }, cwdPackageJson);
 
