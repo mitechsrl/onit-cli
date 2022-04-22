@@ -127,7 +127,7 @@ module.exports = (context, config, packageJson) => {
         optimization: {
             minimize: env === 'production', // enable minimization for production builds
             splitChunks: {
-                chunks: 'all'
+                chunks: 'async'
             },
             minimizer: [
                 // minimize css: https://github.com/webpack-contrib/css-minimizer-webpack-plugin

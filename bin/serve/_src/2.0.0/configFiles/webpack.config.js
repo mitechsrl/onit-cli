@@ -44,7 +44,7 @@ const TerserPlugin = require('terser-webpack-plugin');
  * @param {*} packageJson the package.json content (js object) of the project to be webpacke'd.
  */
 module.exports = (context, config, packageJson) => {
-    const env = 'development';
+    const env = config.production ? 'production' : 'development';
     const componentName = path.basename(context);
 
     const minimize = config.minimize;
@@ -138,7 +138,7 @@ module.exports = (context, config, packageJson) => {
         optimization: Object.assign(
             {
                 splitChunks: {
-                    chunks: 'all'
+                    chunks: 'async'
                 }
             },
 
