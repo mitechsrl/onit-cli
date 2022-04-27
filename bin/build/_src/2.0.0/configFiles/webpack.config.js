@@ -127,7 +127,10 @@ module.exports = (context, config, packageJson) => {
         optimization: {
             minimize: env === 'production', // enable minimization for production builds
             splitChunks: {
-                chunks: 'async'
+                // was all, but started having issues.
+                // Can't find why.
+                // Info: https://github.com/jantimon/html-webpack-plugin/issues/1366
+                chunks: 'async' 
             },
             minimizer: [
                 // minimize css: https://github.com/webpack-contrib/css-minimizer-webpack-plugin

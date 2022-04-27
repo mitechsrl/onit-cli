@@ -138,6 +138,9 @@ module.exports = (context, config, packageJson) => {
         optimization: Object.assign(
             {
                 splitChunks: {
+                    // was all, but started having issues.
+                    // Can't find why.
+                    // Info: https://github.com/jantimon/html-webpack-plugin/issues/1366
                     chunks: 'async'
                 }
             },
