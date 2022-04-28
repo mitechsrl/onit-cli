@@ -50,13 +50,13 @@ module.exports.prompt = async (buildTarget, vars, cwdPackageJson) => {
         increaseLevels.push(['prerelease', 'uat']);
         // increaseLevel2 = ['preminor', 'uat'];
         break;
-    case 'test':
+    case 'beta':
         append = '-beta.0';
         additionalMatch = /^[0-9.]+-beta\.[0-9]+$/;
         increaseLevels.push(['prerelease', 'beta']);
         // increaseLevel2 = ['preminor', 'beta'];
         break;
-    case 'beta':
+    case 'test':
         append = '-test.0';
         additionalMatch = /^[0-9.]+-test\.[0-9]+$/;
         increaseLevels.push(['prerelease', 'test']);
