@@ -14,12 +14,6 @@ const fs = require('fs');
 function spawnNodeProcess (onitConfigFile, params = [], options = {}) {
     const paramsFromOnitConfigFile = (onitConfigFile.json.serve.nodeArgs || []);
 
-    // some hardcoded parameters
-    let nodeProcessSpaceSize = ['--max-old-space-size=4096'];
-    if (paramsFromOnitConfigFile.find(p => p.indexOf('max-old-space-size') >= 0)) {
-        nodeProcessSpaceSize = [];
-    }
-
     // Prepare the env variables
     let env = (onitConfigFile.json.serve || {}).environment || {};
 
@@ -70,7 +64,7 @@ function spawnNodeProcess (onitConfigFile, params = [], options = {}) {
     // this allow the usage of system-wide vars.
     env = Object.assign({}, process.env, env);
 
-    const finalParams = [...nodeProcessSpaceSize, ...params, ...paramsFromOnitConfigFile, mainJsFile];
+    const finalParams = [...params, ...paramsFromOnitConfigFile, mainJsFile];
     logger.info('Spawn node process: node ' + finalParams.join(' '));
 
     // finally launch the node process

@@ -33,29 +33,37 @@ const fs = require('fs');
 
 module.exports.prompt = async (buildTarget, vars, cwdPackageJson) => {
     const versionManagement = buildTarget.version;
-    let increaseLevel = null; // how to calculate next version
-    let increaseLevelPreminor = null; // another way to calculate versions but only for test and dev
+    const increaseLevels = []; // keep sorted from lowest to higer
     let append = '';
     let additionalMatch = null;
     switch (buildTarget.mode) {
     case 'production':
         append = '';
         additionalMatch = /^[0-9.]+$/;
-        increaseLevel = ['patch'];
-        increaseLevelPreminor = null;
+        increaseLevels.push(['patch']);
+        increaseLevels.push(['minor']);
+        increaseLevels.push(['major']);
         break;
-    case 'development':
-        append = '-dev.0';
-        additionalMatch = /^[0-9.]+-dev\.[0-9]+$/;
-        increaseLevel = ['prerelease', 'dev'];
-        increaseLevelPreminor = ['preminor', 'dev'];
+    case 'uat':
+        append = '-uat.0';
+        additionalMatch = /^[0-9.]+-uat\.[0-9]+$/;
+        increaseLevels.push(['prerelease', 'uat']);
+        // increaseLevel2 = ['preminor', 'uat'];
         break;
     case 'test':
         append = '-beta.0';
         additionalMatch = /^[0-9.]+-beta\.[0-9]+$/;
-        increaseLevel = ['prerelease', 'beta'];
-        increaseLevelPreminor = ['preminor', 'beta'];
+        increaseLevels.push(['prerelease', 'beta']);
+        // increaseLevel2 = ['preminor', 'beta'];
         break;
+    case 'beta':
+        append = '-test.0';
+        additionalMatch = /^[0-9.]+-test\.[0-9]+$/;
+        increaseLevels.push(['prerelease', 'test']);
+        // increaseLevel2 = ['preminor', 'beta'];
+        break;
+
+    default: throw new Error('Unknown build mode ' + buildTarget.mode + '. Use one from: production, uat, beta, test.');
     }
 
     let version = null;
@@ -71,25 +79,19 @@ module.exports.prompt = async (buildTarget, vars, cwdPackageJson) => {
         }];
 
         // this allow us to create a dev/distribution of the current version
-        if (append && !cwdPackageJson.version.endsWith(append)) {
+        if (append && !cwdPackageJson.version.match(additionalMatch)) {
             list[0].choices.push({
                 name: 'Passa a ' + cwdPackageJson.version + append,
                 value: cwdPackageJson.version + append
             });
         }
 
-        list[0].choices.push({
-            name: 'Incrementa a ' + semverInc(cwdPackageJson.version, ...increaseLevel),
-            value: semverInc(cwdPackageJson.version, ...increaseLevel)
-        });
-
-        if (increaseLevelPreminor) {
-            const v = semverInc(cwdPackageJson.version, ...increaseLevelPreminor);
+        increaseLevels.forEach(increaseLevel => {
             list[0].choices.push({
-                name: 'Prossima minor ' + v,
-                value: v
+                name: 'Prossima ' + increaseLevel[0] + ' ' + semverInc(cwdPackageJson.version, ...increaseLevel),
+                value: semverInc(cwdPackageJson.version, ...increaseLevel)
             });
-        }
+        });
 
         if (versionManagement.additional) {
             const _additional = replace(versionManagement.additional, vars);
@@ -115,17 +117,20 @@ module.exports.prompt = async (buildTarget, vars, cwdPackageJson) => {
                 // logger.error(e);
             }
 
-            const v = semverInc(val, ...increaseLevel);
-            if (v) {
-                list[0].choices.push({
-                    name: versionManagement.additional.name + ' ' + v,
-                    value: v
-                });
-            }
+            increaseLevels.forEach(increaseLevel => {
+                const v = semverInc(val, ...increaseLevel);
+                if (v) {
+                    list[0].choices.push({
+                        name: versionManagement.additional.name + ' ' + increaseLevel[0] + ' ' + v,
+                        value: v
+                    });
+                }
+            });
         }
         const answers = await inquirer.prompt(list);
         version = answers.version;
     }
+
     return version;
 };
 
