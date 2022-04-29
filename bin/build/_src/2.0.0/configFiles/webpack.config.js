@@ -125,12 +125,13 @@ module.exports = (context, config, packageJson) => {
         // this will create shared modules between pages.
         // https://webpack.js.org/plugins/split-chunks-plugin/#splitchunkschunks
         optimization: {
+            realContentHash: true,
             minimize: env === 'production', // enable minimization for production builds
             splitChunks: {
                 // was all, but started having issues.
                 // Can't find why.
                 // Info: https://github.com/jantimon/html-webpack-plugin/issues/1366
-                chunks: 'async' 
+                chunks: 'async'
             },
             minimizer: [
                 // minimize css: https://github.com/webpack-contrib/css-minimizer-webpack-plugin
@@ -217,7 +218,7 @@ module.exports = (context, config, packageJson) => {
         // https://webpack.js.org/configuration/performance/
         performance: {
             // https://webpack.js.org/configuration/performance/#performancemaxentrypointsize
-            maxEntrypointSize: 512000
+            maxEntrypointSize: 768000
         },
 
         // these libs are loaded manually in the browser (some of them are standard, some others are custom made)
