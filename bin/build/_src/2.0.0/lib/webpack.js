@@ -63,7 +63,7 @@ module.exports = async function (distFeTargetDir, onitConfigFile, buildMode, inj
 
     // webpack build is either development or production.
     // everything non-development is translated to roduction (even out 'test' mode)
-    webpackConfig.mode = (buildMode !== 'development') ? 'production' : 'development';
+    webpackConfig.mode = (buildMode === 'production') ? 'production' : 'development';
 
     // merge the base webpack config with exports
     webpackConfig = _.mergeWith(webpackConfig, thisProjectWebpackExports, webpackUtils.webpackMergeFn);

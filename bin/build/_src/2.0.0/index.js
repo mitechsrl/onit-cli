@@ -66,7 +66,7 @@ module.exports.start = async function (onitConfigFile, builderVersion, basepath,
 
     logger.info('Selected build target: ' + buildTarget.key);
 
-    const supportedBuildModes = ['production', 'development', 'test'];
+    const supportedBuildModes = ['production', 'uat', 'beta', 'test'];
 
     if (!supportedBuildModes.includes(buildTarget.mode)) {
         throw new Error('Build mode ' + buildTarget.mode + ' non supportato. Usa uno tra ' + supportedBuildModes.join(', '));

@@ -30,7 +30,13 @@ const tsc = require('./tsc');
 
 module.exports.build = async function (cwdPackageJson, buildTarget, onitConfigFile) {
     // Do a production build as default
-    const buildMode = buildTarget.mode || 'production';
+
+    let buildMode = '';
+    if (['production', 'uat'].includes(buildTarget.mode)) {
+        buildMode = 'production';
+    } else {
+        buildMode = 'development';
+    }
 
     // clean the build directory
     await clean(onitConfigFile, buildMode, cwdPackageJson);
