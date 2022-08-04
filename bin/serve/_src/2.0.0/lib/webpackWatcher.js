@@ -91,11 +91,11 @@ module.exports = (webpackConfig, params) => {
         process.on('SIGINT', () => {
             if (!called) {
                 called = true;
-                logger.warn('[WEBPACK] ' + componentName + ' - Stop webpack watcher...');
-                watcher.close(() => {
-                    logger.warn('[WEBPACK] ' + componentName + ' - Webpack watch stopped');
-                    resolve(0);
-                });
+                // logger.warn('[WEBPACK] ' + componentName + ' - Stop webpack watcher...');
+                resolve(0);
+                // watcher.close(() => {
+                //     resolve(0);
+                // });
             }
         });
     });
