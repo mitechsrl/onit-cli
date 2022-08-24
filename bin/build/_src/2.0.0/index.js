@@ -108,14 +108,14 @@ module.exports.start = async function (onitConfigFile, builderVersion, basepath,
         afterSteps = afterSteps.filter((step, index) => answers['step_' + index]);
     }
 
-    logger.log('Checking links...');
-    await links.start(onitConfigFile);
-
     // update the package.json and package-lock.json versions if needed
     if (newPackageVersion) {
         versionManagement.update(cwdPackageJson, cwdPackageJsonFileName, newPackageVersion);
         vars.$_PACKAGE_VERSION = newPackageVersion;
     }
+
+    logger.log('Checking links...');
+    await links.start(onitConfigFile);
 
     // extra steps management
     if (beforeSteps.length > 0) {
