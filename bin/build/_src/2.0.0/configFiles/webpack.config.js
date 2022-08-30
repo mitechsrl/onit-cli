@@ -218,7 +218,9 @@ module.exports = (context, config, packageJson) => {
         // https://webpack.js.org/configuration/performance/
         performance: {
             // https://webpack.js.org/configuration/performance/#performancemaxentrypointsize
-            maxEntrypointSize: 768000
+            maxEntrypointSize: 768000,
+            // https://webpack.js.org/configuration/performance/#performancemaxassetsize
+            maxAssetSize: 768000
         },
 
         // these libs are loaded manually in the browser (some of them are standard, some others are custom made)

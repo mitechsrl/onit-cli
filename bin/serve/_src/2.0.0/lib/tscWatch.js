@@ -142,8 +142,8 @@ module.exports.start = async (onitConfigFile, params) => {
         // Catch SIGINT (ctrl+c from console) so we stop nodemon when the user ask for it
         process.on('SIGINT', async () => {
             logger.warn('Stop/reset tsc...');
-            await fileCopy.close();
-            watch.kill();
+            //await fileCopy.close();
+            //watch.kill();
             killSubProcesses(() => {
                 if (nodeProcess) {
                     logger.warn('Killing node process...');

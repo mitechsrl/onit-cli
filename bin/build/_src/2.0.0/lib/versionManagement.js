@@ -81,7 +81,7 @@ module.exports.prompt = async (buildTarget, vars, cwdPackageJson) => {
         // this allow us to create a dev/distribution of the current version
         if (append && !cwdPackageJson.version.match(additionalMatch)) {
             list[0].choices.push({
-                name: 'Passa a ' + cwdPackageJson.version + append,
+                name: 'Passa a ' + cwdPackageJson.version.split('-')[0] + append,
                 value: cwdPackageJson.version + append
             });
         }
@@ -139,8 +139,8 @@ module.exports.prompt = async (buildTarget, vars, cwdPackageJson) => {
  *
  * @param {*} version
  */
-module.exports.update = async (cwdPackageJson, cwdPackageJsonFileName, version) => {
-    cwdPackageJson.version = version;
+module.exports.update = (cwdPackageJson, cwdPackageJsonFileName, version) => {
+    // on workspaces sometimes package-lock does not exists. It's the one from parent directory
     const cwdPackageLockJsonFileName = path.join(process.cwd(), 'package-lock.json');
 
     if (fs.existsSync(cwdPackageLockJsonFileName)) {
@@ -149,6 +149,7 @@ module.exports.update = async (cwdPackageJson, cwdPackageJsonFileName, version) 
         fs.writeFileSync(cwdPackageLockJsonFileName, JSON.stringify(cwdPackageLockJson, null, 4));
     }
 
+    cwdPackageJson.version = version;
     fs.writeFileSync(cwdPackageJsonFileName, JSON.stringify(cwdPackageJson, null, 4));
 };
 
