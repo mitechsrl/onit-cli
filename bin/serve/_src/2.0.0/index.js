@@ -50,17 +50,14 @@ module.exports.start = async function (onitConfigFile, version, basepath, params
 
     // SMTP_SERVER warning
     if (process.argv.find(v => v.toLowerCase() === '-dangerouslyenablesmtpserver')) {
-        logger.error('----------------------------------------------------------------------------');
-        logger.error('--------------------------------- WARNING ----------------------------------');
-        logger.error('----------------------------------------------------------------------------');
-        logger.error('You have used the flag dangerouslyenablesmtpserver.');
-        logger.error('Smtp server evironment variable is enabled. If you provided a valid server, ');
-        logger.error('queued and new mails can be sent for real.');
-        logger.error('');
-        logger.error('----------------------------------------------------------------------------');
-        logger.warn();
+        logger.warn(':warning:  --------------------------------- WARNING --------------------------------- :warning:');
+        logger.warn(':warning:  You have used the flag dangerouslyenablesmtpserver.                         :warning:');
+        logger.warn(':warning:  Smtp server evironment variable is enabled. If you provided a valid server, :warning:');
+        logger.warn(':warning:  queued and new mails can be sent for real.                                  :warning:');
+        logger.warn(':warning:  --------------------------------------------------------------------------- :warning:');
+        logger.warn('');
         logger.warn('Resuming serve in 10 seconds. If you don\'t want this, press ctrl+c now!');
-        logger.warn();
+        logger.warn('   ');
 
         await new Promise(resolve => {
             setTimeout(resolve, 10000);
