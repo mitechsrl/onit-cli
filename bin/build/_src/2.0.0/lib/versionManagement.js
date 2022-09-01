@@ -37,33 +37,33 @@ module.exports.prompt = async (buildTarget, vars, cwdPackageJson) => {
     let append = '';
     let additionalMatch = null;
     switch (buildTarget.mode) {
-    case 'production':
-        append = '';
-        additionalMatch = /^[0-9.]+$/;
-        increaseLevels.push(['patch']);
-        increaseLevels.push(['minor']);
-        increaseLevels.push(['major']);
-        break;
-    case 'uat':
-        append = '-uat.0';
-        additionalMatch = /^[0-9.]+-uat\.[0-9]+$/;
-        increaseLevels.push(['prerelease', 'uat']);
-        // increaseLevel2 = ['preminor', 'uat'];
-        break;
-    case 'beta':
-        append = '-beta.0';
-        additionalMatch = /^[0-9.]+-beta\.[0-9]+$/;
-        increaseLevels.push(['prerelease', 'beta']);
-        // increaseLevel2 = ['preminor', 'beta'];
-        break;
-    case 'test':
-        append = '-test.0';
-        additionalMatch = /^[0-9.]+-test\.[0-9]+$/;
-        increaseLevels.push(['prerelease', 'test']);
-        // increaseLevel2 = ['preminor', 'beta'];
-        break;
+        case 'production':
+            append = '';
+            additionalMatch = /^[0-9.]+$/;
+            increaseLevels.push(['patch']);
+            increaseLevels.push(['minor']);
+            increaseLevels.push(['major']);
+            break;
+        case 'uat':
+            append = '-uat.0';
+            additionalMatch = /^[0-9.]+-uat\.[0-9]+$/;
+            increaseLevels.push(['prerelease', 'uat']);
+            // increaseLevel2 = ['preminor', 'uat'];
+            break;
+        case 'beta':
+            append = '-beta.0';
+            additionalMatch = /^[0-9.]+-beta\.[0-9]+$/;
+            increaseLevels.push(['prerelease', 'beta']);
+            // increaseLevel2 = ['preminor', 'beta'];
+            break;
+        case 'test':
+            append = '-test.0';
+            additionalMatch = /^[0-9.]+-test\.[0-9]+$/;
+            increaseLevels.push(['prerelease', 'test']);
+            // increaseLevel2 = ['preminor', 'beta'];
+            break;
 
-    default: throw new Error('Unknown build mode ' + buildTarget.mode + '. Use one from: production, uat, beta, test.');
+        default: throw new Error('Unknown build mode ' + buildTarget.mode + '. Use one from: production, uat, beta, test.');
     }
 
     let version = null;
@@ -142,6 +142,7 @@ module.exports.prompt = async (buildTarget, vars, cwdPackageJson) => {
 module.exports.update = (cwdPackageJson, cwdPackageJsonFileName, version) => {
     // on workspaces sometimes package-lock does not exists. It's the one from parent directory
     const cwdPackageLockJsonFileName = path.join(process.cwd(), 'package-lock.json');
+
     if (fs.existsSync(cwdPackageLockJsonFileName)) {
         const cwdPackageLockJson = require(cwdPackageLockJsonFileName);
         cwdPackageLockJson.version = version;
