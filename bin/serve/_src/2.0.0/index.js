@@ -27,11 +27,11 @@ const pm2Dev = require('./lib/pm2');
 const webpack = require('./lib/webpack');
 const tsc = require('./lib/tscWatch.js');
 const links = require('../../../../shared/1.0.0/lib/link');
-const { spawnNodeProcessPromise } = require('./lib/spawnNodeProcess');
 const logger = require('../../../../lib/logger');
 const path = require('path');
 const fs = require('fs');
 const semver = require('semver');
+const { spawnNodeProcessPromise } = require('../../../../shared/2.0.0/lib/spawnNodeProcess');
 
 module.exports.start = async function (onitConfigFile, version, basepath, params) {
     // get the package json in the current directory

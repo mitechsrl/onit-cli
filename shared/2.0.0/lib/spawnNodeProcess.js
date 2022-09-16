@@ -1,21 +1,17 @@
 const { spawn } = require('child_process');
-const logger = require('../../../../../lib/logger');
+const logger = require('../../../lib/logger');
 const path = require('path');
 const fs = require('fs');
 
 /**
- * Spawn a node process for the app
  *
- * @param {*} onitConfigFile the onit configuration file
- * @param {*} params the params to be added at the command line
- * @param {*} options options for child_process.spawn
+ * @param {*} onitConfigFile
+ * @param {*} serveConfig
  * @returns
  */
-function spawnNodeProcess (onitConfigFile, params = [], options = {}) {
-    const paramsFromOnitConfigFile = (onitConfigFile.json.serve.nodeArgs || []);
-
+function buildEnvironment (onitConfigFile, serveConfig) {
     // Prepare the env variables
-    let env = (onitConfigFile.json.serve || {}).environment || {};
+    let env = serveConfig.environment || {};
 
     if (!process.argv.find(v => v.toLowerCase() === '-dangerouslyenablesmtpserver')) {
         env.EMAIL_SERVER = null;
@@ -24,36 +20,24 @@ function spawnNodeProcess (onitConfigFile, params = [], options = {}) {
 
     env.ONIT_COMPONENTS = [];
 
-    // check whatever we need to launch the app as component
-    let mainJsFile = './dist/index.js';
+    // components have some specific env variables
     if (onitConfigFile.json.component) {
         // in case of component, set a different main js file and
         // add in the environment a variable to enable this directory as compoennt
         env.ONIT_COMPONENTS.push(path.resolve(process.cwd(), './'));
-        env.ONIT_COMPONENTS_SCANDIRS = ((onitConfigFile.json.serve || {}).componentsScanDirs || []).map(d => path.resolve(process.cwd(), d));
-
-        mainJsFile = (onitConfigFile.json.serve || {}).main;
-        if (!mainJsFile) {
-            // now is onit-next, this will save us in future when a rename to onit will be done
-            mainJsFile = [
-                './node_modules/@mitech/onit-next/dist/index.js',
-                './node_modules/@mitech/onit/dist/index.js',
-                '../node_modules/@mitech/onit-next/dist/index.js',
-                '../node_modules/@mitech/onit/dist/index.js'
-            ].find(p => {
-                return fs.existsSync(p);
-            });
-        }
+        env.ONIT_COMPONENTS_SCANDIRS = (serveConfig.componentsScanDirs || [])
+            .map(d => path.resolve(process.cwd(), d));
     }
 
     // extra additional components to be loaded
-    const componentsPaths = (onitConfigFile.json.serve || {}).componentsPaths || [];
+    const componentsPaths = serveConfig.componentsPaths || [];
     if (componentsPaths.length > 0) {
         env.ONIT_COMPONENTS.push(...componentsPaths.map(p => path.resolve(process.cwd(), p)));
     }
 
     // remove duplicates
-    env.ONIT_COMPONENTS = env.ONIT_COMPONENTS.filter((item, index) => env.ONIT_COMPONENTS.indexOf(item) === index);
+    env.ONIT_COMPONENTS = env.ONIT_COMPONENTS
+        .filter((item, index) => env.ONIT_COMPONENTS.indexOf(item) === index);
 
     // env vars must be strings, so check and convert them.
     Object.keys(env).forEach(key => {
@@ -63,6 +47,54 @@ function spawnNodeProcess (onitConfigFile, params = [], options = {}) {
     // merge the generated env (from serve file) with the standard one from the OS
     // this allow the usage of system-wide vars.
     env = Object.assign({}, process.env, env);
+
+    return env;
+}
+
+/**
+ * Get the main onit executable filename
+ *
+ * @param {*} onitConfigFile
+ * @param {*} serveConfig
+ * @returns
+ */
+function getMainExecutableFilePath (onitConfigFile, serveConfig) {
+// check whatever we need to launch the app as component
+    let mainJsFile = './dist/index.js';
+    if (onitConfigFile.json.component) {
+        mainJsFile = serveConfig.main;
+        if (!mainJsFile) {
+        // now is onit-next, this will save us in future when a rename to onit will be done
+            mainJsFile = [
+                './node_modules/@mitech/onit-next/dist/index.js',
+                '../node_modules/@mitech/onit-next/dist/index.js'
+            ].find(p => {
+                return fs.existsSync(p);
+            });
+        }
+    }
+
+    return mainJsFile;
+}
+/**
+ * Spawn a node process for the app
+ *
+ * @param {*} onitConfigFile the onit configuration file
+ * @param {*} params the params to be added at the command line
+ * @param {*} options options for child_process.spawn
+ * @returns
+ */
+function spawnNodeProcess (
+    onitConfigFile,
+    serveConfig,
+    params = [],
+    options = {}
+) {
+    const paramsFromOnitConfigFile = serveConfig.nodeArgs || [];
+
+    // Prepare the env variables
+    const env = buildEnvironment(onitConfigFile, serveConfig);
+    const mainJsFile = getMainExecutableFilePath(onitConfigFile, serveConfig);
 
     const finalParams = [...params, ...paramsFromOnitConfigFile, mainJsFile];
     logger.info('Spawn node process: node ' + finalParams.join(' '));
@@ -118,7 +150,10 @@ function spawnNodeProcessPromise (onitConfigFile, nodeParams) {
         });
     });
 }
+
 module.exports = {
     spawnNodeProcess: spawnNodeProcess,
-    spawnNodeProcessPromise: spawnNodeProcessPromise
+    spawnNodeProcessPromise: spawnNodeProcessPromise,
+    buildEnvironment: buildEnvironment,
+    getMainExecutableFilePath: getMainExecutableFilePath
 };

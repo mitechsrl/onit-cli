@@ -28,7 +28,7 @@ const logger = require('../../../../../lib/logger');
 const readline = require('readline');
 const copyExtraFiles = require('../../../../../shared/2.0.0/lib/copyExtraFiles');
 const _ = require('lodash');
-const { spawnNodeProcess } = require('./spawnNodeProcess');
+const { spawnNodeProcess } = require('../../../../../shared/2.0.0/lib/spawnNodeProcess');
 const { spawnSubprocess } = require('./spawnSubprocess');
 
 const subProcesses = [];
@@ -53,11 +53,11 @@ module.exports.start = async (onitConfigFile, params) => {
                 // we have an already running node porcess. kill it and respawn
                 console.log('Reloading node app...');
                 nodeProcess.kill(() => {
-                    nodeProcess = spawnNodeProcess(onitConfigFile);
+                    nodeProcess = spawnNodeProcess(onitConfigFile, onitConfigFile.json.serve || {});
                 });
             } else {
                 // no node processes already running . Spawn a new one
-                nodeProcess = spawnNodeProcess(onitConfigFile);
+                nodeProcess = spawnNodeProcess(onitConfigFile, onitConfigFile.json.serve || {});
             }
         };
 
