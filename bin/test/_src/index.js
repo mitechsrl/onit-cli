@@ -22,6 +22,7 @@ async function onitProcessLauncher (onitConfigFile, testTarget) {
     await new Promise(resolve => setTimeout(resolve, 4000));
 
     return {
+        onit: onitInstance,
         stop: () => {
             return new Promise(resolve => {
                 onitInstance.lbApp.onStop(() => {
@@ -70,6 +71,7 @@ module.exports.start = async (onitConfigFile, testTarget, basepath, params) => {
     if (testTarget.launchOnit !== false) {
         logger.log('Launching onit...');
         onitInstance = await onitProcessLauncher(onitConfigFile, testTarget);
+        testEnvironment.onit = onitInstance.onit;
     }
 
     // beforeTest must run after onit launch.
@@ -77,6 +79,9 @@ module.exports.start = async (onitConfigFile, testTarget, basepath, params) => {
         logger.log('Launch beforeTest script ...');
         testEnvironment = await requires.beforeTest.beforeTest(testEnvironment);
     }
+
+    // set the testEnvironemtn as global so from now on it can be accessible
+    global.testEnvironment = testEnvironment;
 
     // run now mocha and wait for result
     const mochaResult = await runMocha(testTarget, Mocha, testCaseFiles);

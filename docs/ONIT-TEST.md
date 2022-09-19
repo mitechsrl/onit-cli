@@ -51,6 +51,8 @@ Il comando serve chiamerà la funzione startup in automatico.
 #### beforeTest file
 
 Questo file vie eseguito subito prima il lancio di mocha. In questo momento si ha a disposizione una instanza onit tramite **testEnv.onit**.
+L'istanza lbApp è accesibile tramite **testEnv.onit.lbApp**.
+
 
 Utilizza questo file per eseguire inizializzazioni tramite onit.
 
@@ -59,7 +61,7 @@ Il file deve presentare la seguente struttura:
 ```ts
 import { BeforeTestFunction, TestEnvironment } from '@mitech/onit-dev-tools';
 
-export const beforeTest: BeforeTestFunction = async (testEnv: TestEnvironment): Promise<TestEnvironment>=> {
+export const beforeTest: BeforeTestFunction<ExpressServer> = async (testEnv: TestEnvironment<ExpressServer>): Promise<TestEnvironment<ExpressServer>> => {
     
     // do something
     return testEnv;
@@ -77,7 +79,7 @@ Il file deve presentare la seguente struttura:
 ```ts
 import { ShutdownFunction, TestEnvironment, MochaResult } from '@mitech/onit-dev-tools';
 
-export const shutdown: ShutdownFunction = async (testEnv: TestEnvironment, mochaResult: MochaResult): Promise<void>=> {
+export const shutdown: ShutdownFunction<ExpressServer> = async (testEnv: TestEnvironment<ExpressServer>, mochaResult: MochaResult): Promise<void>=> {
     // console.log('Shutdown');
 };
 ```
@@ -91,11 +93,11 @@ Il file dovrebbe avere una struttura di questo tipo:
 ```ts
 // ritorna testEnvironment del file startup. Non è possibile passare dati a mocha, pertanto molto probabilmente
 // questo ritorna un valore globale settato in precedenza dallo startup
-const testEnvironment = getTestEnvironment() 
+const testEnvironment = getTestEnvironment<ExpressServer>() 
 
 describe('nomeTest',() => {
 	it('should seturn some value #myTag1 #myTag2', async function () {
-		const service = await testEnvironment.onit.get('services.someName');
+		const service = await testEnvironment.onit.lbApp.get('services.someName');
 		const result = await service.someFunction();
         assert.equal(result, 'expecting this string as result');
     });
