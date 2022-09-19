@@ -65,9 +65,12 @@ module.exports.start = async (onitConfigFile, testTarget, basepath, params) => {
         testEnvironment = (await requires.startup.startup()) || testEnvironment;
     }
 
+    let onitInstance = null;
     // start onit.
-    logger.log('Launching onit...');
-    const onitInstance = await onitProcessLauncher(onitConfigFile, testTarget);
+    if (testTarget.launchOnit !== false) {
+        logger.log('Launching onit...');
+        onitInstance = await onitProcessLauncher(onitConfigFile, testTarget);
+    }
 
     // beforeTest must run after onit launch.
     if (requires.beforeTest) {
@@ -78,9 +81,11 @@ module.exports.start = async (onitConfigFile, testTarget, basepath, params) => {
     // run now mocha and wait for result
     const mochaResult = await runMocha(testTarget, Mocha, testCaseFiles);
 
+    if (onitInstance) {
     // stop the onit process
-    logger.log('Stopping onit...');
-    await onitInstance.stop();
+        logger.log('Stopping onit...');
+        await onitInstance.stop();
+    }
 
     // tests are finished. Run the shutdown script if any
     if (requires.shutdown) {
