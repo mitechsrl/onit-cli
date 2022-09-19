@@ -51,8 +51,9 @@ module.exports.start = async (onitConfigFile, testTarget, basepath, params) => {
         logger.log('');
         const runningPath = process.cwd();
         const requires = checkFiles(testTarget, runningPath);
+
         let testEnvironment = {
-            env: testTarget.env
+            env: testTarget.environment
         };
 
         // get the mocha instance from the target workspace
