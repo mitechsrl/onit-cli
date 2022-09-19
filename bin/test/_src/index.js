@@ -5,6 +5,7 @@ const { checkFiles } = require('./lib/checkFiles');
 const { requireMochaFromProcessCwd } = require('./lib/requireMochaFromProcessCwd');
 const { buildEnvironment, getMainExecutableFilePath } = require('../../../shared/2.0.0/lib/spawnNodeProcess.js');
 const path = require('path');
+const { printError } = require('../../../lib/printError');
 
 /**
  *
@@ -44,63 +45,91 @@ async function onitProcessLauncher (onitConfigFile, testTarget) {
  * @param {*} params cli unmanaged params
  */
 module.exports.start = async (onitConfigFile, testTarget, basepath, params) => {
-    logger.log('');
-    logger.warn('Be sure all your code is compiled!');
-    logger.log('');
-    const runningPath = process.cwd();
-    const requires = checkFiles(testTarget, runningPath);
-    let testEnvironment = {};
+    try {
+        logger.log('');
+        logger.warn('Be sure all your code is compiled!');
+        logger.log('');
+        const runningPath = process.cwd();
+        const requires = checkFiles(testTarget, runningPath);
+        let testEnvironment = {
+            env: testTarget.env
+        };
 
-    // get the mocha instance from the target workspace
-    const Mocha = requireMochaFromProcessCwd();
-    if (!Mocha) {
-        throw new Error('Cannot find a local instance of mocha. Please add the dependency @mitech/onit-dev-tools.');
-    }
+        // get the mocha instance from the target workspace
+        const Mocha = requireMochaFromProcessCwd();
+        if (!Mocha) {
+            throw new Error('Cannot find a local instance of mocha. Please add the dependency @mitech/onit-dev-tools.');
+        }
 
-    const testCaseFiles = await resolveTestFilesDirectories(testTarget);
+        const testCaseFiles = await resolveTestFilesDirectories(testTarget);
 
-    // file existance checked. Run them
-    // startup must run before anything else.
-    if (requires.startup) {
-        logger.log('Launch startup script...');
-        testEnvironment = (await requires.startup.startup()) || testEnvironment;
-    }
+        // file existance checked. Run them
+        // startup must run before anything else.
+        if (requires.startup) {
+            logger.log('Launch startup script...');
+            try {
+                testEnvironment = (await requires.startup.startup(testEnvironment)) || testEnvironment;
+            } catch (e) {
+                logger.error('Startup script failed.');
+                throw e;
+            }
+        }
 
-    let onitInstance = null;
-    // start onit.
-    if (testTarget.launchOnit !== false) {
-        logger.log('Launching onit...');
-        onitInstance = await onitProcessLauncher(onitConfigFile, testTarget);
-        testEnvironment.onit = onitInstance.onit;
-    }
+        let onitInstance = null;
+        // start onit.
+        if (testTarget.launchOnit !== false) {
+            logger.log('Launching onit...');
+            try {
+                onitInstance = await onitProcessLauncher(onitConfigFile, testTarget);
+            } catch (e) {
+                logger.error('Launch of onit process failed.');
+                throw e;
+            }
+            testEnvironment.onit = onitInstance.onit;
+        }
 
-    // beforeTest must run after onit launch.
-    if (requires.beforeTest) {
-        logger.log('Launch beforeTest script ...');
-        testEnvironment = await requires.beforeTest.beforeTest(testEnvironment);
-    }
+        // beforeTest must run after onit launch.
+        if (requires.beforeTest) {
+            logger.log('Launch beforeTest script ...');
+            try {
+                testEnvironment = await requires.beforeTest.beforeTest(testEnvironment);
+            } catch (e) {
+                logger.error('beforeTest script failed.');
+                throw e;
+            }
+        }
 
-    // set the testEnvironemtn as global so from now on it can be accessible
-    global.testEnvironment = testEnvironment;
+        // set the testEnvironemtn as global so from now on it can be accessible
+        global.testEnvironment = testEnvironment;
 
-    // run now mocha and wait for result
-    const mochaResult = await runMocha(testTarget, Mocha, testCaseFiles);
+        // run now mocha and wait for result
+        const mochaResult = await runMocha(testTarget, Mocha, testCaseFiles);
 
-    if (onitInstance) {
-    // stop the onit process
-        logger.log('Stopping onit...');
-        await onitInstance.stop();
-    }
+        if (onitInstance) {
+        // stop the onit process
+            logger.log('Stopping onit...');
+            await onitInstance.stop();
+        }
 
-    // tests are finished. Run the shutdown script if any
-    if (requires.shutdown) {
-        logger.log('Launch shutdown script...');
-        await requires.shutdown.shutdown(testEnvironment, mochaResult);
-    }
+        // tests are finished. Run the shutdown script if any
+        if (requires.shutdown) {
+            logger.log('Launch shutdown script...');
+            try {
+                await requires.shutdown.shutdown(testEnvironment, mochaResult);
+            } catch (e) {
+                logger.error('shutdown script failed.');
+                throw e;
+            }
+        }
 
-    if (mochaResult.exitCode !== 0) {
+        if (mochaResult.exitCode !== 0) {
+            throw new Error('Mocha report some tests are failed');
+        }
+    } catch (e) {
+        printError(e);
         logger.error('Test failed!');
-    } else {
-        logger.info('Test success!');
+        return;
     }
+
+    logger.info('Test success!');
 };
