@@ -17,7 +17,7 @@ Aggiungi la configurzione di test al file onit.config.[js|json]
             startup: './dist/test/startup.js', // startup stript. 
             beforeTest: './dist/test/beforeTest.js' // beforeTest script
             testFilesDirectories: ['./dist/test/cases/*'], // tests scan directories
-            matchNameTag: '.*', // test name matching regex
+            grep: '.*', // test name matching regex
             shutdown: './dist/test/shutdown.js', // shutdown script
             launchOnit: true // Lancia onit. Default true
             
@@ -108,7 +108,7 @@ Il motore utilizzarto per eseguire i test è [mocha](https://mochajs.org/).
 Per maggiori info, vedi vedi https://loopback.io/doc/en/lb4/Testing-your-application.html
 
 
-**matchNameTag** 
+**grep** 
 Il parametro può essere usato per il macth dei test effettivi da eseguire.
 
 La stringa specificata è una regex che deve eseguire match sui tag descritti nella sezione *it* del test.

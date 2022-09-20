@@ -24,16 +24,23 @@ OTHER DEALINGS IN THE SOFTWARE.
 */
 
 const onitFileLoader = require('../../lib/onitFileLoader');
-const fs = require('fs');
-const path = require('path');
 const logger = require('../../lib/logger');
 const inquirer = require('inquirer');
 
 module.exports.info = 'Test utility';
 module.exports.help = [
-    ['-c', 'Onit config file']
+    ['-c', 'Onit config file'],
+    ['--no-rebuild', 'Do not clean and recompile the project before launching test'],
+    ['-t', 'Quick grep override. Replaces the one provided from cnfig file']
 ];
 
+/**
+ * Show prompt to ask the user for test set.
+ * If test set is only one, it will be autoselected
+ *
+ * @param {*} onitConfigFile
+ * @returns
+ */
 async function selectTest (onitConfigFile) {
     // check for buildTargets existence
     const tests = onitConfigFile.json.test || {};
@@ -79,11 +86,21 @@ module.exports.cmd = async function (basepath, params) {
         if (!onitConfigFile.json.test) {
             throw new Error('Il test non è disponibile. Verifica di avere la proprietà <test> nel file di configurazioen di onit.');
         }
+
+        // prompt the user to elect a test set
         const testTarget = await selectTest(onitConfigFile);
         const test = require('./_src/index');
+
+        // quick replace the tag from testTarget
+        const overrideMatchTag = params.get('-t');
+        if (overrideMatchTag.found) {
+            testTarget.grep = overrideMatchTag.value;
+        }
+
+        // launch test
         await test.start(onitConfigFile, testTarget, basepath, params);
     } catch (e) {
-        logger.error('Serve interrotto');
+        logger.error('Test interrotto');
         throw e;
     }
 };

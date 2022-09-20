@@ -1,3 +1,5 @@
+const logger = require('../../../../lib/logger');
+
 /**
  * Run mocha with the passed-in test files
  * See https://mochajs.org/api/ for programmatical API's
@@ -13,8 +15,14 @@ function runMocha (testTarget, Mocha, files) {
         files.forEach(file => mocha.addFile(file));
 
         // apply name filtering if any
-        if (testTarget.matchNameTag) {
-            mocha.grep(testTarget.matchNameTag);
+        if (testTarget.grep) {
+            logger.log('Mocha: setting grep ' + testTarget.grep.toString());
+            mocha.grep(testTarget.grep);
+        }
+
+        if (testTarget.timeout) {
+            logger.log('Mocha: setting timeout ' + testTarget.timeout.toString());
+            mocha.timeout(testTarget.timeout);
         }
 
         // Run mocha. THis will perform all the tests
