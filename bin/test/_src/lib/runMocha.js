@@ -16,10 +16,9 @@ function runMocha (testTarget, Mocha, files) {
 
         // get the mocha properties from config and set them
         Object.getOwnPropertyNames(Mocha.prototype).forEach(propName => {
-            // skip these propertis
+            // skip these properties
             if (['constructor'].includes(propName)) return;
             if (propName.startsWith('_')) return;
-
             // set in mocha if also set in testTarget
             if (testTarget[propName]) {
                 logger.log(`Mocha: set ${propName}=${testTarget[propName].toString()}`);
