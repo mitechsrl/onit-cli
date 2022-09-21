@@ -10,6 +10,7 @@
         "onit": "bin/cli.js"
     },
     "scripts": {
+        "mitech-publish": "mitech npm publish",
         "lint": "npx eslint --fix */**/*.js"
     },
     "author": "Mitech Srl.",
