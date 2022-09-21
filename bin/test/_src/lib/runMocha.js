@@ -25,7 +25,7 @@ function runMocha (testTarget, Mocha, files) {
             mocha.timeout(testTarget.timeout);
         }
 
-        // Run mocha. THis will perform all the tests
+        // Run mocha. This will perform all the tests
         mocha.run(failures => {
             // resolve on end. Return a non-zero status if there were failures
             resolve({

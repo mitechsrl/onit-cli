@@ -30,6 +30,7 @@ const command = require('../lib/command');
 const header = require('../lib/header');
 const npmVersionCheck = require('../lib/npmVersionCheck');
 const { printError } = require('../lib/printError');
+const { setupOutputRedirecion, closeOutputRedirction } = require('../lib/outputRedirection');
 
 // show CLI version
 if (process.argv.length === 3 && process.argv[2] === '-v') {
@@ -44,10 +45,18 @@ npmVersionCheck();
 
 // handler for any other command
 (async () => {
+    const redirectOutput = process.argv.find(p => p === '--log-to-file');
+    if (redirectOutput) {
+        await setupOutputRedirecion();
+    }
     try {
         await command.command(__dirname, process.argv.slice(2));
     } catch (e) {
         printError(e);
+    }
+
+    if (redirectOutput) {
+        closeOutputRedirction();
     }
     // eslint-disable-next-line no-process-exit
     process.exit();
