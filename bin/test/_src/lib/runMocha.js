@@ -14,17 +14,7 @@ function runMocha (testTarget, Mocha, files) {
         // add the test cases files
         files.forEach(file => mocha.addFile(file));
 
-        // apply name filtering if any
-        /* if (testTarget.grep) {
-            logger.log('Mocha: setting grep ' + testTarget.grep.toString());
-            mocha.grep(testTarget.grep);
-        }
-
-        if (testTarget.timeout) {
-            logger.log('Mocha: setting timeout ' + testTarget.timeout.toString());
-            mocha.timeout(testTarget.timeout);
-        } */
-
+        // get the mocha properties from config and set them
         Object.getOwnPropertyNames(Mocha.prototype).forEach(propName => {
             // skip these propertis
             if (['constructor'].includes(propName)) return;
