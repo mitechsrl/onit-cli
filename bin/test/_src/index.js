@@ -39,8 +39,6 @@ const { npmExecutable, onitExecutable } = require('../../../lib/commandNames');
  * @param {*} testTarget
  */
 async function onitProcessLauncher (onitConfigFile, testTarget) {
-    // create the proces.env object to be set in order to pass values to onit
-    process.env = buildEnvironment(onitConfigFile, testTarget);
     // find the main onit js file
     const mainFile = getMainExecutableFilePath(onitConfigFile, testTarget);
     // Require onit and launch it
@@ -115,6 +113,13 @@ module.exports.start = async (onitConfigFile, testTarget, basepath, params) => {
                 throw e;
             }
         }
+
+        // IV 22-09-2022: mosso DOPO startup script perchè cosi lo stesso può
+        // modificare l'environment se necessario
+        
+        // create the proces.env object to be set in order to pass values to onit
+        testTarget.environment = testEnvironment.env;
+        process.env = buildEnvironment(onitConfigFile, testTarget);
 
         let onitInstance = null;
 
