@@ -95,7 +95,7 @@ module.exports.start = async function (onitConfigFile, version, basepath, params
             nodeParams.push('--preserve-symlinks');
             nodeParams.push('--preserve-symlinks-main');
         }
-        await spawnNodeProcessPromise(onitConfigFile, nodeParams);
+        await spawnNodeProcessPromise(onitConfigFile, onitConfigFile.json.serve || {}, nodeParams);
     } else {
         logger.log('Lancio webpack e tsc...');
         await Promise.all([

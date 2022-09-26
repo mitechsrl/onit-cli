@@ -94,6 +94,11 @@ function spawnNodeProcess (
 
     // Prepare the env variables
     const env = buildEnvironment(onitConfigFile, serveConfig);
+    console.log("-------------------DEEEEE-------------------------");
+    console.log(serveConfig);
+    console.log("-------------------ENV--------------------------");
+    console.log(env);
+    console.log("-------------------ENV--------------------------");
     const mainJsFile = getMainExecutableFilePath(onitConfigFile, serveConfig);
 
     const finalParams = [...params, ...paramsFromOnitConfigFile, mainJsFile];
@@ -139,9 +144,9 @@ function spawnNodeProcess (
  * @param {*} nodeParams
  * @returns
  */
-function spawnNodeProcessPromise (onitConfigFile, nodeParams) {
+function spawnNodeProcessPromise (onitConfigFile, serveConfig, nodeParams) {
     return new Promise(resolve => {
-        const nodeProcess = spawnNodeProcess(onitConfigFile, nodeParams);
+        const nodeProcess = spawnNodeProcess(onitConfigFile, serveConfig, nodeParams);
 
         // Catch SIGINT (ctrl+c from console) so we stop nodemon when the user ask for it
         process.on('SIGINT', async () => {
