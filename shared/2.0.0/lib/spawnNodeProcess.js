@@ -94,11 +94,6 @@ function spawnNodeProcess (
 
     // Prepare the env variables
     const env = buildEnvironment(onitConfigFile, serveConfig);
-    console.log("-------------------DEEEEE-------------------------");
-    console.log(serveConfig);
-    console.log("-------------------ENV--------------------------");
-    console.log(env);
-    console.log("-------------------ENV--------------------------");
     const mainJsFile = getMainExecutableFilePath(onitConfigFile, serveConfig);
 
     const finalParams = [...params, ...paramsFromOnitConfigFile, mainJsFile];
