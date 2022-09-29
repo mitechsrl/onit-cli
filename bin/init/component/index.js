@@ -89,7 +89,7 @@ module.exports.cmd = async function (basepath, params) {
     console.warn('name without scope: ' + answers.appNameWithoutScope);
     const directory = path.join(process.cwd(), './' + answers.appNameWithoutScope);
     if (existsSync(directory)) {
-        throw new Error(`Directory ${directory} already exists`);
+        throw new Error(`Directory ${directory} already exists. Please select another name`);
     }
     // target directory does not exists. Good, nothing is going to be overwritten
     logger.log('Clone empty project...');
