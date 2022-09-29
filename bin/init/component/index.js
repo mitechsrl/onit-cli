@@ -86,7 +86,7 @@ module.exports.cmd = async function (basepath, params) {
 
     // check target directory
     answers.appNameWithoutScope = answers.appName.replace(/^@[^/]+\//, '');
-    console.warn('name without scope: ' + answers.appNameWithoutScope);
+    console.warn('Name without scope: ' + answers.appNameWithoutScope);
     const directory = path.join(process.cwd(), './' + answers.appNameWithoutScope);
     if (existsSync(directory)) {
         throw new Error(`Directory ${directory} already exists. Please select another name`);
