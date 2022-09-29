@@ -34,6 +34,7 @@ const { removeUnwantedFiles } = require('./_lib/removeUnwantedFiles');
 const { relpaceInFile } = require('./_lib/replaceInFile');
 const { capitalize, camelCase } = require('lodash');
 const { fixOnitConfig } = require('./_lib/fixOnitConfig');
+const { unlinkGitRepo, commitRepo } = require('./_lib/git');
 
 module.exports.info = 'Project related init utilities';
 module.exports.help = [
@@ -95,6 +96,9 @@ module.exports.cmd = async function (basepath, params) {
     logger.log('Clone empty project...');
     await spawn('git', ['clone', 'https://github.com/mitechsrl/onit-next-example-webcomponent.git', directory]);
 
+    logger.log('Unlinking git repository');
+    await unlinkGitRepo(directory, answers);
+
     logger.log('Fixing files...');
     // replace string values
     await replaceValues(directory, answers);
@@ -110,6 +114,9 @@ module.exports.cmd = async function (basepath, params) {
         path.join(directory, './src/client/routes/main.ts'),
         /^.+demoRouter.+;/mg,
         '');
+
+    logger.log('Commit changes...');
+    await commitRepo(directory, answers);
 
     logger.info('Component setup complete!');
     logger.log('To launch the project, run');

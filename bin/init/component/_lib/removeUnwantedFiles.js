@@ -1,4 +1,4 @@
-const { readFileSync, writeFileSync, unlinkSync, statSync, rmdirSync } = require('fs');
+const { writeFileSync, unlinkSync, statSync, rmSync } = require('fs');
 const { join } = require('path');
 
 module.exports.removeUnwantedFiles = async function (cwd, answers) {
@@ -14,7 +14,7 @@ module.exports.removeUnwantedFiles = async function (cwd, answers) {
         const filename = join(cwd, file);
         const stat = statSync(filename);
         if (stat.isDirectory()) {
-            rmdirSync(filename, { recursive: true });
+            rmSync(filename, { recursive: true });
         } else {
             unlinkSync(filename);
         }
