@@ -1,0 +1,44 @@
+import { Constructor, inject } from '@loopback/core';
+import { <%= dataSourceClassName %> } from '../datasources';
+import { <%= modelName %>, <%= modelName %>Relations } from '../models';
+<%if ( !isRepositoryBaseBuiltin ) { -%>
+import { <%=repositoryBaseClass %> } from './<%=repositoryBaseFile %>';
+<% } -%>
+import { OnitMixin } from '../types';
+import { OnitDefaultRepository } from './onit-base.repository';
+import { applyRepositoryMixins } from '../lib/mixins/applyRepositoryMixin';
+import { getArtifactExtensions } from '../lib/mixins/artifactExtensions';<% 
+mixins.forEach(m => { %>
+import { <%= m.mixinName %> } from '<%= m.filename %>';<%
+}) %>
+
+/**
+ * @onitChapter <%= classNameCapitalRepoName %>
+ * @onitTitle <%= className %>Repository
+ * @onitDoc
+ */
+
+export const <%= classNameCapitalRepoName %>_REPOSITORY_NAME = 'repositories.<%= className %>';
+
+class Base extends OnitDefaultRepository<
+<%= modelName %>, typeof <%= modelName %>.prototype.<%= idProperty %>, <%= modelName %>Relations
+> {
+    constructor(
+    @inject('datasources.<%= dataSourceName %>') dataSource: <%= dataSourceClassName %>,
+    ) {
+        super(<%= modelName %>, dataSource);
+    }
+}
+
+const mixins: OnitMixin[] = [
+    <%= mixins.map(m => m.mixinName).join(',\n    ') %>,
+    // get the artifact extensions registered while loading extension modules
+    ...getArtifactExtensions('repository', <%= classNameCapitalRepoName %>_REPOSITORY_NAME)
+];
+
+export class <%= className %>Repository
+    extends applyRepositoryMixins<<%= modelName %>, typeof <%= modelName %>.prototype.id, Constructor<Base>>
+    (mixins, Base, { repositoryName: '<%= className %>Repository', modelName: <%= modelName %>.name })
+{
+
+};
