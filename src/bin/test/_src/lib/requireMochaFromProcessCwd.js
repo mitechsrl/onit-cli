@@ -23,35 +23,34 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
 
-module.exports.replace = function (obj, vars) {
-    const stringReplace = function (v) {
-        while (true) {
-            let found = false;
-            Object.keys(vars).forEach(variable => {
-                const _v = v.replace(variable, vars[variable]);
-                found = found || _v !== v;
-                v = _v;
-            });
-            if (!found) break;
+const path = require('path');
+const logger = require('../../../../lib/logger');
+
+/**
+ * Search and require an instance of mocha in the target workspace
+ * @returns;
+ */
+function requireMochaFromProcessCwd () {
+    const base = process.cwd();
+    let importPath = null;
+    let mocha = null;
+    [
+        './node_modules/mocha',
+        '../node_modules/mocha'
+    ].find(p => {
+        try {
+            // console.log(path.join(base, p));
+            importPath = path.join(base, p);
+            mocha = require(importPath);
+            return true;
+        } catch (e) {
+            importPath = null;
+            return false;
         }
-        return v;
-    };
-
-    const _replace = function (obj) {
-        if (Array.isArray(obj)) obj.forEach(o => _replace(o));
-
-        if (obj && typeof obj === 'object') {
-            Object.keys(obj).forEach(k => {
-                if (typeof obj[k] === 'string') {
-                    obj[k] = stringReplace(obj[k]);
-                    return;
-                }
-
-                _replace(obj[k]);
-            });
-        }
-    };
-
-    _replace(obj);
-    return obj;
-};
+    });
+    if (importPath) {
+        logger.log('Found a mocha instance in ' + importPath);
+    }
+    return mocha;
+}
+module.exports.requireMochaFromProcessCwd = requireMochaFromProcessCwd;

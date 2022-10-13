@@ -24,14 +24,24 @@ OTHER DEALINGS IN THE SOFTWARE.
 */
 
 const path = require('path');
-const fs = require('fs');
+const glob = require('glob-all');
 
-module.exports = async (cwdPackageJson, targetDir) => {
-    const readmeFilename = path.join(targetDir, 'README.md');
+/**
+ * Scan directories for test cases files. Directory match can be inglob syntax
+ *
+ * @param {*} testTarget
+ * @return A promise which resolves with the files list
+ */
+function resolveTestFilesDirectories (testTarget) {
+    return new Promise((resolve, reject) => {
+        glob(testTarget.testFilesDirectories, {}, function (error, files) {
+            if (error) { return reject(error); }
+            files = files
+                .filter(f => f.endsWith('.js'))
+                .map(f => path.resolve(process.cwd(), f));
 
-    const markdown = '' +
-    '## ' + cwdPackageJson.name + '\n';
-
-    fs.writeFileSync(readmeFilename, markdown);
-    return 0;
-};
+            resolve(files);
+        });
+    });
+}
+module.exports.resolveTestFilesDirectories = resolveTestFilesDirectories;
