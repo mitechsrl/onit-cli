@@ -38,7 +38,6 @@ const { mixinToArtifactFileName } = require('../_lib/mixinUtils');
 class CustomModelGenerator extends ModelGenerator {
     // override the default copy template since we are using a custom one.
     copyTemplatedFiles (_unused, filename, data) {
-        console.log(data);
         // magic stuff with names...
         if (!data.className.toLowerCase().startsWith('onit')) {
             data.className = 'Onit' + _.upperFirst(data.className);

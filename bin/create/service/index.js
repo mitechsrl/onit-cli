@@ -24,29 +24,19 @@ OTHER DEALINGS IN THE SOFTWARE.
 */
 
 const ejs = require('ejs');
-const RepositoryGenerator = require('@loopback/cli/generators/repository/index');
+const path = require('path');
+const ServiceGenerator = require('@loopback/cli/generators/service/index');
 const { readFileSync, writeFileSync } = require('fs-extra');
 const { join, parse } = require('path');
-const _ = require('lodash');
-const utils = require('@loopback/cli/lib/utils');
-const inquirer = require('inquirer');
-const { mixinToArtifactFileName } = require('../_lib/mixinUtils');
 
 /**
  * Subclass loopback-cli model generator and apply custom logic
  */
-class CustomRepositoryGenerator extends RepositoryGenerator {
+class CustomServiceGenerator extends ServiceGenerator {
     // override the default copy template since we are using a custom one.
     copyTemplatedFiles (_unused, filename, data) {
-        // magic stuff with names...
-        if (!data.className.toLowerCase().startsWith('onit')) {
-            data.className = 'Onit' + _.upperFirst(data.className);
-        }
-        data.className = _.upperFirst(_.camelCase(data.className));
-        data.classNameCapitalRepoName = _.snakeCase(data.className).toUpperCase();
-
         // render the model file and writer it out
-        const template = readFileSync(join(__dirname, './_lib/templates/repository.ts.ejs')).toString();
+        const template = readFileSync(this.artifactInfo.defaultTemplate).toString();
         const rendered = ejs.render(template, data);
         writeFileSync(filename, rendered);
 
@@ -59,46 +49,40 @@ class CustomRepositoryGenerator extends RepositoryGenerator {
     }
 
     // overwrite the last methos to ask for mixins before effectively scaffolding
-    async _scaffold () {
-        await this.promptMixinSelection();
-        return super._scaffold();
-    }
+    async scaffold () {
+        // change directory polinters
+        const REMOTE_SERVICE_TEMPLATE = path.join(__dirname, './_lib/templates/remote-service-proxy-template.ts.ejs');
+        const LOCAL_CLASS_TEMPLATE = path.join(__dirname, './_lib/templates/local-service-class-template.ts.ejs');
+        const LOCAL_PROVIDER_TEMPLATE = path.join(__dirname, '../_lib/templates/local-service-provider-template.ts.ejs');
+        const TEMPLATES = {
+            proxy: REMOTE_SERVICE_TEMPLATE,
+            class: LOCAL_CLASS_TEMPLATE,
+            provider: LOCAL_PROVIDER_TEMPLATE
+        };
 
-    // Prompt the mixin selection checkboxes
-    async promptMixinSelection () {
-        const mixinsDir = join(this.artifactInfo.datasourcesDir, '../mixins');
-        const mixinNames = await utils.getArtifactList(
-            mixinsDir,
-            'mixin',
-            true
-        );
+        this.artifactInfo.defaultTemplate = TEMPLATES[this.artifactInfo.serviceType];
 
-        this.artifactInfo.mixins = (await inquirer.prompt({
-            type: 'checkbox',
-            name: 'mixins',
-            message: 'Select mixins',
-            choices: mixinNames
-        })).mixins.map(m => {
-            return { filename: '../mixins/' + mixinToArtifactFileName(m), mixinName: _.camelCase(m) };
-        });
+        return super.scaffold();
     }
 }
 
-module.exports.info = 'Create a repository';
+module.exports.info = 'Create a service';
 module.exports.help = [
-    'Interctive repository creation tool.  This tool must be run into a onit-based app directory'
+    'Interctive service creation tool. This tool must be run into a onit-based app directory'
 ];
 
 module.exports.cmd = async function (basepath, params) {
-    const repoGenerator = new CustomRepositoryGenerator();
+    const generator = new CustomServiceGenerator();
 
     // NOTE: the orignal class methods were run with yeoman.
     // Yeoman runs sequentially the class mehods. Imitating it with this code.
-    for (const method of Object.getOwnPropertyNames(RepositoryGenerator.prototype)) {
+    for (const method of Object.getOwnPropertyNames(ServiceGenerator.prototype)) {
         // NOTE1: skipping checkLoopBackProject to avoid dependency checks. We just need to create the model file
         // NOTE2: skipping methods starting with _. Those are private.
         if (['constructor', 'checkLoopBackProject'].includes(method) || method.startsWith('_')) continue;
 
-        await repoGenerator[method]();
+        await generator[method]();
     }
+
+    await new Promise(resolve => setTimeout(resolve, 1000));
 };
