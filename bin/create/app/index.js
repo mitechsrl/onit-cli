@@ -120,6 +120,7 @@ module.exports.cmd = async function (basepath, params) {
 
     logger.info('Component setup complete!');
     logger.log('To launch the project, run');
+    logger.log(' > cd ' + answers.appNameWithoutScope);
     logger.log(' > npm install');
     logger.log(' > onit serve');
 };
