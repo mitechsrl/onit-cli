@@ -13,12 +13,13 @@ import { <%= m.mixinName %> } from '<%= m.filename %>';<%
 }) %>
 
 /**
- * @onitChapter <%= classNameCapitalRepoName %>
+ * @onitChapter <%= classNameCapitalRepoName %>_REPOSITORY
  * @onitTitle <%= className %>Repository
  * @onitDoc
+ * Repository for <%= className %> model instances
  */
 
-export const <%= classNameCapitalRepoName %>_REPOSITORY_NAME = 'repositories.<%= className %>';
+export const <%= classNameCapitalRepoName %>_REPOSITORY_NAME = 'repositories.<%= className %>Repository';
 
 class Base extends OnitDefaultRepository<
 <%= modelName %>, typeof <%= modelName %>.prototype.<%= idProperty %>, <%= modelName %>Relations
@@ -30,6 +31,7 @@ class Base extends OnitDefaultRepository<
     }
 }
 
+// Mixin list definition. you sholud keep this mixin list equal to the one of <%= className %> model
 const mixins: OnitMixin[] = [
     <%= mixins.map(m => m.mixinName).join(',\n    ') %>,
     // get the artifact extensions registered while loading extension modules
@@ -40,5 +42,4 @@ export class <%= className %>Repository
     extends applyRepositoryMixins<<%= modelName %>, typeof <%= modelName %>.prototype.id, Constructor<Base>>
     (mixins, Base, { repositoryName: '<%= className %>Repository', modelName: <%= modelName %>.name })
 {
-
 };

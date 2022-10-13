@@ -30,7 +30,7 @@ const { join, parse } = require('path');
 const _ = require('lodash');
 const utils = require('@loopback/cli/lib/utils');
 const inquirer = require('inquirer');
-const { mixinToArtifactFileName } = require('./_lib/mixinUtils');
+const { mixinToArtifactFileName } = require('../_lib/mixinUtils');
 
 /**
  * Subclass loopback-cli model generator and apply custom logic
@@ -66,7 +66,6 @@ class CustomRepositoryGenerator extends RepositoryGenerator {
 
     // Prompt the mixin selection checkboxes
     async promptMixinSelection () {
-        console.log(this.artifactInfo);
         const mixinsDir = join(this.artifactInfo.datasourcesDir, '../mixins');
         const mixinNames = await utils.getArtifactList(
             mixinsDir,
@@ -87,7 +86,7 @@ class CustomRepositoryGenerator extends RepositoryGenerator {
 
 module.exports.info = 'Create a repository';
 module.exports.help = [
-    'Interctive repository creation tool'
+    'Interctive repository creation tool.  This tool must be runinto a onit-based app directory'
 ];
 
 module.exports.cmd = async function (basepath, params) {

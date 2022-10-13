@@ -36,10 +36,10 @@ const { capitalize, camelCase } = require('lodash');
 const { fixOnitConfig } = require('./_lib/fixOnitConfig');
 const { unlinkGitRepo, commitRepo } = require('./_lib/git');
 
-module.exports.info = 'Project related init utilities';
+module.exports.info = 'Create a new empty onit-based app';
 module.exports.help = [
-    `Create an new empty onit component by cloning the @mitech/onit-next-example-webcomponent repository.
-    NOTE: this command requires read permissions on such repository`
+    'Create a new empty onit-based app by cloning the @mitech/onit-next-example-webcomponent repository.',
+    'NOTE: this command requires read permissions on such repository'
 ];
 
 module.exports.cmd = async function (basepath, params) {

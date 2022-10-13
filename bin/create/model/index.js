@@ -30,7 +30,7 @@ const { join, parse } = require('path');
 const _ = require('lodash');
 const utils = require('@loopback/cli/lib/utils');
 const inquirer = require('inquirer');
-const { mixinToArtifactFileName } = require('./_lib/mixinUtils');
+const { mixinToArtifactFileName } = require('../_lib/mixinUtils');
 
 /**
  * Subclass loopback-cli model generator and apply custom logic
@@ -87,7 +87,7 @@ class CustomModelGenerator extends ModelGenerator {
 
 module.exports.info = 'Create a model';
 module.exports.help = [
-    'Interctive model creation tool'
+    'Interctive model creation tool. This tool must be runinto a onit-based app directory'
 ];
 
 module.exports.cmd = async function (basepath, params) {
