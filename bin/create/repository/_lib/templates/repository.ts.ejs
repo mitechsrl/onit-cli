@@ -4,8 +4,8 @@ import { <%= modelName %>, <%= modelName %>Relations } from '../models';
 <%if ( !isRepositoryBaseBuiltin ) { -%>
 import { <%=repositoryBaseClass %> } from './<%=repositoryBaseFile %>';
 <% } -%>
-import { OnitMixin } from '../types';
-import { OnitDefaultRepository } from './onit-base.repository';
+import { OnitMixin } from '<%= importPath %>/types';
+import { OnitDefaultRepository } from '<%= importPath %>/repositories/onit-base.repository';
 import { applyRepositoryMixins } from '<%= importPath %>/lib/mixins/applyRepositoryMixin';
 import { getArtifactExtensions } from '<%= importPath %>/lib/mixins/artifactExtensions';<% 
 mixins.forEach(m => { %>

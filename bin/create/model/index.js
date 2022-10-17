@@ -23,7 +23,9 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
 const ModelGenerator = require('@loopback/cli/generators/model/index');
+const { repoGenerator } = require('../repository');
 const { CustomModelGenerator } = require('./_lib/CustomModelGenerator');
+const inquirer = require('inquirer');
 
 module.exports.info = 'Create a model';
 module.exports.help = [
@@ -41,5 +43,20 @@ module.exports.cmd = async function (basepath, params) {
         if (['constructor', 'checkLoopBackProject'].includes(method) || method.startsWith('_')) continue;
 
         await modelGenerator[method]();
+    }
+
+    // Ask the user if he wants to create the relative repository
+    const answers = await inquirer.prompt([{ type: 'confirm', name: 'createRepo', message: 'Do you want to create a repository for this model?', default: false }]);
+    if (answers.createRepo) {
+        // pass these values to the repo generators, so we can skip inquirer prompts
+        const presets = {
+            modelNameList: [modelGenerator.artifactInfo.className],
+            mixins: modelGenerator.artifactInfo.mixins,
+            idProperty: Object.keys(modelGenerator.artifactInfo.properties).find(k => {
+                if (modelGenerator.artifactInfo.properties[k].id) return true;
+                return false;
+            })
+        };
+        await repoGenerator(presets);
     }
 };

@@ -11,6 +11,14 @@ const fs = require('fs');
  * Subclass loopback-cli model generator and apply custom logic
  */
 class CustomRepositoryGenerator extends RepositoryGenerator {
+    presetValues (data) {
+        this.hasPresetValues = true;
+        Object.assign(this.artifactInfo, data);
+
+        // mixins: [list of mixins]
+        // modelNameList: [ 'OmcCertificateDocument' ]
+    }
+
     /**
      * override the default copy template since we are using a custom one.
      * @param {*} _source Source template path
@@ -25,10 +33,39 @@ class CustomRepositoryGenerator extends RepositoryGenerator {
     }
 
     /**
+     * Ovwerwirte the promptModelId method to skip the inquirer prompt if we passed the value as parameter
+     */
+    async promptModelId () {
+        if (!this.hasPresetValues || !this.artifactInfo.idProperty) {
+            await super.promptModelId();
+        } else {
+            // promptModelId() was calling _scaffold() internally for each model
+            // if we don't call promptModelId(), we must call _scaffold by ourself
+            for (const m of this.artifactInfo.modelNameList) {
+                this.artifactInfo.modelName = m;
+                await this._scaffold();
+            }
+        }
+    }
+
+    /**
+     *
+     */
+    async promptModels () {
+        if (!this.hasPresetValues || !this.artifactInfo.modelNameList) {
+            await super.promptModels();
+        } else {
+            await this._inferRepositoryType();
+        }
+    }
+
+    /**
      * overwrite the scaffold methods to perform custom checks and ask for mixins before effectively scaffolding
      */
     async _scaffold () {
-        await this.promptMixinSelection();
+        if (!this.hasPresetValues || !this.artifactInfo.mixins) {
+            await this.promptMixinSelection();
+        }
 
         // magic stuff with names...
         this.artifactInfo.className = utils.toClassName(this.artifactInfo.modelName);
