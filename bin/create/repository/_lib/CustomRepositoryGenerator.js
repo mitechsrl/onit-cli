@@ -24,7 +24,9 @@ class CustomRepositoryGenerator extends RepositoryGenerator {
         writeFileSync(dest, rendered);
     }
 
-    // overwrite the last methos to ask for mixins before effectively scaffolding
+    /**
+     * overwrite the scaffold methods to perform custom checks and ask for mixins before effectively scaffolding
+     */
     async _scaffold () {
         await this.promptMixinSelection();
 
@@ -37,7 +39,7 @@ class CustomRepositoryGenerator extends RepositoryGenerator {
         this.artifactInfo.className = _.upperFirst(_.camelCase(this.artifactInfo.className));
         this.artifactInfo.classNameCapitalRepoName = _.snakeCase(this.artifactInfo.className).toUpperCase();
 
-        // onit-next has different import path
+        // onit-next has different import path. Setup them
         this.artifactInfo.importPath = '@mitech/onit-next/dist';
         if (fs.existsSync(join(process.cwd(), './src/types/onitMixin.ts'))) {
             this.artifactInfo.importPath = '..';
