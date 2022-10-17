@@ -2,6 +2,7 @@ const HasOneRelationGenerator = require('@loopback/cli/generators/relation/has-o
 const { readFileSync, writeFileSync } = require('fs');
 const path = require('path');
 const ejs = require('ejs');
+const relationUtils = require('@loopback/cli/generators/relation/utils.generator');
 
 class CustomHasOneRelationGenerator extends HasOneRelationGenerator {
     /**
@@ -10,9 +11,16 @@ class CustomHasOneRelationGenerator extends HasOneRelationGenerator {
      * @param {*} options
      */
     _initializeProperties (options) {
+        // Our repos have a 'Base' class which is the one to be changed. Temporary set the correct name.
         super._initializeProperties(options);
+
+        // check if we have the Base class. If so, use that class instead of the original srcRepositoryClassName
+        // still keep the previous value for future uses
         this.artifactInfo.originalSrcRepositoryClassName = this.artifactInfo.srcRepositoryClassName;
-        this.artifactInfo.srcRepositoryClassName = 'Base';
+        try {
+            relationUtils.getClassObj(this.artifactInfo.srcRepositoryFileObj, 'Base');
+            this.artifactInfo.srcRepositoryClassName = 'Base';
+        } catch (e) { /* getting here meas Baseis not available */ }
     }
 
     /**
@@ -46,4 +54,5 @@ class CustomHasOneRelationGenerator extends HasOneRelationGenerator {
         this.artifactInfo.srcRepositoryClassName = this.artifactInfo.originalSrcRepositoryClassName;
     }
 }
+
 exports.CustomHasOneRelationGenerator = CustomHasOneRelationGenerator;

@@ -33,17 +33,14 @@ module.exports.help = [
 
 module.exports.cmd = async function (basepath, params) {
     const generator = new CustomRelationGenerator();
-    try {
+
     // NOTE: the orignal class methods were run with yeoman.
     // Yeoman runs sequentially the class mehods. Imitating it with this code.
-        for (const method of Object.getOwnPropertyNames(RelationGenerator.prototype)) {
+    for (const method of Object.getOwnPropertyNames(RelationGenerator.prototype)) {
         // NOTE1: skipping checkLoopBackProject to avoid dependency checks. We just need to create the model file
         // NOTE2: skipping methods starting with _. Those are private.
-            if (['constructor', 'checkLoopBackProject'].includes(method) || method.startsWith('_')) continue;
+        if (['constructor', 'checkLoopBackProject'].includes(method) || method.startsWith('_')) continue;
 
-            await generator[method]();
-        }
-    } catch (e) {
-        console.error(e.stack);
+        await generator[method]();
     }
 };
