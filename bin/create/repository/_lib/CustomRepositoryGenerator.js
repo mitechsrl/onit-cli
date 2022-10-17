@@ -11,36 +11,41 @@ const { mixinToArtifactFileName } = require('../../_lib/mixinUtils');
  * Subclass loopback-cli model generator and apply custom logic
  */
 class CustomRepositoryGenerator extends RepositoryGenerator {
-    // override the default copy template since we are using a custom one.
-    copyTemplatedFiles(_unused, filename, data) {
+    /**
+     * override the default copy template since we are using a custom one.
+     * @param {*} _source Source template path
+     * @param {*} dest destination file path
+     * @param {*} artifactInfo Source data object for current artifact
+     */
+    copyTemplatedFiles (_source, dest, artifactInfo) {
         // magic stuff with names...
-        if (!data.className.toLowerCase().startsWith('onit')) {
-            data.className = 'Onit' + _.upperFirst(data.className);
+        if (!artifactInfo.className.toLowerCase().startsWith('onit')) {
+            artifactInfo.className = 'Onit' + _.upperFirst(artifactInfo.className);
         }
-        data.className = _.upperFirst(_.camelCase(data.className));
-        data.classNameCapitalRepoName = _.snakeCase(data.className).toUpperCase();
+        artifactInfo.className = _.upperFirst(_.camelCase(artifactInfo.className));
+        artifactInfo.classNameCapitalRepoName = _.snakeCase(artifactInfo.className).toUpperCase();
 
         // render the model file and writer it out
         const template = readFileSync(join(__dirname, './_lib/templates/repository.ts.ejs')).toString();
-        const rendered = ejs.render(template, data);
-        writeFileSync(filename, rendered);
+        const rendered = ejs.render(template, artifactInfo);
+        writeFileSync(dest, rendered);
 
         // add the reference to index.ts file
-        const indexTsFilename = join(filename, '../index.ts');
-        const filenameWithoutExt = parse(filename).name;
+        const indexTsFilename = join(dest, '../index.ts');
+        const filenameWithoutExt = parse(dest).name;
         let indexTsContent = readFileSync(indexTsFilename).toString();
         indexTsContent += `\nexport * from './${filenameWithoutExt}';`;
         writeFileSync(indexTsFilename, indexTsContent);
     }
 
     // overwrite the last methos to ask for mixins before effectively scaffolding
-    async _scaffold() {
+    async _scaffold () {
         await this.promptMixinSelection();
         return super._scaffold();
     }
 
     // Prompt the mixin selection checkboxes
-    async promptMixinSelection() {
+    async promptMixinSelection () {
         const mixinsDir = join(this.artifactInfo.datasourcesDir, '../mixins');
         const mixinNames = await utils.getArtifactList(
             mixinsDir,
