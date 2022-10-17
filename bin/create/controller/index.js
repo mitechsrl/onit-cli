@@ -23,24 +23,26 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
 
-const RepositoryGenerator = require('@loopback/cli/generators/repository/index');
-const { CustomRepositoryGenerator } = require('./_lib/CustomRepositoryGenerator');
+const ControllerGenerator = require('@loopback/cli/generators/controller/index');
+const { CustomControllerGenerator } = require('./_lib/CustomControllerGenerator');
 
-module.exports.info = 'Create a repository';
+module.exports.info = 'Create a service';
 module.exports.help = [
-    'Interctive repository creation tool.  This tool must be run into a onit-based app directory'
+    'Interctive service creation tool. This tool must be run into a onit-based app directory'
 ];
 
 module.exports.cmd = async function (basepath, params) {
-    const repoGenerator = new CustomRepositoryGenerator();
+    const generator = new CustomControllerGenerator();
 
     // NOTE: the orignal class methods were run with yeoman.
     // Yeoman runs sequentially the class mehods. Imitating it with this code.
-    for (const method of Object.getOwnPropertyNames(RepositoryGenerator.prototype)) {
+    for (const method of Object.getOwnPropertyNames(ControllerGenerator.prototype)) {
         // NOTE1: skipping checkLoopBackProject to avoid dependency checks. We just need to create the model file
         // NOTE2: skipping methods starting with _. Those are private.
         if (['constructor', 'checkLoopBackProject'].includes(method) || method.startsWith('_')) continue;
 
-        await repoGenerator[method]();
+        await generator[method]();
     }
+
+    await new Promise(resolve => setTimeout(resolve, 1000));
 };

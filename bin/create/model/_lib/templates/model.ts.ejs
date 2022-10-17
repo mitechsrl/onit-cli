@@ -1,11 +1,11 @@
 <% if (isModelBaseBuiltin) { -%>
-import {<%= modelBaseClass %>, model, property} from '@loopback/repository';
+import { <%= modelBaseClass %>, model, property } from '@loopback/repository';
 <% } else { -%>
-import {model, property} from '@loopback/repository';
-import {<%= modelBaseClass %>} from '.';
+import { model, property } from '@loopback/repository';
+import { <%= modelBaseClass %> } from '.';
 <% } -%>
-import { applyModelMixins } from '../lib/mixins/applyModelMixins';
-import { OnitMixin } from '../types';
+import { applyModelMixins } from '<%= importPath %>/lib/mixins/applyModelMixins';
+import { OnitMixin } from '<%= importPath %>/types';
 <% mixins.forEach(m => { %>
 import { <%= m.mixinName %> } from '<%= m.filename %>';<%
 }) %>
@@ -24,11 +24,11 @@ const mixins: OnitMixin[] = [
 export class <%= className %> extends applyModelMixins(mixins, <%= modelBaseClass %>) {
 <% Object.entries(properties).forEach(([key, val]) => { -%>
     @property({
-    <%_ Object.entries(val).forEach(([propKey, propVal]) => { -%>
-    <%_ if (!['tsType'].includes(propKey)) { -%>
-    <%= propKey %>: <%- propVal %>,
-    <%_ } -%>
-    <%_ }) -%>
+        <%_ Object.entries(val).forEach(([propKey, propVal]) => { -%>
+        <%_ if (!['tsType'].includes(propKey)) { -%>
+        <%= propKey %>: <%- propVal %>,
+        <%_ } -%>
+        <%_ }) -%>
     })
     <%= key %><%if (!val.required) {%>?<% } %>: <%= val.tsType %>;
 
@@ -42,7 +42,7 @@ export class <%= className %> extends applyModelMixins(mixins, <%= modelBaseClas
 <% } -%>
 
     constructor(data?: Partial<<%= className %>>) {
-    super(data);
+        super(data);
     }
 }
 
@@ -51,4 +51,3 @@ export interface <%= className %>Relations {
 }
 
 export type <%= className %>WithRelations = <%= className %> & <%= className %>Relations;
-    

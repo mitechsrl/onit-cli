@@ -1,0 +1,12 @@
+import { injectable, /* inject, */ BindingScope } from '@loopback/core';
+
+export const <%= classNameCapitalServiceName %>_SERVICE_NAME = 'services.<%= className %>Service';
+
+@injectable({ scope: BindingScope.TRANSIENT })
+export class <%= className %>Service {
+    constructor(/* Add @inject to inject parameters */) {}
+
+    /*
+     * Add service methods here
+     */
+}
