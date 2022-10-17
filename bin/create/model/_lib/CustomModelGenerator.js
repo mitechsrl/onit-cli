@@ -1,12 +1,10 @@
 const ejs = require('ejs');
 const ModelGenerator = require('@loopback/cli/generators/model/index');
 const { readFileSync, writeFileSync } = require('fs-extra');
-const { join, resolve } = require('path');
 const fs = require('fs');
 const _ = require('lodash');
 const utils = require('@loopback/cli/lib/utils');
-const inquirer = require('inquirer');
-const { mixinToArtifactFileName } = require('../../_lib/mixinUtils');
+const { promptMixinSelection } = require('../../_lib/mixinUtils');
 const relationUtils = require('@loopback/cli/generators/relation/utils.generator');
 const path = require('path');
 
@@ -17,7 +15,7 @@ class CustomModelGenerator extends ModelGenerator {
     // override the default copy template since we are using a custom one.
     copyTemplatedFiles (_unused, filename, artifactInfo) {
         // render the model file and writer it out
-        const template = readFileSync(join(__dirname, './templates/model.ts.ejs')).toString();
+        const template = readFileSync(path.join(__dirname, './templates/model.ts.ejs')).toString();
         const rendered = ejs.render(template, artifactInfo);
         writeFileSync(filename, rendered);
     }
@@ -34,7 +32,7 @@ class CustomModelGenerator extends ModelGenerator {
         this.artifactInfo.classNameCapitalModelName = _.snakeCase(this.artifactInfo.className).toUpperCase();
 
         // onit-next has different import path
-        this.artifactInfo.importPath = '@mitech/oni-next/dist';
+        this.artifactInfo.importPath = '@mitech/onit-next/dist';
         if (fs.existsSync(path.join(process.cwd(), './src/types/onitMixin.ts'))) {
             this.artifactInfo.importPath = '..';
         }
@@ -46,7 +44,7 @@ class CustomModelGenerator extends ModelGenerator {
         const kebabCaseFilename = utils.toFileName(this.artifactInfo.className);
         await relationUtils.addExportController(
             this,
-            resolve(this.artifactInfo.outDir, 'index.ts'),
+            path.resolve(this.artifactInfo.outDir, 'index.ts'),
             this.artifactInfo.className,
             kebabCaseFilename + '.model'
         );
@@ -54,21 +52,7 @@ class CustomModelGenerator extends ModelGenerator {
 
     // Prompt the mixin selection checkboxes
     async promptMixinSelection () {
-        const mixinsDir = join(this.artifactInfo.modelDir, '../mixins');
-        const mixinNames = await utils.getArtifactList(
-            mixinsDir,
-            'mixin',
-            true
-        );
-
-        this.artifactInfo.mixins = (await inquirer.prompt({
-            type: 'checkbox',
-            name: 'mixins',
-            message: 'Select mixins',
-            choices: mixinNames
-        })).mixins.map(m => {
-            return { filename: '../mixins/' + mixinToArtifactFileName(m), mixinName: _.camelCase(m) };
-        });
+        await promptMixinSelection(this.artifactInfo.modelDir, this.artifactInfo);
     }
 }
 exports.CustomModelGenerator = CustomModelGenerator;

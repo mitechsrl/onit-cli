@@ -1,13 +1,12 @@
 const ejs = require('ejs');
 const RepositoryGenerator = require('@loopback/cli/generators/repository/index');
 const { readFileSync, writeFileSync } = require('fs-extra');
-const { join, parse, resolve } = require('path');
+const { join, resolve } = require('path');
 const _ = require('lodash');
 const utils = require('@loopback/cli/lib/utils');
-const inquirer = require('inquirer');
-const { mixinToArtifactFileName } = require('../../_lib/mixinUtils');
 const relationUtils = require('@loopback/cli/generators/relation/utils.generator');
-
+const { promptMixinSelection } = require('../../_lib/mixinUtils');
+const fs = require('fs');
 /**
  * Subclass loopback-cli model generator and apply custom logic
  */
@@ -38,6 +37,12 @@ class CustomRepositoryGenerator extends RepositoryGenerator {
         this.artifactInfo.className = _.upperFirst(_.camelCase(this.artifactInfo.className));
         this.artifactInfo.classNameCapitalRepoName = _.snakeCase(this.artifactInfo.className).toUpperCase();
 
+        // onit-next has different import path
+        this.artifactInfo.importPath = '@mitech/onit-next/dist';
+        if (fs.existsSync(join(process.cwd(), './src/types/onitMixin.ts'))) {
+            this.artifactInfo.importPath = '..';
+        }
+
         // call the original scaffold
         await super._scaffold();
 
@@ -53,21 +58,7 @@ class CustomRepositoryGenerator extends RepositoryGenerator {
 
     // Prompt the mixin selection checkboxes
     async promptMixinSelection () {
-        const mixinsDir = join(this.artifactInfo.datasourcesDir, '../mixins');
-        const mixinNames = await utils.getArtifactList(
-            mixinsDir,
-            'mixin',
-            true
-        );
-
-        this.artifactInfo.mixins = (await inquirer.prompt({
-            type: 'checkbox',
-            name: 'mixins',
-            message: 'Select mixins',
-            choices: mixinNames
-        })).mixins.map(m => {
-            return { filename: '../mixins/' + mixinToArtifactFileName(m), mixinName: _.camelCase(m) };
-        });
+        await promptMixinSelection(this.artifactInfo.datasourcesDir, this.artifactInfo);
     }
 }
 exports.CustomRepositoryGenerator = CustomRepositoryGenerator;

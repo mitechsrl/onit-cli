@@ -6,8 +6,8 @@ import { <%=repositoryBaseClass %> } from './<%=repositoryBaseFile %>';
 <% } -%>
 import { OnitMixin } from '../types';
 import { OnitDefaultRepository } from './onit-base.repository';
-import { applyRepositoryMixins } from '../lib/mixins/applyRepositoryMixin';
-import { getArtifactExtensions } from '../lib/mixins/artifactExtensions';<% 
+import { applyRepositoryMixins } from '<%= importPath %>/lib/mixins/applyRepositoryMixin';
+import { getArtifactExtensions } from '<%= importPath %>/lib/mixins/artifactExtensions';<% 
 mixins.forEach(m => { %>
 import { <%= m.mixinName %> } from '<%= m.filename %>';<%
 }) %>

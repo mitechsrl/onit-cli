@@ -2,7 +2,7 @@ import { Count, Filter, FilterExcludingWhere, repository, Where } from '@loopbac
 import { param, requestBody } from '@loopback/rest';
 import { <%= modelName %> } from '../../models';
 import { <%= repositoryName %> } from '../../repositories';
-import { onitApi } from '@mitech/onit-next/dist/lib/decorators/rest';
+import { onitApi } from '<%= importPath %>/lib/decorators/rest';
 import { createSpec, createRequestBodySpec, countSpec, findSpec, updateAllSpec, 
     updateAllRequestBodySpec, findByIdSpec, updateByIdSpec, updateByIdRequestBodySpec,
     replaceByIdSpec, deleteByIdSpec
