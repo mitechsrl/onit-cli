@@ -32,21 +32,17 @@ module.exports.help = [
 ];
 
 async function repoGenerator (repoGeneratorParams) {
-    try {
-        const repoGenerator = new CustomRepositoryGenerator();
-        if (repoGeneratorParams) repoGenerator.presetValues(repoGeneratorParams);
+    const repoGenerator = new CustomRepositoryGenerator();
+    if (repoGeneratorParams) repoGenerator.presetValues(repoGeneratorParams);
 
-        // NOTE: the orignal class methods were run with yeoman.
-        // Yeoman runs sequentially the class mehods. Imitating it with this code.
-        for (const method of Object.getOwnPropertyNames(RepositoryGenerator.prototype)) {
+    // NOTE: the orignal class methods were run with yeoman.
+    // Yeoman runs sequentially the class mehods. Imitating it with this code.
+    for (const method of Object.getOwnPropertyNames(RepositoryGenerator.prototype)) {
         // NOTE1: skipping checkLoopBackProject to avoid dependency checks. We just need to create the model file
         // NOTE2: skipping methods starting with _. Those are private.
-            if (['constructor', 'checkLoopBackProject'].includes(method) || method.startsWith('_')) continue;
+        if (['constructor', 'checkLoopBackProject'].includes(method) || method.startsWith('_')) continue;
 
-            await repoGenerator[method]();
-        }
-    } catch (e) {
-        console.error(e.stack);
+        await repoGenerator[method]();
     }
 }
 module.exports.repoGenerator = repoGenerator;
