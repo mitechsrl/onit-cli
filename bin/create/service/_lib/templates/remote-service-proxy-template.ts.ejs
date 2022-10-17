@@ -2,6 +2,8 @@ import {inject, Provider} from '@loopback/core';
 import {getService} from '@loopback/service-proxy';
 import {<%= dataSourceClassName %>} from '../datasources';
 
+export const <%= classNameCapitalServiceName %>_SERVICE_NAME = 'services.<%= className %>Provider';
+
 export interface <%= className %> {
   // this is where you define the Node.js methods that will be
   // mapped to REST/SOAP/gRPC operations as stated in the datasource

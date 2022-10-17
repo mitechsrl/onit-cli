@@ -43,6 +43,4 @@ module.exports.cmd = async function (basepath, params) {
 
         await generator[method]();
     }
-
-    await new Promise(resolve => setTimeout(resolve, 1000));
 };
