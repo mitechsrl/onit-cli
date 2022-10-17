@@ -12,14 +12,14 @@ Onit dev CLI utility
 npm install -g @mitech/onit-cli
 ```
 
-## Comandi 
+## Commands 
 
-- [onit serve](ONIT-SERVE.md) utility serve di sviluppo
-- [onit doc](ONIT-DOC.md) uility estrazione/generazione documentazione
-- [onit build](ONIT-BUILD.md) utility build progetto
-- [onit test](ONIT-TEST.md) utility testing progetto
-- [onit labels](ONIT-LABELS.md) utility gestione lebels
-
+- [onit serve](ONIT-SERVE.md), development serve command
+- [onit doc](ONIT-DOC.md), documentation generation utility
+- [onit build](ONIT-BUILD.md), app build utility
+- [onit test](ONIT-TEST.md), automated test utility
+- [onit labels](ONIT-LABELS.md), labels management utility
+- [onit create](ONIT-CREATE.md), artifach creation utilities
 
 ## Files di configurazione locali/globali
 
