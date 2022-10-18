@@ -32,7 +32,7 @@ const { replaceValues } = require('./_lib/replaceValues');
 const { fixPackageJson } = require('./_lib/fixPackageJson');
 const { removeUnwantedFiles } = require('./_lib/removeUnwantedFiles');
 const { relpaceInFile } = require('./_lib/replaceInFile');
-const { capitalize, camelCase } = require('lodash');
+const { capitalize, camelCase, snakeCase, upperFirst } = require('lodash');
 const { fixOnitConfig } = require('./_lib/fixOnitConfig');
 const { unlinkGitRepo, commitRepo } = require('./_lib/git');
 
@@ -44,34 +44,45 @@ module.exports.help = [
 
 module.exports.cmd = async function (basepath, params) {
     // await spawn('git', ['clone', 'https://github.com/mitechsrl/onit-next-example-webcomponent.git','ciaooo']);
-
+    const nameMatch = /^(@[a-zA-Z0-9-_]+\/){0,1}([a-zA-Z0-9-_]+)$/g;
     const answers = await inquirer.prompt([
         {
             type: 'input',
             name: 'appName',
             message: 'App name (package.json name)',
             validate: (v) => {
-                if (!v.match(/^(@[a-zA-Z0-9-_]+\/){0,1}[a-zA-Z0-9-_]+$/g)) {
-                    return Promise.reject(new Error('Invalid name. Please change it and continue.'));
+                if (!v.match(nameMatch)) {
+                    return Promise.reject(new Error('Invalid format. Avoid spaces and special chars. Package scope is allowed. Please change it and continue.'));
                 }
                 return true;
             }
         },
-        { type: 'input', name: 'appExtendedName', message: 'App extended name' },
-        { type: 'input', name: 'appDescription', message: 'App description' },
+        { type: 'input', name: 'appExtendedName', message: 'App short description' },
         {
             type: 'input',
             name: 'componentClassName',
             message: 'Component class name',
+            default: (answers) => {
+                return upperFirst(camelCase(answers.appName.replace(nameMatch, '$2'))) + 'Component';
+            },
             validate: (v) => {
                 if (!v.match(/^[a-zA-Z0-9-_]+$/g)) {
-                    return Promise.reject(new Error('Invalid name. Please change it and continue.'));
+                    return Promise.reject(new Error('Invalid format. Avoid spaces and special chars. Please change it and continue.'));
                 }
                 return true;
             }
         },
-        { type: 'input', name: 'databaseName', message: 'Database name' }
+        {
+            type: 'input',
+            name: 'databaseName',
+            message: 'Database name for local serve',
+            default: (answers) => {
+                return snakeCase(answers.appName.replace(nameMatch, '$2')).replace(/_/g, '-');
+            }
+        }
     ]);
+
+    answers.appDescription = answers.appExtendedName;
 
     // standardize class name
     // - CamelCase

@@ -20,7 +20,8 @@ module.exports = {
         from: './src',
         to: './dist',
         glob: [
-            './src/**/*.ejs'
+            './src/**/*.ejs',
+            './src/**/*.json'
         ]
     },
 
@@ -29,10 +30,10 @@ module.exports = {
      */
     serve: {
         // array of paths to be scanned for components. Optional.
-        //componentsScanDirs: []
+        // componentsScanDirs: []
         
         // main file to launch for serve. Defaults to onit index file
-        //main:'',
+        // main:'',
         
         // node main process arguments
         // nodeArgs: []
@@ -71,7 +72,7 @@ module.exports = {
     build: {
         targets: {
             Production: {
-                mode: 'production', // uat, beta, test
+                mode: 'production', // production, uat, beta, test
                 version: {
                     additional: {
                         name: 'Versione successiva da repository npm',
@@ -86,8 +87,7 @@ module.exports = {
                     {
                         name: 'Commit and tag version with git',
                         cmd: [
-                            'git add package.json',
-                            'git add package-lock.json',
+                            'git add package*.json',
                             'git commit -m "V$_PACKAGE_VERSION"',
                             'git tag V$_PACKAGE_VERSION',
                             'git push origin V$_PACKAGE_VERSION'
@@ -96,6 +96,28 @@ module.exports = {
                 ]
             }
         }
-    }
+    },
+
+    /**
+     * Test config. See ONIT-TEST.md
+     */
+    test: {
+		"nomeSet":{ 
+		
+			// Environent params for test onit launcher
+			"environment":{}
+			
+			// Test-specific parameters
+			"startup":"someFile.js",
+			"beforeTest":"someFile2.js"
+			"testFilesDirectories":["./src/test/cases", "../../onit-next/dist/test/cases"], // mocha test files directories 
+			"shutdown": "pathToFile.js"
+			
+			// Add any mocha-supported property. See list here: https://mochajs.org/api/mocha,
+			// These properties are passed down directly to mocha.
+			"grep":"*", // https://mochajs.org/api/mocha#grep
+			"timeout": "10s", //https://mochajs.org/api/mocha#timeout
+		}
+	}
 }
 ```
