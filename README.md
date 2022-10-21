@@ -1,5 +1,5 @@
 # Onit-cli
-Onit development CLI
+Onit development CLI tool.
 
 This package provide the **onit** cli command, a developer tool for onit-based projects.
 
@@ -18,7 +18,5 @@ See [CHANGELOG.md](CHANGELOG.md) for more info
 <br>
 <br>
 <br>
-
-[<img src="docs/mitech.png">](https://www.mitechsrl.it/) 
-[<img src="docs/logo-onit.png">](https://www.mitechsrl.it/onit/)
+[<img src="docs/mitech.png">](https://www.mitechsrl.it/) &nbsp; &nbsp;[<img src="docs/logo-onit.png">](https://www.mitechsrl.it/onit/)
 

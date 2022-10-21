@@ -105,7 +105,7 @@ module.exports.prompt = async (buildTarget, vars, cwdPackageJson) => {
             // we can process both a single string or an array of version strings.
             // In case of array, get the next suitable version
             try {
-                const _match = val.match(/(\[[^\]]+\])/gm);
+                const _match = val.match(/(\[[^\]]+\])|(^"[0-9.]+"$)/gm);
                 if (_match && _match[0]) val = _match[0];
 
                 let _val = JSON.parse(val);
