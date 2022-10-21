@@ -100,36 +100,37 @@ module.exports.prompt = async (buildTarget, vars, cwdPackageJson) => {
                 shell: true,
                 cwd: process.cwd()
             });
-            val = val.data.trim();
+            if (val.exitCode === 0) {
+                val = val.data.trim();
 
-            // we can process both a single string or an array of version strings.
-            // In case of array, get the next suitable version
-            try {
-                const _match = val.match(/(\[[^\]]+\])|(^"[0-9.]+"$)/gm);
-                if (_match && _match[0]) val = _match[0];
+                // we can process both a single string or an array of version strings.
+                // In case of array, get the next suitable version
+                try {
+                    const _match = val.match(/(\[[^\]]+\])|(^"[0-9.]+"$)/gm);
+                    if (_match && _match[0]) val = _match[0];
 
-                let _val = JSON.parse(val);
-                if (Array.isArray(_val)) {
-                    _val = _val.filter(v => !!v.match(additionalMatch));
-                    _val = semverSort(_val);
-                    val = _val.pop();
-                } else {
-                    val = _val;
+                    let _val = JSON.parse(val);
+                    if (Array.isArray(_val)) {
+                        _val = _val.filter(v => !!v.match(additionalMatch));
+                        _val = semverSort(_val);
+                        val = _val.pop();
+                    } else {
+                        val = _val;
+                    }
+                } catch (e) {
+                    console.error(e);
                 }
-            } catch (e) {
-                console.error(e);
-                // logger.error(e);
+
+                increaseLevels.forEach(increaseLevel => {
+                    const v = semverInc(val, ...increaseLevel);
+                    if (v) {
+                        list[0].choices.push({
+                            name: versionManagement.additional.name + ' ' + increaseLevel[0] + ' ' + v,
+                            value: v
+                        });
+                    }
+                });
             }
-
-            increaseLevels.forEach(increaseLevel => {
-                const v = semverInc(val, ...increaseLevel);
-                if (v) {
-                    list[0].choices.push({
-                        name: versionManagement.additional.name + ' ' + increaseLevel[0] + ' ' + v,
-                        value: v
-                    });
-                }
-            });
         }
         const answers = await inquirer.prompt(list);
         version = answers.version;
