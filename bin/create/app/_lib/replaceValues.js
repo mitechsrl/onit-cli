@@ -1,5 +1,5 @@
 const { readFileSync, writeFileSync } = require('fs');
-const { snakeCase, camelCase, capitalize } = require('lodash');
+const { snakeCase, camelCase, capitalize, upperFirst } = require('lodash');
 const { readdir } = require('fs').promises;
 const { resolve, join } = require('path');
 
@@ -22,9 +22,10 @@ module.exports.replaceValues = async function (cwd, answers) {
     process.chdir(cwd);
     const replacements = [ // find & replace in files di src
         // { find: '@mitech/onit-next-example-webcomponent', replace: answers.appName },
-        { find: 'ExampleWebComponent', replace: capitalize(camelCase(answers.componentClassName)) }, // nome class ecomponente
-        { find: 'EXAMPLE_WEB_COMPONENT', replace: snakeCase(answers.componentClassName).toUpperCase() }, // nome componente
-        { find: 'exampleWebComponent', replace: camelCase(answers.componentClassName) },
+        { find: 'OnitExampleWebComponent', replace: answers.componentClassName }, // nome class ecomponente
+        { find: 'ONIT_EXAMPLE_WEB_COMPONENT', replace: answers.componentNameExport }, // nome componente
+        { find: 'exampleWebComponent', replace: answers.componentClassNameShortCamelCase },
+        { find: 'ExampleWebComponent', replace: upperFirst(answers.componentClassNameShortCamelCase) },
         { find: 'Onit example web component', replace: answers.appExtendedName },
         { find: 'onit-next-example-webcomponent', replace: answers.appNameWithoutScope }
     ];
@@ -32,7 +33,7 @@ module.exports.replaceValues = async function (cwd, answers) {
     const files = [
         // join(process.cwd(), 'package.json'),
         join(process.cwd(), 'README.md'),
-        ...await getFiles('./src')
+        ...await getFiles(join(process.cwd(), './src'))
     ];
 
     files.forEach(file => {

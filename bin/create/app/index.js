@@ -63,7 +63,7 @@ module.exports.cmd = async function (basepath, params) {
             name: 'componentClassName',
             message: 'Component class name',
             default: (answers) => {
-                return upperFirst(camelCase(answers.appName.replace(nameMatch, '$2'))) + 'Component';
+                return 'Onit' + upperFirst(camelCase(answers.appName.replace(nameMatch, '$2'))) + 'Component';
             },
             validate: (v) => {
                 if (!v.match(/^[a-zA-Z0-9-_]+$/g)) {
@@ -84,21 +84,35 @@ module.exports.cmd = async function (basepath, params) {
 
     answers.appDescription = answers.appExtendedName;
 
-    // standardize class name
-    // - CamelCase
-    // - ends with "Component"
-    answers.componentClassName = capitalize(camelCase(answers.componentClassName));
+    // Ensure some names starts with "Onit"
+    if (answers.componentClassName.toLowerCase().startsWith('onit')) {
+        answers.componentClassNameShortCamelCase = camelCase(answers.componentClassName.substring(4));
+        answers.componentClassName = upperFirst(camelCase(answers.componentClassName));
+    } else {
+        answers.componentClassNameShortCamelCase = camelCase(answers.componentClassName);
+        answers.componentClassName = 'Onit' + upperFirst(camelCase(answers.componentClassName));
+    }
+
+    // Ensure some names ends in "Component"
     if (answers.componentClassName.match(/^(.+)([Cc]omponent)$/gi)) {
         answers.componentClassName = answers.componentClassName.replace(/^(.+)([Cc]omponent)$/gi, '$1Component');
     } else {
         answers.componentClassName += 'Component';
     }
+    if (answers.componentClassNameShortCamelCase.match(/^(.+)([Cc]omponent)$/gi)) {
+        answers.componentClassNameShortCamelCase = answers.componentClassNameShortCamelCase.replace(/^(.+)([Cc]omponent)$/gi, '$1Component');
+    } else {
+        answers.componentClassNameShortCamelCase += 'Component';
+    }
+
+    answers.componentNameExport = snakeCase(answers.componentClassName).toUpperCase();
 
     console.warn('Component name: ' + answers.componentClassName);
 
     // check target directory
     answers.appNameWithoutScope = answers.appName.replace(/^@[^/]+\//, '');
     console.warn('Name without scope: ' + answers.appNameWithoutScope);
+
     const directory = path.join(process.cwd(), './' + answers.appNameWithoutScope);
     if (existsSync(directory)) {
         throw new Error(`Directory ${directory} already exists. Please select another name`);
