@@ -32,7 +32,7 @@ const { replaceValues } = require('./_lib/replaceValues');
 const { fixPackageJson } = require('./_lib/fixPackageJson');
 const { removeUnwantedFiles } = require('./_lib/removeUnwantedFiles');
 const { relpaceInFile } = require('./_lib/replaceInFile');
-const { capitalize, camelCase, snakeCase, upperFirst } = require('lodash');
+const { camelCase, snakeCase, upperFirst } = require('lodash');
 const { fixOnitConfig } = require('./_lib/fixOnitConfig');
 const { unlinkGitRepo, commitRepo } = require('./_lib/git');
 
