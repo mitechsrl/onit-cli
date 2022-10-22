@@ -24,9 +24,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
 Object.defineProperty(exports, "__esModule", { value: true });
-const logger_1 = require("../../lib/logger");
 const exec = async (argv) => {
-    logger_1.logger.log("PIPPPOOOOO");
     /*try {
         // check for manual serve file specifed
         const manualConfigFile = argv.c as string|undefined;

@@ -15,7 +15,7 @@ const config: Command = {
         config: {
             alias:'no-rebuild',
             type:'boolean',
-            description: 'Onit config file'
+            description: 'Do not rebuild'
         }
     },
     {

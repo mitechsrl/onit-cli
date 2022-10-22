@@ -11,11 +11,11 @@ const packageJson_1 = require("../lib/packageJson");
 exports.cli = yargs_1.default.scriptName('onit')
     .usage('$0 <cmd> [args]')
     .option('h', { alias: 'help' })
-    .option('verbose', { describe: 'Enable verbose log' })
+    .option('verbose', { describe: 'Enable verbose log', type: 'boolean' })
+    .option('log-to-file', { describe: 'Save output to log file', type: 'boolean' })
     .version(false)
     .command('$0', '', (yargs) => {
-    yargs.option('v', { alias: 'version', describe: 'Show version' });
-    yargs.option('log-to-file', { describe: 'Save output to log file' });
+    yargs.option('v', { alias: 'version', describe: 'Show version', type: 'boolean' });
 }, (argv) => {
     // Mostra la versione se richiesto
     if (argv.v) {
