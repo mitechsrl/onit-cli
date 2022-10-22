@@ -1,0 +1,7 @@
+[
+    {
+        "cmd": "test",
+        "file": "bin\\test\\commandConfig.js",
+        "children": []
+    }
+]

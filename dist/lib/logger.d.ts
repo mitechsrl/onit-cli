@@ -19,5 +19,6 @@ declare const logger: {
     info: (message: string) => void;
     success: (message: string) => void;
     verbose: (message: string) => void;
+    debug: (message: string) => void;
 };
 export { logger };

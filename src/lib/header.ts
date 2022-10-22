@@ -18,18 +18,15 @@ import { packageJson } from './packageJson';
 export function header() {
 
     logger.info('');
-    logger.info('    &&&&&&       &&&&&&                      ');
-    logger.info('    &&&&&&&     &&&&&&&  &&&&                ');
-    logger.info('    &&&&#&&&   &&& &&&&   &&&&&&&            ');
-    logger.info('    &&&& &&&   &&& &&&&      &&&&&&&&        ');
-    logger.info('    &&&& &&&& &&&& &&&&          &&&&&&      ');
-    logger.info('    &&&&  &&& &&&  &&&&      &&&&&&&&        ');
-    logger.info('    &&&&  &&&&&&&  &&&&   &&&&&&&            ');
-    logger.info('    &&&&   &&&&&   &&&&  &&&&                ');
-    logger.info('    &&&&   &&&&&   &&&&                      ');
+    logger.info('░█████╗░███╗░░██╗██╗████████╗░░░░░░░█████╗░██╗░░░░░██╗');
+    logger.info('██╔══██╗████╗░██║██║╚══██╔══╝░░░░░░██╔══██╗██║░░░░░██║');
+    logger.info('██║░░██║██╔██╗██║██║░░░██║░░░█████╗██║░░╚═╝██║░░░░░██║');
+    logger.info('██║░░██║██║╚████║██║░░░██║░░░╚════╝██║░░██╗██║░░░░░██║');
+    logger.info('╚█████╔╝██║░╚███║██║░░░██║░░░░░░░░░╚█████╔╝███████╗██║');
+    logger.info('░╚════╝░╚═╝░░╚══╝╚═╝░░░╚═╝░░░░░░░░░░╚════╝░╚══════╝╚═╝');
 
     logger.info('');
-    logger.info('Mitech CLI tool ' + packageJson.version);
+    logger.info('Onit CLI tool ' + packageJson.version);
     logger.log('Add -h flag for more info');
     // logger.log('Config files dir ' + persistent.baseConfigDir);
 }

@@ -6,7 +6,12 @@ import { Command, StringError } from './types/index.js';
 import { errorHandler } from './lib/errorHandler.js';
 import { cli } from './bin/main.js';
 import yargs from 'yargs';
-import { existsSync, readFileSync } from 'fs';
+import fs from 'fs';
+import { closeOutputRedirction, setupOutputRedirecion } from './lib/outputRedirection.js';
+
+
+// generic check for log to file.
+const redirectOutput = process.argv.find(p => p === '--log-to-file');
 
 function recourseRegisterCommand(parentYargs: yargs.Argv, commandConfig: ScanCommandResult) {
     const configFilePath = path.join(__dirname,commandConfig.file);
@@ -35,24 +40,31 @@ function recourseRegisterCommand(parentYargs: yargs.Argv, commandConfig: ScanCom
         _yargs.strictCommands(command.strictCommands !== false);
 
     }, (argv) => {
-        // funzione chiamata sull'esecuzione del comando
-        Promise.resolve()
-            .then(() => {
-                // Non c'è exec specificato
-                if (!command.exec) throw new StringError('File exec non specificato');
+        // Command method runner        
+        let promise = Promise.resolve();
+        if (redirectOutput){
+            promise = setupOutputRedirecion();
+        }
 
-                // command execution callback
-                const configFilePath = path.join(__dirname,commandConfig.file);
-                const execFilePath = path.join(path.dirname(configFilePath), command.exec+'.js');
+        promise.then(() => {
+            // Non c'è exec specificato
+            if (!command.exec) throw new StringError('File exec non specificato');
 
-                if (!existsSync(execFilePath)) {
-                    throw new StringError('Questo comando è rotto. Verifica che commandConfig punta a un file di exec valido');
-                }
-                // eslint-disable-next-line @typescript-eslint/no-var-requires
-                return require(execFilePath).default;
-            })
-            .then((execFn) => execFn(argv))
-            .catch(errorHandler);
+            // command execution callback
+            const configFilePath = path.join(__dirname,commandConfig.file);
+            const execFilePath = path.join(path.dirname(configFilePath), command.exec+'.js');
+
+            if (!fs.existsSync(execFilePath)) {
+                throw new StringError('Questo comando è rotto. Verifica che commandConfig punta a un file di exec valido');
+            }
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            return require(execFilePath).default;
+        })
+        .then((execFn) => execFn(argv))
+        .catch(errorHandler)
+        .then(() => {
+            if (redirectOutput) return closeOutputRedirction();
+        })
     });
 }
 
@@ -66,18 +78,18 @@ function recourseRegisterCommand(parentYargs: yargs.Argv, commandConfig: ScanCom
 // Se vuoi ripristinare lo scan ad ogni boot, sostituisci la promise con la riga
 // scanCommands(path.join(__dirname, './bin'), '');
 
-// step 1: ottini json dei comandi (precompilato)
-new Promise<ScanCommandResult[]>((resolve)=> {
-    const content = readFileSync(path.join(__dirname,'./commands.json')).toString();
-    resolve(JSON.parse(content) as ScanCommandResult[]);
-})
-    .then((files:ScanCommandResult[]) => {
+
+
+fs.promises.readFile(path.join(__dirname,'./commands.json'))
+    .then((content: Buffer) => {
+        const commands = JSON.parse(content.toString()) as ScanCommandResult[]
+
         // step 2: monta i comandi
-        files.forEach(commandConfig => {
+        commands.forEach(commandConfig => {
             recourseRegisterCommand(cli, commandConfig);
         });
-        // questa roba qui fa partire la cli.
-        cli.argv;
+
+        return cli.parse();
     })
-    .catch(errorHandler);
+    .catch(errorHandler)
 

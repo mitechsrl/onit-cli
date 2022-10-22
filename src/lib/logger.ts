@@ -30,6 +30,11 @@ const logger = {
         if (verbose){
             console.log(magenta('VERBOSE: '+message));
         }
+    },
+    debug: (message: string) => {
+        if (verbose){
+            console.log(magenta('DEBUG: '+message));
+        }
     }
 };
 

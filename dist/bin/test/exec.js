@@ -25,33 +25,36 @@ OTHER DEALINGS IN THE SOFTWARE.
 */
 Object.defineProperty(exports, "__esModule", { value: true });
 const logger_1 = require("../../lib/logger");
-const onitFileLoader_1 = require("../../lib/onitFileLoader");
-const selectTest_1 = require("./_lib/selectTest");
 const exec = async (argv) => {
-    try {
+    logger_1.logger.log("PIPPPOOOOO");
+    /*try {
         // check for manual serve file specifed
-        const manualConfigFile = argv.c;
+        const manualConfigFile = argv.c as string|undefined;
+
         // load the buildFile
-        const onitConfigFile = await (0, onitFileLoader_1.onitFileLoader)(process.cwd(), manualConfigFile);
-        logger_1.logger.warn('Uso file(s) config ' + onitConfigFile.sources.join(', '));
+        const onitConfigFile = await onitFileLoader(process.cwd(), manualConfigFile);
+        logger.warn('Uso file(s) config ' + onitConfigFile.sources.join(', '));
+
         if (!onitConfigFile.json.test) {
             throw new Error('Il test non è disponibile. Verifica di avere la proprietà <test> nel file di configurazioen di onit.');
         }
+
         // prompt the user to elect a test set
-        const testTarget = await (0, selectTest_1.selectTest)(onitConfigFile);
+        const testTarget = await selectTest(onitConfigFile);
         const test = require('./_src/index');
+
         // quick replace the tag from testTarget
-        const overrideMatchTag = argv.t;
+        const overrideMatchTag = argv.t as string;
         if (overrideMatchTag) {
             testTarget.grep = overrideMatchTag;
         }
+
         // launch test
         await test.start(onitConfigFile, testTarget, basepath, params);
-    }
-    catch (e) {
-        logger_1.logger.error('Test interrotto');
+    } catch (e) {
+        logger.error('Test interrotto');
         throw e;
-    }
+    }*/
 };
 exports.default = exec;
 //# sourceMappingURL=exec.js.map

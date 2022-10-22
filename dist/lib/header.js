@@ -18,17 +18,14 @@ const logger_1 = require("./logger");
 const packageJson_1 = require("./packageJson");
 function header() {
     logger_1.logger.info('');
-    logger_1.logger.info('    &&&&&&       &&&&&&                      ');
-    logger_1.logger.info('    &&&&&&&     &&&&&&&  &&&&                ');
-    logger_1.logger.info('    &&&&#&&&   &&& &&&&   &&&&&&&            ');
-    logger_1.logger.info('    &&&& &&&   &&& &&&&      &&&&&&&&        ');
-    logger_1.logger.info('    &&&& &&&& &&&& &&&&          &&&&&&      ');
-    logger_1.logger.info('    &&&&  &&& &&&  &&&&      &&&&&&&&        ');
-    logger_1.logger.info('    &&&&  &&&&&&&  &&&&   &&&&&&&            ');
-    logger_1.logger.info('    &&&&   &&&&&   &&&&  &&&&                ');
-    logger_1.logger.info('    &&&&   &&&&&   &&&&                      ');
+    logger_1.logger.info('░█████╗░███╗░░██╗██╗████████╗░░░░░░░█████╗░██╗░░░░░██╗');
+    logger_1.logger.info('██╔══██╗████╗░██║██║╚══██╔══╝░░░░░░██╔══██╗██║░░░░░██║');
+    logger_1.logger.info('██║░░██║██╔██╗██║██║░░░██║░░░█████╗██║░░╚═╝██║░░░░░██║');
+    logger_1.logger.info('██║░░██║██║╚████║██║░░░██║░░░╚════╝██║░░██╗██║░░░░░██║');
+    logger_1.logger.info('╚█████╔╝██║░╚███║██║░░░██║░░░░░░░░░╚█████╔╝███████╗██║');
+    logger_1.logger.info('░╚════╝░╚═╝░░╚══╝╚═╝░░░╚═╝░░░░░░░░░░╚════╝░╚══════╝╚═╝');
     logger_1.logger.info('');
-    logger_1.logger.info('Mitech CLI tool ' + packageJson_1.packageJson.version);
+    logger_1.logger.info('Onit CLI tool ' + packageJson_1.packageJson.version);
     logger_1.logger.log('Add -h flag for more info');
     // logger.log('Config files dir ' + persistent.baseConfigDir);
 }

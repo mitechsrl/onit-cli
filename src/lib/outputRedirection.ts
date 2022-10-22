@@ -1,15 +1,17 @@
-const logger = require('./logger');
-const fs = require('fs');
-const path = require('path');
+import path from 'path';
+import fs from 'fs';
+import { GenericObject } from '../types';
+import { logger } from './logger';
+
 const filename = path.join(process.cwd(), 'onit-cli-log-' + (new Date()).toISOString().replace(/[:.]/g, '-') + '.log');
-let writeStream = null;
+let writeStream: fs.WriteStream | null = null;
 
 /**
  *
  * @param {*} tag A geeric tag string
  * @param {*} data array of data to be print to log
  */
-function appendToLog (tag, data) {
+function appendToLog (tag: string, data: GenericObject[]) {
     const strings = data.map((d, index) => {
         try {
             if (typeof d === 'string') return d;
@@ -19,14 +21,14 @@ function appendToLog (tag, data) {
         }
     });
 
-    writeStream.write(tag + strings.join(' ') + '\n');
+    writeStream?.write(tag + strings.join(' ') + '\n');
 }
 
 /**
  * Create a console proxy to write data to a file stream
  * @returns 
  */
-module.exports.setupOutputRedirecion = async () => {
+export async function setupOutputRedirecion(): Promise<void>{
     return new Promise((resolve, reject) => {
         writeStream = fs.createWriteStream(filename);
         writeStream.on('open', function (fd) {
@@ -34,8 +36,10 @@ module.exports.setupOutputRedirecion = async () => {
             const maxLength = 1 + Math.max(...methods.map(m => m.length));
 
             methods.forEach(methodName => {
+                // @ts-expect-error console
                 const nativeMethod = console[methodName];
-                console[methodName] = (...args) => {
+                // @ts-expect-error console
+                console[methodName] = (...args: any[]) => {
                     nativeMethod(...args);
                     appendToLog((methodName + ':').padEnd(maxLength, ' '), args);
                 };
@@ -53,7 +57,7 @@ module.exports.setupOutputRedirecion = async () => {
 /**
  * Close the write stream to file
  */
-module.exports.closeOutputRedirction = () => {
+export async function closeOutputRedirction(){
     if (writeStream) {
         // close the stream
         writeStream.end();

@@ -31,6 +31,11 @@ const logger = {
         if (verbose) {
             console.log((0, colors_1.magenta)('VERBOSE: ' + message));
         }
+    },
+    debug: (message) => {
+        if (verbose) {
+            console.log((0, colors_1.magenta)('DEBUG: ' + message));
+        }
     }
 };
 exports.logger = logger;

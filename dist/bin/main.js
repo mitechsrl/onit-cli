@@ -8,13 +8,14 @@ const yargs_1 = __importDefault(require("yargs"));
 const header_1 = require("../lib/header");
 const logger_1 = require("../lib/logger");
 const packageJson_1 = require("../lib/packageJson");
-exports.cli = yargs_1.default.scriptName('mitech')
+exports.cli = yargs_1.default.scriptName('onit')
     .usage('$0 <cmd> [args]')
     .option('h', { alias: 'help' })
     .option('verbose', { describe: 'Enable verbose log' })
     .version(false)
     .command('$0', '', (yargs) => {
     yargs.option('v', { alias: 'version', describe: 'Show version' });
+    yargs.option('log-to-file', { describe: 'Save output to log file' });
 }, (argv) => {
     // Mostra la versione se richiesto
     if (argv.v) {

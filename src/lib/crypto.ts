@@ -12,8 +12,7 @@
  * 0. You just DO WHAT THE FUCK YOU WANT TO.
  */
 
-import crypto, { Encoding } from 'crypto';
-import { SshTargetPassword } from '../types';
+import crypto, { HexBase64BinaryEncoding } from 'crypto';
 
 /**
  * Encrypt a plain text string and return the encrypted object.
@@ -24,14 +23,14 @@ import { SshTargetPassword } from '../types';
  *
  * @returns The returned object is an object made of two elements: iv (init vector) and encryptedData. Both value are needed to perform a decrypt.
  */
-export function encrypt(privateKey: crypto.BinaryLike, plainTextData: string, encoding?: Encoding) {
+export function encrypt(privateKey: crypto.BinaryLike, plainTextData: string, encoding?: HexBase64BinaryEncoding) {
     const _encoding = encoding ?? 'hex';
     const iv = crypto.randomBytes(16);
     const key = crypto.scryptSync(privateKey, 'nein_nein_nein_nein!', 32);
     const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
-    let encrypted = cipher.update(plainTextData, 'utf-8', _encoding);
+    let encrypted = cipher.update(plainTextData, 'utf8', _encoding);
     encrypted += cipher.final(_encoding);
-    return { algo: 'aes-256-cbc', iv: iv.toString(_encoding), encryptedData: encrypted } as SshTargetPassword;
+    return { algo: 'aes-256-cbc', iv: iv.toString(_encoding), encryptedData: encrypted };
 }
 
 /**
@@ -42,12 +41,12 @@ export function encrypt(privateKey: crypto.BinaryLike, plainTextData: string, en
  * @param {*} encryptedData The encoded string to be decoded
  * @param {*} encoding The format of initVector and encryptedData. Default to hex
  */
-export function decrypt(initVector: string, privateKey: string, encryptedData: string, encoding?: Encoding) {
+export function decrypt(initVector: string, privateKey: string, encryptedData: string, encoding?: HexBase64BinaryEncoding) {
     const _encoding = encoding ?? 'hex';
     const iv = Buffer.from(initVector, 'hex');
     const key = crypto.scryptSync(privateKey, 'nein_nein_nein_nein!', 32);
     const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
-    let decrypted = decipher.update(encryptedData, _encoding ?? 'hex', 'utf-8');
-    decrypted += decipher.final('utf-8');
+    let decrypted = decipher.update(encryptedData, _encoding ?? 'hex', 'utf8');
+    decrypted += decipher.final('utf8');
     return decrypted;
 }

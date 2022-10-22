@@ -8,7 +8,10 @@ const path_1 = __importDefault(require("path"));
 const index_js_1 = require("./types/index.js");
 const errorHandler_js_1 = require("./lib/errorHandler.js");
 const main_js_1 = require("./bin/main.js");
-const fs_1 = require("fs");
+const fs_1 = __importDefault(require("fs"));
+const outputRedirection_js_1 = require("./lib/outputRedirection.js");
+// generic check for log to file.
+const redirectOutput = process.argv.find(p => p === '--log-to-file');
 function recourseRegisterCommand(parentYargs, commandConfig) {
     const configFilePath = path_1.default.join(__dirname, commandConfig.file);
     // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -32,23 +35,30 @@ function recourseRegisterCommand(parentYargs, commandConfig) {
         // https://yargs.js.org/docs/#api-reference-strictcommandsenabledtrue
         _yargs.strictCommands(command.strictCommands !== false);
     }, (argv) => {
-        // funzione chiamata sull'esecuzione del comando
-        Promise.resolve()
-            .then(() => {
+        // Command method runner        
+        let promise = Promise.resolve();
+        if (redirectOutput) {
+            promise = (0, outputRedirection_js_1.setupOutputRedirecion)();
+        }
+        promise.then(() => {
             // Non c'è exec specificato
             if (!command.exec)
                 throw new index_js_1.StringError('File exec non specificato');
             // command execution callback
             const configFilePath = path_1.default.join(__dirname, commandConfig.file);
             const execFilePath = path_1.default.join(path_1.default.dirname(configFilePath), command.exec + '.js');
-            if (!(0, fs_1.existsSync)(execFilePath)) {
+            if (!fs_1.default.existsSync(execFilePath)) {
                 throw new index_js_1.StringError('Questo comando è rotto. Verifica che commandConfig punta a un file di exec valido');
             }
             // eslint-disable-next-line @typescript-eslint/no-var-requires
             return require(execFilePath).default;
         })
             .then((execFn) => execFn(argv))
-            .catch(errorHandler_js_1.errorHandler);
+            .catch(errorHandler_js_1.errorHandler)
+            .then(() => {
+            if (redirectOutput)
+                return (0, outputRedirection_js_1.closeOutputRedirction)();
+        });
     });
 }
 // NOTA: lo scan dei comandi è stato demandato a compile time.
@@ -60,18 +70,14 @@ function recourseRegisterCommand(parentYargs, commandConfig) {
 // Questo rende l'avvio piu leggero e piu veloce.
 // Se vuoi ripristinare lo scan ad ogni boot, sostituisci la promise con la riga
 // scanCommands(path.join(__dirname, './bin'), '');
-// step 1: ottini json dei comandi (precompilato)
-new Promise((resolve) => {
-    const content = (0, fs_1.readFileSync)(path_1.default.join(__dirname, './commands.json')).toString();
-    resolve(JSON.parse(content));
-})
-    .then((files) => {
+fs_1.default.promises.readFile(path_1.default.join(__dirname, './commands.json'))
+    .then((content) => {
+    const commands = JSON.parse(content.toString());
     // step 2: monta i comandi
-    files.forEach(commandConfig => {
+    commands.forEach(commandConfig => {
         recourseRegisterCommand(main_js_1.cli, commandConfig);
     });
-    // questa roba qui fa partire la cli.
-    main_js_1.cli.argv;
+    return main_js_1.cli.parse();
 })
     .catch(errorHandler_js_1.errorHandler);
 //# sourceMappingURL=index.js.map

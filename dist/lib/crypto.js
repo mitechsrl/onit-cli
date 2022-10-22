@@ -32,7 +32,7 @@ function encrypt(privateKey, plainTextData, encoding) {
     const iv = crypto_1.default.randomBytes(16);
     const key = crypto_1.default.scryptSync(privateKey, 'nein_nein_nein_nein!', 32);
     const cipher = crypto_1.default.createCipheriv('aes-256-cbc', key, iv);
-    let encrypted = cipher.update(plainTextData, 'utf-8', _encoding);
+    let encrypted = cipher.update(plainTextData, 'utf8', _encoding);
     encrypted += cipher.final(_encoding);
     return { algo: 'aes-256-cbc', iv: iv.toString(_encoding), encryptedData: encrypted };
 }
@@ -50,8 +50,8 @@ function decrypt(initVector, privateKey, encryptedData, encoding) {
     const iv = Buffer.from(initVector, 'hex');
     const key = crypto_1.default.scryptSync(privateKey, 'nein_nein_nein_nein!', 32);
     const decipher = crypto_1.default.createDecipheriv('aes-256-cbc', key, iv);
-    let decrypted = decipher.update(encryptedData, _encoding !== null && _encoding !== void 0 ? _encoding : 'hex', 'utf-8');
-    decrypted += decipher.final('utf-8');
+    let decrypted = decipher.update(encryptedData, _encoding !== null && _encoding !== void 0 ? _encoding : 'hex', 'utf8');
+    decrypted += decipher.final('utf8');
     return decrypted;
 }
 exports.decrypt = decrypt;

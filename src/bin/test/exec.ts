@@ -30,7 +30,8 @@ import { CommandExecFunction } from '../../types';
 import { selectTest } from './_lib/selectTest';
 
 const exec: CommandExecFunction = async (argv: yargs.ArgumentsCamelCase<{}>) => {
-    try {
+
+    /*try {
         // check for manual serve file specifed
         const manualConfigFile = argv.c as string|undefined;
 
@@ -57,7 +58,7 @@ const exec: CommandExecFunction = async (argv: yargs.ArgumentsCamelCase<{}>) => 
     } catch (e) {
         logger.error('Test interrotto');
         throw e;
-    }
+    }*/
 };
 
 export default exec;

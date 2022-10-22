@@ -12,8 +12,7 @@
  * 0. You just DO WHAT THE FUCK YOU WANT TO.
  */
 /// <reference types="node" />
-/// <reference types="node" />
-import crypto, { Encoding } from 'crypto';
+import crypto, { HexBase64BinaryEncoding } from 'crypto';
 /**
  * Encrypt a plain text string and return the encrypted object.
  *
@@ -23,7 +22,11 @@ import crypto, { Encoding } from 'crypto';
  *
  * @returns The returned object is an object made of two elements: iv (init vector) and encryptedData. Both value are needed to perform a decrypt.
  */
-export declare function encrypt(privateKey: crypto.BinaryLike, plainTextData: string, encoding?: Encoding): SshTargetPassword;
+export declare function encrypt(privateKey: crypto.BinaryLike, plainTextData: string, encoding?: HexBase64BinaryEncoding): {
+    algo: string;
+    iv: string;
+    encryptedData: string;
+};
 /**
  * Decrypt an encrypted data string and return the plain text result
  *
@@ -32,4 +35,4 @@ export declare function encrypt(privateKey: crypto.BinaryLike, plainTextData: st
  * @param {*} encryptedData The encoded string to be decoded
  * @param {*} encoding The format of initVector and encryptedData. Default to hex
  */
-export declare function decrypt(initVector: string, privateKey: string, encryptedData: string, encoding?: Encoding): Buffer & string;
+export declare function decrypt(initVector: string, privateKey: string, encryptedData: string, encoding?: HexBase64BinaryEncoding): string;
