@@ -11,4 +11,5 @@
  * TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION:
  * 0. You just DO WHAT THE FUCK YOU WANT TO.
  */
-export declare function errorHandler(error: unknown): void;
+import yargs from 'yargs';
+export declare function errorHandler(error: unknown, argv?: yargs.ArgumentsCamelCase<unknown>): void;

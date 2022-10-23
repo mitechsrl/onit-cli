@@ -56,7 +56,10 @@ module.exports = {
             }
         ],
         // to me, is somehow more clear {prop:prop}
-        'object-shorthand': ['error', 'never']
+        'object-shorthand': ['error', 'never'],
+
+        // I'm sure when to use it!
+        '@typescript-eslint/no-non-null-assertion': 'off'
     }
 
 };

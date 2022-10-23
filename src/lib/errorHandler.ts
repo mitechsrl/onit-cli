@@ -12,17 +12,31 @@
  * 0. You just DO WHAT THE FUCK YOU WANT TO.
  */
 
-import { StringError } from '../types';
+import yargs from 'yargs';
+import { NotFoundError, StringError } from '../types';
 import { logger } from './logger';
 
-export function errorHandler(error: unknown) {
+export function errorHandler(error: unknown, argv?: yargs.ArgumentsCamelCase<unknown>) {
 
-    // Nel caso di StringError stampa solo il messaggio
+    // on verbose, print all the error
+    if (argv?.verbose){
+        logger.error(error);
+        return;
+    }
+
+    // Simple StringError. Print only message, skip stack
     if (error instanceof StringError) {
         logger.error(error.message);
         return;
     }
 
-    // in tutti gli altri casi stampa tutto
+    // Something was not found. The error message should already contain all the needed info
+    // no need to print stack trace.
+    if (error instanceof NotFoundError){
+        logger.error(error.message);
+        return;
+    }
+
+    // any other case will also print stack trace
     logger.error(error);
 }

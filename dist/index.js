@@ -54,7 +54,8 @@ function recourseRegisterCommand(parentYargs, commandConfig) {
             return require(execFilePath).default;
         })
             .then((execFn) => execFn(argv))
-            .catch(errorHandler_js_1.errorHandler)
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .catch((e) => (0, errorHandler_js_1.errorHandler)(e, argv))
             .then(() => {
             if (redirectOutput)
                 return (0, outputRedirection_js_1.closeOutputRedirction)();

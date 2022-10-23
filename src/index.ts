@@ -9,7 +9,6 @@ import yargs from 'yargs';
 import fs from 'fs';
 import { closeOutputRedirction, setupOutputRedirecion } from './lib/outputRedirection.js';
 
-
 // generic check for log to file.
 const redirectOutput = process.argv.find(p => p === '--log-to-file');
 
@@ -60,11 +59,12 @@ function recourseRegisterCommand(parentYargs: yargs.Argv, commandConfig: ScanCom
             // eslint-disable-next-line @typescript-eslint/no-var-requires
             return require(execFilePath).default;
         })
-        .then((execFn) => execFn(argv))
-        .catch(errorHandler)
-        .then(() => {
-            if (redirectOutput) return closeOutputRedirction();
-        })
+            .then((execFn) => execFn(argv))
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .catch((e:any) => errorHandler(e, argv))
+            .then(() => {
+                if (redirectOutput) return closeOutputRedirction();
+            });
     });
 }
 
@@ -78,11 +78,9 @@ function recourseRegisterCommand(parentYargs: yargs.Argv, commandConfig: ScanCom
 // Se vuoi ripristinare lo scan ad ogni boot, sostituisci la promise con la riga
 // scanCommands(path.join(__dirname, './bin'), '');
 
-
-
 fs.promises.readFile(path.join(__dirname,'./commands.json'))
     .then((content: Buffer) => {
-        const commands = JSON.parse(content.toString()) as ScanCommandResult[]
+        const commands = JSON.parse(content.toString()) as ScanCommandResult[];
 
         // step 2: monta i comandi
         commands.forEach(commandConfig => {
@@ -91,5 +89,5 @@ fs.promises.readFile(path.join(__dirname,'./commands.json'))
 
         return cli.parse();
     })
-    .catch(errorHandler)
+    .catch(errorHandler);
 
