@@ -27,13 +27,20 @@ import fs from 'fs';
 import _ from 'lodash';
 import { spawn } from '../../../../../lib/spawn';
 import { GenericObject, OnitConfigFile } from '../../../../../types';
+import { spawn as _spawn } from 'child_process';
 
 // windows fa il windows percui lui vuole 'pm2.cmd' anzichè 'pm2' come comando di avvio
 const isWindows = (process.env.OS || '').toUpperCase().includes('WIN');
 const pm2exec = isWindows ? 'pm2.cmd' : 'pm2';
 
 export async function pm2stop() {
-    return spawn(pm2exec, ['stop', 'all'], true);
+    // launch this detached so the cli can exit quickly while pm2 is still stopping apps
+    const subprocess = _spawn(pm2exec, ['stop', 'all'], {
+        detached: true,
+        stdio: 'ignore'
+    });
+    subprocess.unref();
+
 }
 
 export async function pm2start(onitConfigFile: OnitConfigFile) {
