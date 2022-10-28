@@ -37,33 +37,33 @@ module.exports.prompt = async (buildTarget, vars, cwdPackageJson) => {
     let append = '';
     let additionalMatch = null;
     switch (buildTarget.mode) {
-        case 'production':
-            append = '';
-            additionalMatch = /^[0-9.]+$/;
-            increaseLevels.push(['patch']);
-            increaseLevels.push(['minor']);
-            increaseLevels.push(['major']);
-            break;
-        case 'uat':
-            append = '-uat.0';
-            additionalMatch = /^[0-9.]+-uat\.[0-9]+$/;
-            increaseLevels.push(['prerelease', 'uat']);
-            // increaseLevel2 = ['preminor', 'uat'];
-            break;
-        case 'beta':
-            append = '-beta.0';
-            additionalMatch = /^[0-9.]+-beta\.[0-9]+$/;
-            increaseLevels.push(['prerelease', 'beta']);
-            // increaseLevel2 = ['preminor', 'beta'];
-            break;
-        case 'test':
-            append = '-test.0';
-            additionalMatch = /^[0-9.]+-test\.[0-9]+$/;
-            increaseLevels.push(['prerelease', 'test']);
-            // increaseLevel2 = ['preminor', 'beta'];
-            break;
+    case 'production':
+        append = '';
+        additionalMatch = /^[0-9.]+$/;
+        increaseLevels.push(['patch']);
+        increaseLevels.push(['minor']);
+        increaseLevels.push(['major']);
+        break;
+    case 'uat':
+        append = '-uat.0';
+        additionalMatch = /^[0-9.]+-uat\.[0-9]+$/;
+        increaseLevels.push(['prerelease', 'uat']);
+        // increaseLevel2 = ['preminor', 'uat'];
+        break;
+    case 'beta':
+        append = '-beta.0';
+        additionalMatch = /^[0-9.]+-beta\.[0-9]+$/;
+        increaseLevels.push(['prerelease', 'beta']);
+        // increaseLevel2 = ['preminor', 'beta'];
+        break;
+    case 'test':
+        append = '-test.0';
+        additionalMatch = /^[0-9.]+-test\.[0-9]+$/;
+        increaseLevels.push(['prerelease', 'test']);
+        // increaseLevel2 = ['preminor', 'beta'];
+        break;
 
-        default: throw new Error('Unknown build mode ' + buildTarget.mode + '. Use one from: production, uat, beta, test.');
+    default: throw new Error('Unknown build mode ' + buildTarget.mode + '. Use one from: production, uat, beta, test.');
     }
 
     let version = null;
@@ -100,32 +100,37 @@ module.exports.prompt = async (buildTarget, vars, cwdPackageJson) => {
                 shell: true,
                 cwd: process.cwd()
             });
-            val = val.data.trim();
+            if (val.exitCode === 0) {
+                val = val.data.trim();
 
-            // we can process both a single string or an array of version strings.
-            // In case of array, get the next suitable version
-            try {
-                let _val = JSON.parse(val);
-                if (Array.isArray(_val)) {
-                    _val = _val.filter(v => !!v.match(additionalMatch));
-                    _val = semverSort(_val);
-                    val = _val.pop();
-                } else {
-                    val = _val;
+                // we can process both a single string or an array of version strings.
+                // In case of array, get the next suitable version
+                try {
+                    const _match = val.match(/(\[[^\]]+\])|(^"[0-9.]+"$)/gm);
+                    if (_match && _match[0]) val = _match[0];
+
+                    let _val = JSON.parse(val);
+                    if (Array.isArray(_val)) {
+                        _val = _val.filter(v => !!v.match(additionalMatch));
+                        _val = semverSort(_val);
+                        val = _val.pop();
+                    } else {
+                        val = _val;
+                    }
+                } catch (e) {
+                    console.error(e);
                 }
-            } catch (e) {
-                // logger.error(e);
+
+                increaseLevels.forEach(increaseLevel => {
+                    const v = semverInc(val, ...increaseLevel);
+                    if (v) {
+                        list[0].choices.push({
+                            name: versionManagement.additional.name + ' ' + increaseLevel[0] + ' ' + v,
+                            value: v
+                        });
+                    }
+                });
             }
-
-            increaseLevels.forEach(increaseLevel => {
-                const v = semverInc(val, ...increaseLevel);
-                if (v) {
-                    list[0].choices.push({
-                        name: versionManagement.additional.name + ' ' + increaseLevel[0] + ' ' + v,
-                        value: v
-                    });
-                }
-            });
         }
         const answers = await inquirer.prompt(list);
         version = answers.version;

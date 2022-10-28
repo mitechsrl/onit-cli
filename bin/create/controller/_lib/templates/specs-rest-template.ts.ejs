@@ -1,0 +1,111 @@
+import { RequestBodyObject, OperationObject } from 'openapi3-ts';
+import { <%= modelName %> } from '../models';
+import { getModelSchemaRef } from '@loopback/openapi-v3';
+
+export const createSpec: OperationObject = {
+    responses: {
+        '200': {
+            description: '<%= modelName %> model instance',
+            content: {'application/json': { schema: getModelSchemaRef(<%= modelName %>) } },
+        }
+    }
+};
+
+export const createRequestBodySpec: Partial<RequestBodyObject> = {
+    content: {
+        'application/json': {
+            schema: getModelSchemaRef(<%= modelName %>, {
+                title: 'New<%= modelName %>',
+                <%if (idOmitted) {%>exclude: ['<%= id %>'],<% } %>
+            }),
+        },
+    },
+};
+
+export const countSpec: OperationObject = {
+    responses: {
+        200: {
+            description: '<%= modelName %> model count',
+            content: { 'application/json': { schema: CountSchema } },
+        }
+    }
+};
+
+export const findSpec: OperationObject  = {
+    responses: {
+        200: {
+            description: 'Array of <%= modelName %> model instances',
+            content: {
+                'application/json': {
+                    schema: {
+                        type: 'array',
+                        items: getModelSchemaRef( <%= modelName %>, { includeRelations: true } ),
+                    },
+                },
+            },
+        }
+    }
+};
+
+export const updateAllSpec: OperationObject = {
+    responses: {
+        200: {
+            description: '<%= modelName %> PATCH success count',
+            content: { 'application/json': { schema: CountSchema } },
+        }
+    }
+};
+
+export const updateAllRequestBodySpec: Partial<RequestBodyObject> = {
+    content: {
+        'application/json': {
+            schema: getModelSchemaRef(<%= modelName %>, { partial: true }),
+        },
+    },
+};
+
+export const findByIdSpec: OperationObject  = {
+    responses: {
+        200: {
+            description: '<%= modelName %> model instance',
+            content: {
+                'application/json': {
+                    schema: getModelSchemaRef(<%= modelName %>, { includeRelations: true }),
+                },
+            },
+        }
+    }
+};
+
+export const updateByIdSpec: OperationObject = {
+    responses: {
+        204: {
+            description: '<%= modelName %> PATCH success',
+        }
+    }
+};
+
+export const updateByIdRequestBodySpec: Partial<RequestBodyObject> = {
+    content: {
+        'application/json': {
+            schema: getModelSchemaRef(<%= modelName %>, { partial: true }),
+        },
+    },
+};
+
+export const replaceByIdSpec: OperationObject = {
+    responses: {
+        204: {
+            description: '<%= modelName %> PUT success',
+        }
+    }
+};
+
+export const deleteByIdSpec: OperationObject = {
+    responses: {
+        204: {
+            description: '<%= modelName %> DELETE success',
+        }
+    }
+};
+

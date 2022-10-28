@@ -1,0 +1,114 @@
+import { Count, Filter, FilterExcludingWhere, repository, Where } from '@loopback/repository';
+import { param, requestBody } from '@loopback/rest';
+import { <%= modelName %> } from '../../models';
+import { <%= repositoryName %> } from '../../repositories';
+import { onitApi } from '<%= importPath %>/lib/decorators/rest';
+import { createSpec, createRequestBodySpec, countSpec, findSpec, updateAllSpec, 
+    updateAllRequestBodySpec, findByIdSpec, updateByIdSpec, updateByIdRequestBodySpec,
+    replaceByIdSpec, deleteByIdSpec
+} from './specs';
+
+export class <%= className %>Controller {
+    constructor(
+        @repository(<%= repositoryName %>) public <%= repositoryNameCamel %> : <%= repositoryName %>,
+    ) {}
+
+    @onitApi({
+        method: 'post',
+        path: '<%= httpPathName %>',
+        authenticate: true,
+        spec: createSpec
+    })
+    async create(
+        @requestBody(createRequestBodySpec) <%= modelVariableName %>: <% if (!idOmitted) { -%><%= modelName %><% } else { -%>Omit<<%= modelName %>, '<%= id %>'><% } -%>,
+    ): Promise<<%= modelName %>> {
+        return this.<%= repositoryNameCamel %>.create(<%= modelVariableName %>);
+    }
+
+    @onitApi({
+        method: 'get',
+        path: '<%= httpPathName %>/count',
+        authenticate: true,
+        spec: countSpec
+    })
+    async count(
+        @param.where(<%= modelName %>) where?: Where<<%= modelName %>>,
+    ): Promise<Count> {
+        return this.<%= repositoryNameCamel %>.count(where);
+    }
+
+    @onitApi({
+        method: 'get',
+        path: '<%= httpPathName %>',
+        authenticate: true,
+        spec: findSpec
+    })
+    async find(
+        @param.filter(<%= modelName %>) filter?: Filter<<%= modelName %>>,
+    ): Promise<<%= modelName %>[]> {
+        return this.<%= repositoryNameCamel %>.find(filter);
+    }
+
+    @onitApi({
+        method: 'patch',
+        path: '<%= httpPathName %>',
+        authenticate: true,
+        spec: updateAllSpec
+    })
+    async updateAll(
+        @requestBody(updateAllRequestBodySpec) <%= modelVariableName %>: <%= modelName %>,
+        @param.where(<%= modelName %>) where?: Where<<%= modelName %>>,
+    ): Promise<Count> {
+        return this.<%= repositoryNameCamel %>.updateAll(<%= modelVariableName %>, where);
+    }
+
+    @onitApi({
+        method: 'get',
+        path: '<%= httpPathName %>/{id}',
+        authenticate: true,
+        spec: findByIdSpec
+    })
+    async findById(
+        @param.path.<%= idType %>('id') id: <%= idType %>,
+        @param.filter(<%= modelName %>, {exclude: 'where'}) filter?: FilterExcludingWhere<<%= modelName %>>
+    ): Promise<<%= modelName %>> {
+        return this.<%= repositoryNameCamel %>.findById(id, filter);
+    }
+
+    @onitApi({
+        method: 'patch',
+        path: '<%= httpPathName %>/{id}',
+        authenticate: true,
+        spec: updateByIdSpec
+    })
+    async updateById(
+        @param.path.<%= idType %>('id') id: <%= idType %>,
+        @requestBody(updateByIdRequestBodySpec)
+        <%= modelVariableName %>: <%= modelName %>,
+    ): Promise<void> {
+        await this.<%= repositoryNameCamel %>.updateById(id, <%= modelVariableName %>);
+    }
+
+    @onitApi({
+        method: 'put',
+        path: '<%= httpPathName %>/{id}',
+        authenticate: true,
+        spec: replaceByIdSpec
+    })
+    async replaceById(
+        @param.path.<%= idType %>('id') id: <%= idType %>,
+        @requestBody() <%= modelVariableName %>: <%= modelName %>,
+    ): Promise<void> {
+        await this.<%= repositoryNameCamel %>.replaceById(id, <%= modelVariableName %>);
+    }
+
+    @onitApi({
+        method: 'del',
+        path: '<%= httpPathName %>/{id}',
+        authenticate: true,
+        spec: deleteByIdSpec
+    })
+    async deleteById(@param.path.<%= idType %>('id') id: <%= idType %>): Promise<void> {
+        await this.<%= repositoryNameCamel %>.deleteById(id);
+    }
+}

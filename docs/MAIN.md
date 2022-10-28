@@ -1,44 +1,45 @@
 # Onit-cli
 Onit dev CLI utility
 
-## Installazione
+## Install
 
-### Da repository git
- - Clona questo repository
- - npm install && npm link
+### From git repository
+You can install onit-cli directly from git. Open a terminal session and type:
 
-### Da npm
 ```
-npm install -g @mitech/onit-cli
+> git clone https://github.com/mitechsrl/onit-cli.git
+> cd onit-cli
+> npm install
+> npm link
 ```
 
-## Comandi 
+To update it, simply pull the changes from this repo.
 
-- [onit serve](ONIT-SERVE.md) utility serve di sviluppo
-- [onit doc](ONIT-DOC.md) uility estrazione/generazione documentazione
-- [onit build](ONIT-BUILD.md) utility build progetto
-- [onit test](ONIT-TEST.md) utility testing progetto
-- [onit labels](ONIT-LABELS.md) utility gestione lebels
+### from npm
+All onit-cli releases are also puched on npm.com.
+Open a terminal session and type:
 
+```
+> npm install -g @mitech/onit-cli
+```
 
-## Files di configurazione locali/globali
+## Commands 
+Here's the list of main commands. For further docs, see the command-specific page.
 
-I comandi **serve**, **test** e **build** necessitano di files di configurazione(vedi rispettive sezioni per info).
+- [onit serve](ONIT-SERVE.md), development serve command
+- [onit doc](ONIT-DOC.md), documentation generation utility
+- [onit build](ONIT-BUILD.md), app build utility
+- [onit test](ONIT-TEST.md), automated test utility
+- [onit labels](ONIT-LABELS.md), labels management utility
+- [onit create](ONIT-CREATE.md), artifact creation utilities
 
-I files di configurazione possono esssere locali/globali:
+## onit.config.js file
+Commands **serve**, **test** and **build** requires a configuration file.
 
-- globali: file nominato **onit.config.[js,json]**, contenente configurazioni statiche e/o globali per la funzione richiesta, indipendenti dal sistema, il quale è previsto possa essere posto **in staging git**
+The tool search in the working directory the **onit.config.js** or **onit.config.json** files.
 
-- locali: file nominato **onit.config.local.[js,json]**, contenente configurazioni specifiche del sistema corrente, come puntamenti a files esterni al progetto oppure configurazioni locali configurate dallo sviluppatore. Tale file **non è previsto venga messo in staging git**. Usa questo file per aggiungere comandi custom o dipendenti dalla struttura fs locale.
+You can also create the files **onit.config.local.js** or **onit.config.local.json** which are intended to include sensitive data (or user ds-dependend data) which **should not be pushed on git repository**.
 
-  Il sistema legge automaticamente il file **.local** ed esegue un merge della sua configurazione con quella del file **non .local**.
+The tool will automatically merge the content of the local and non-local file when needed.
 
-
-## Windows powershell
-
-Note per windows powershell:
-
-** Esecuzione cmdlet per default**
-
-Lanciando il comando **onit**, powershell esegue per default il comando **onit.cmd** anzichè **onit.ps1** dipendentemente dalla variabile di ambiente di windows **PATHEXT**.
-Verificare in quella variabile se la dicitura **.ps1** è presente. Deve essere specificata in ordine **prima** di **.cmd**.
+For more info, [see here a complete example of config file](./ONIT-CONFIG-EXAMPLE-FILE.md)

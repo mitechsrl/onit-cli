@@ -23,12 +23,24 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
 
-const logger = require('../../lib/logger');
+const RelationGenerator = require('@loopback/cli/generators/relation/index');
+const { CustomRelationGenerator } = require('./_lib/CustomRelationGenerator');
 
-module.exports.info = 'Project related init utilities';
+module.exports.info = 'Create a relation';
 module.exports.help = [
+    'Interctive relation creation tool. This tool must be run into a onit-based app directory'
 ];
 
 module.exports.cmd = async function (basepath, params) {
-    logger.log('Nothing to do here. Add -h for help');
+    const generator = new CustomRelationGenerator();
+
+    // NOTE: the orignal class methods were run with yeoman.
+    // Yeoman runs sequentially the class mehods. Imitating it with this code.
+    for (const method of Object.getOwnPropertyNames(RelationGenerator.prototype)) {
+        // NOTE1: skipping checkLoopBackProject to avoid dependency checks. We just need to create the model file
+        // NOTE2: skipping methods starting with _. Those are private.
+        if (['constructor', 'checkLoopBackProject'].includes(method) || method.startsWith('_')) continue;
+
+        await generator[method]();
+    }
 };

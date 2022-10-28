@@ -1,8 +1,8 @@
-## Onit doc
+# Onit doc
 
 Onit documentation generator tool
 
-### Config file
+## Config file
 
 Il comando **onit doc** richiede la definizione del file **onitdocumentation.config.js**, il quale presenta una struttura come definita:
 
@@ -13,7 +13,7 @@ module.export = {
 }
 ```
 
-##### ignore
+#### ignore
 Array di stringhe, descrive, utilizzando il formato [gitignore](https://git-scm.com/docs/gitignore), la lista dei files/directory da non scansionare per la ricerca di documentazione.
 
 E' vivamente consigliato l'inserimento dei seguenti valori di default: 
@@ -29,7 +29,7 @@ E' vivamente consigliato l'inserimento dei seguenti valori di default:
     ]
 ```
 
-##### chapters
+#### chapters
 Chapters identifica la lista di capitoli e le loro proprietà. *chapter* è un oggetto contenente le seguenti proprietà:
 
 ```js
@@ -42,7 +42,7 @@ chapter = {
 }
 ```
 
-### Custom tags
+## Custom tags
 
 Oltre ai tag di [JsDoc](https://jsdoc.app/), sono disponibili alcuni tag aggiuntivi per la definizione della struttura di documentazione proprietaria di Onit.
 
@@ -109,7 +109,7 @@ Definisce l'inizio del blocco di testo contente la documentazione da estrapolare
     */
     ```
 
-##### Immagini
+#### Immagini
 Utiluzzare il classito tag markdown per la gestione delle immagini:
 
 ```
@@ -133,7 +133,7 @@ Viene risolto con un link verso il capitolo *n1.n2.n3*, con anchor *#Info*. Il t
 **[@onitChapter n1.n2.n3]**
 Viene risolto con un link verso il capitolo *n1.n2.n3*. Il testo visualizzato è l'url web del capitolo selezionato.
 
-##### Include di codice sorgente
+#### Include di codice sorgente
 Utilizzare il tag 
 ```
 [@onitSrc path transformFunction]
@@ -152,12 +152,12 @@ Esempi di **transformFunction** disponibili:
 
 NOTA: la risoluzione delle inclusioni è ricorsiva, pertanto soggetta a dipendenza ciclica.
   
-##### Files processati
+#### Files processati
 
 *.js, *.md, *.jsx *.ts
 
 NOTA: Il supporto ai tag @onit è limitato nei files markdown. Utilizzare un unico @onitChapter per file markdown.
-##### Esempio 
+#### Esempio 
 
 **Codice commento**
 ```

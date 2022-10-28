@@ -32,62 +32,87 @@ const { replaceValues } = require('./_lib/replaceValues');
 const { fixPackageJson } = require('./_lib/fixPackageJson');
 const { removeUnwantedFiles } = require('./_lib/removeUnwantedFiles');
 const { relpaceInFile } = require('./_lib/replaceInFile');
-const { capitalize, camelCase } = require('lodash');
+const { camelCase, snakeCase, upperFirst } = require('lodash');
 const { fixOnitConfig } = require('./_lib/fixOnitConfig');
 const { unlinkGitRepo, commitRepo } = require('./_lib/git');
 
-module.exports.info = 'Project related init utilities';
+module.exports.info = 'Create a new empty onit-based app';
 module.exports.help = [
-    `Create an new empty onit component by cloning the @mitech/onit-next-example-webcomponent repository.
-    NOTE: this command requires read permissions on such repository`
+    'Create a new empty onit-based app by cloning the @mitech/onit-next-example-webcomponent repository.',
+    'NOTE: this command requires read permissions on such repository'
 ];
 
 module.exports.cmd = async function (basepath, params) {
     // await spawn('git', ['clone', 'https://github.com/mitechsrl/onit-next-example-webcomponent.git','ciaooo']);
-
+    const nameMatch = /^(@[a-zA-Z0-9-_]+\/){0,1}([a-zA-Z0-9-_]+)$/g;
     const answers = await inquirer.prompt([
         {
             type: 'input',
             name: 'appName',
             message: 'App name (package.json name)',
             validate: (v) => {
-                if (!v.match(/^(@[a-zA-Z0-9-_]+\/){0,1}[a-zA-Z0-9-_]+$/g)) {
-                    return Promise.reject(new Error('Invalid name. Please change it and continue.'));
+                if (!v.match(nameMatch)) {
+                    return Promise.reject(new Error('Invalid format. Avoid spaces and special chars. Package scope is allowed. Please change it and continue.'));
                 }
                 return true;
             }
         },
-        { type: 'input', name: 'appExtendedName', message: 'App extended name' },
-        { type: 'input', name: 'appDescription', message: 'App description' },
+        { type: 'input', name: 'appExtendedName', message: 'App short description' },
         {
             type: 'input',
             name: 'componentClassName',
             message: 'Component class name',
+            default: (answers) => {
+                return 'Onit' + upperFirst(camelCase(answers.appName.replace(nameMatch, '$2'))) + 'Component';
+            },
             validate: (v) => {
                 if (!v.match(/^[a-zA-Z0-9-_]+$/g)) {
-                    return Promise.reject(new Error('Invalid name. Please change it and continue.'));
+                    return Promise.reject(new Error('Invalid format. Avoid spaces and special chars. Please change it and continue.'));
                 }
                 return true;
             }
         },
-        { type: 'input', name: 'databaseName', message: 'Database name' }
+        {
+            type: 'input',
+            name: 'databaseName',
+            message: 'Database name for local serve',
+            default: (answers) => {
+                return snakeCase(answers.appName.replace(nameMatch, '$2')).replace(/_/g, '-');
+            }
+        }
     ]);
 
-    // standardize class name
-    // - CamelCase
-    // - ends with "Component"
-    answers.componentClassName = capitalize(camelCase(answers.componentClassName));
+    answers.appDescription = answers.appExtendedName;
+
+    // Ensure some names starts with "Onit"
+    if (answers.componentClassName.toLowerCase().startsWith('onit')) {
+        answers.componentClassNameShortCamelCase = camelCase(answers.componentClassName.substring(4));
+        answers.componentClassName = upperFirst(camelCase(answers.componentClassName));
+    } else {
+        answers.componentClassNameShortCamelCase = camelCase(answers.componentClassName);
+        answers.componentClassName = 'Onit' + upperFirst(camelCase(answers.componentClassName));
+    }
+
+    // Ensure some names ends in "Component"
     if (answers.componentClassName.match(/^(.+)([Cc]omponent)$/gi)) {
         answers.componentClassName = answers.componentClassName.replace(/^(.+)([Cc]omponent)$/gi, '$1Component');
     } else {
         answers.componentClassName += 'Component';
     }
+    if (answers.componentClassNameShortCamelCase.match(/^(.+)([Cc]omponent)$/gi)) {
+        answers.componentClassNameShortCamelCase = answers.componentClassNameShortCamelCase.replace(/^(.+)([Cc]omponent)$/gi, '$1Component');
+    } else {
+        answers.componentClassNameShortCamelCase += 'Component';
+    }
+
+    answers.componentNameExport = snakeCase(answers.componentClassName).toUpperCase();
 
     console.warn('Component name: ' + answers.componentClassName);
 
     // check target directory
     answers.appNameWithoutScope = answers.appName.replace(/^@[^/]+\//, '');
     console.warn('Name without scope: ' + answers.appNameWithoutScope);
+
     const directory = path.join(process.cwd(), './' + answers.appNameWithoutScope);
     if (existsSync(directory)) {
         throw new Error(`Directory ${directory} already exists. Please select another name`);
@@ -120,6 +145,7 @@ module.exports.cmd = async function (basepath, params) {
 
     logger.info('Component setup complete!');
     logger.log('To launch the project, run');
+    logger.log(' > cd ' + answers.appNameWithoutScope);
     logger.log(' > npm install');
     logger.log(' > onit serve');
 };

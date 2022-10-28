@@ -1,15 +1,22 @@
 # Onit-cli
 Onit development CLI V3.0.0
 
-This package provide the **onit** command, a developer tool for onit-based projects.
+This package provide the **onit** cli command, a developer tool for onit-based projects.
 
-## Install
-```shell
-npm install -g @mitech/onit-cli@3.0.0
-```
+## Docs
+For install and commands documentation, [see main docs](./docs/MAIN.md)
 
-## Licenza
+## Getting started
+See [getting started documentation page](./docs/GETTING-STARTED.md) for more info
+
+## Changelog
+See [CHANGELOG.md](CHANGELOG.md) for more info
+
+## License
 [MIT](./LICENSE)
 
-## Documentazione
-[See docs for more info](./docs/MAIN.md)
+<br>
+<br>
+<br>
+[<img src="docs/mitech.png">](https://www.mitechsrl.it/) &nbsp; &nbsp;[<img src="docs/logo-onit.png">](https://www.mitechsrl.it/onit/)
+

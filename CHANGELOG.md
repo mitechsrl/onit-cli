@@ -1,6 +1,9 @@
+## 2.3.0
+- Added commands **onit create app**, **onit create service**, **onit create model**, **onit create relation**, **onit create repository**, **onit create service**    
+
 ## 2.2.0
 - Added command **onit test**
-- 
+
 ## 2.1.0
 - Added ModuleFederationPlugin to frontend webpack config
 

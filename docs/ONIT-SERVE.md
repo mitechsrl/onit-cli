@@ -1,8 +1,8 @@
-## Onit serve
+# Onit serve
 
 Permette il serve del progetto al path attuale.
 
-##### onit.config.[js|json]
+## onit.config.[js|json]
 
 Il file contiene una serie di istruzioni per il lancio del progetto in ambiente di sviluppo.
 
@@ -19,13 +19,13 @@ Il file contiene una serie di istruzioni per il lancio del progetto in ambiente 
 }
 ```
 
-##### Component
+### Component
 
 Con questa modalità, la directory corrente rappresenta un componente aggiuntivo di mitown.
 In caso component sia settato a true, il serve avvia onit direttamente dalle dipendenze in node_modules.
 Nel caso sia settato a false, si assume che la cartella corrente contenga onit, pertanto il sistema lancia direttamente il file js iniziale di onit.
 
-##### link
+### link
 
 ```
 [
@@ -40,7 +40,8 @@ Questo array di oggetti viene utilizzato per verificare la presenza dei moduli c
 
 Se **target** è specificato, viene creato un symlink alla directory specificata. Se il target specificato è un path relativo, esso deve essere relativo al file *.onit.js in cui è definito. é possibile utilizzare path assoluti. 
 Questo permette di avere diverse versioni in uso dello stesso pacchetto in diversi progetti (occorre clonare piu volte lo stesso progetto in path diversi e gestire da se le versioni)
-##### Environment
+
+### Environment
 
 Oggetto strutturato come 
 ```
@@ -54,7 +55,7 @@ Oggetto strutturato come
 Questo oggetto viene iniettato automaticamente nel **process.env** dell'istanza di onit lanciata.
 **someValue** può essere di qualsiasi tipo, gli ogetti nel caso vengono stringificati prima di essere passati nel process.env (Process.env suporta dolo stringhe) 
 
-##### Parametri
+### Parametri
 
 **-w** Lancia solo il serve di webpack
 
@@ -66,7 +67,7 @@ Questo oggetto viene iniettato automaticamente nel **process.env** dell'istanza 
 
 **-dangerouslyenablesmtpserver** Abilita la variabile di ambiente SMTP_SERVER, in caso contrario non viene inserita nell'environment. Questo è un flag per assicurarsi che nessuna mail venga mai inviata in sviluppo.
 
-##### Debug
+### Debug
 
 Per avviare **il solo processo node backend** in debug, aggiungere il flag **-debug** al comando **onit serve**.
 Questo causerà l'aggiunta del flag node **--inspect** al processo lanciato da nodemon.

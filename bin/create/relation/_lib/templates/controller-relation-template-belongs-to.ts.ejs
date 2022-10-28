@@ -1,0 +1,34 @@
+import { repository } from '@loopback/repository';
+import { param, getModelSchemaRef } from '@loopback/rest';
+import { <%= sourceModelClassName %>, <%= targetModelClassName %> } from '../models';
+import { <%= sourceRepositoryClassName %> } from '../repositories';
+import { onitApi } from '@mitech/onit-next/dist/lib/decorators/rest';
+
+export class <%= controllerClassName %> {
+    constructor(
+        @repository(<%= sourceRepositoryClassName %>) public <%= paramSourceRepository %>: <%= sourceRepositoryClassName %>,
+    ) { }
+
+    @onitApi({
+        method: 'get',
+        path: '/<%= sourceModelPath %>/{id}/<%= targetModelName %>',
+        authenticate: true,
+        spec: {
+            responses: {
+                '200': {
+                    description: '<%= targetModelClassName %> belonging to <%= sourceModelClassName %>',
+                    content: {
+                        'application/json': {
+                            schema: { type: 'array', items: getModelSchemaRef(<%= targetModelClassName %>)},
+                        },
+                    },
+                }
+            }
+        }
+    })
+    async get<%= targetModelClassName %>(
+        @param.path.<%= sourceModelPrimaryKeyType %>('id') id: typeof <%= sourceModelClassName %>.prototype.<%= sourceModelPrimaryKey %>,
+    ): Promise<<%= targetModelClassName %>> {
+        return this.<%= paramSourceRepository %>.<%= relationPropertyName %>(id);
+    }
+}

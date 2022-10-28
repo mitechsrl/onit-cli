@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /*
 Copyright (c) 2021 Mitech S.R.L.
 
@@ -25,39 +23,26 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
 
-const logger = require('../lib/logger');
-const command = require('../lib/command');
-const header = require('../lib/header');
-const npmVersionCheck = require('../lib/npmVersionCheck');
-const { printError } = require('../lib/printError');
-const { setupOutputRedirecion, closeOutputRedirction } = require('../lib/outputRedirection');
+const ControllerGenerator = require('@loopback/cli/generators/controller/index');
+const { CustomControllerGenerator } = require('./_lib/CustomControllerGenerator');
 
-// show CLI version
-if (process.argv.length === 3 && process.argv[2] === '-v') {
-    header();
+module.exports.info = 'Create a service';
+module.exports.help = [
+    'Interctive service creation tool. This tool must be run into a onit-based app directory'
+];
 
-    // eslint-disable-next-line no-process-exit
-    process.exit(0);
-}
+module.exports.cmd = async function (basepath, params) {
+    const generator = new CustomControllerGenerator();
 
-// launch the npm version check. This will trigger after 3 minutes on uptime
-npmVersionCheck();
+    // NOTE: the orignal class methods were run with yeoman.
+    // Yeoman runs sequentially the class mehods. Imitating it with this code.
+    for (const method of Object.getOwnPropertyNames(ControllerGenerator.prototype)) {
+        // NOTE1: skipping checkLoopBackProject to avoid dependency checks. We just need to create the model file
+        // NOTE2: skipping methods starting with _. Those are private.
+        if (['constructor', 'checkLoopBackProject'].includes(method) || method.startsWith('_')) continue;
 
-// handler for any other command
-(async () => {
-    const redirectOutput = process.argv.find(p => p === '--log-to-file');
-    if (redirectOutput) {
-        await setupOutputRedirecion();
-    }
-    try {
-        await command.command(__dirname, process.argv.slice(2));
-    } catch (e) {
-        printError(e);
+        await generator[method]();
     }
 
-    if (redirectOutput) {
-        closeOutputRedirction();
-    }
-    // eslint-disable-next-line no-process-exit
-    process.exit();
-})();
+    await new Promise(resolve => setTimeout(resolve, 1000));
+};
