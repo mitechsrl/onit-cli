@@ -80,7 +80,7 @@ const resolveSourceIncludes = (block, str) => {
  * @param {*} label
  * @returns
  */
-function getChapterBranchByLabel(config, label) {
+function getChapterBranchByLabel (config, label) {
     const _recurse = (n, branch) => {
         let _branch = null;
         n.some((chapter) => {
@@ -168,12 +168,11 @@ const generateBlock = (block, configFile, defaultTitle) => {
 
     block.doc = block.doc.trim();
 
-
     if (!block.doc.startsWith('#')) {
         switch (block.titleFormat) {
-            case 'h2': str += '#'; break;
-            case 'h3': str += '##'; break;
-            case 'h4': str += '###'; break;
+        case 'h2': str += '#'; break;
+        case 'h3': str += '##'; break;
+        case 'h4': str += '###'; break;
         }
         str += '# ' + (block.title || defaultTitle) + '\n\n';
     }
@@ -202,6 +201,12 @@ const generateBlock = (block, configFile, defaultTitle) => {
         str += '\n\n';
     });
 
+    if (block.returns && block.returns.name) {
+        str += '#### Returns\n';
+        str += block.returns.name + ' ' + block.returns.description;
+        str += '\n\n';
+    }
+
     // resolve the internal links for better navigation
     str = resolveInternalReferences(str, configFile);
 
@@ -211,13 +216,13 @@ const generateBlock = (block, configFile, defaultTitle) => {
     return str;
 };
 
-function reduceJekillHeader(acc, e) {
+function reduceJekillHeader (acc, e) {
     if (typeof e === 'string') acc = acc + '\n' + e;
     if (Array.isArray(e)) acc = acc + '\n' + e[0] + ': ' + e[1];
     return acc.trim();
 };
 
-function createFile(filename, header, content = '') {
+function createFile (filename, header, content = '') {
     const jekillHeader = [
         '---',
         ['layout', 'page'],
@@ -234,7 +239,7 @@ function createFile(filename, header, content = '') {
  * @param {*} chapterKey
  * @returns
  */
-function buildContent(blocks, chapterConfig, configFile) {
+function buildContent (blocks, chapterConfig, configFile) {
     // add extracted blocks markdown
     if (blocks.chapters[chapterConfig.label]) {
         const defaultTitle = chapterConfig.title;

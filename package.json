@@ -25,6 +25,8 @@
         "@babel/preset-env": "^7.16.11",
         "@babel/preset-react": "^7.16.7",
         "@loopback/cli": "^3.2.0",
+        "@microsoft/tsdoc": "^0.14.2",
+        "@phenomnomnominal/tsquery": "^4.2.0",
         "@soda/friendly-errors-webpack-plugin": "^1.8.1",
         "babel-loader": "^8.2.3",
         "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
@@ -38,12 +40,13 @@
         "ejs": "^3.1.8",
         "file-loader": "^6.2.0",
         "find": "^0.3.0",
-        "fs-extra": "^9.1.0",
+        "fs-extra": "^10.1.0",
         "glob-all": "^3.2.1",
         "html-webpack-plugin": "^5.5.0",
         "ignore": "^5.2.0",
         "inquirer": "^7.3.3",
         "lodash": "^4.17.21",
+        "tsutils": "^3.21.0",
         "mini-css-extract-plugin": "^1.6.2",
         "ncp": "^2.0.0",
         "node-emoji": "^1.11.0",
@@ -64,8 +67,7 @@
         "uuid": "^8.3.2",
         "webpack": "^5.67.0",
         "webpack-merge": "^5.8.0",
-        "webpack-subresource-integrity": "^5.1.0",
-        "@phenomnomnominal/tsquery": "^4.2.0"
+        "webpack-subresource-integrity": "^5.1.0"
     },
     "devDependencies": {
         "@babel/eslint-parser": "^7.16.5",

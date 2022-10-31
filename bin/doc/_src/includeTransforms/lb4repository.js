@@ -1,27 +1,90 @@
 const ts = require('typescript');
-const stripComments = require('strip-comments');
-
-const NEWLINE = '\n';
 
 /**
- * Parse modifiers string to enhance some of its components.
- * @param {*} str
+ * Convert a property object to markdown
+ *
+ * @param {*} property
  * @returns
  */
-function modifiersParser (str) {
-    if (!str) return '';
-    const components = stripComments(str).split(' ').map(c => c.trim()).filter(c => !!c).map(c => {
-        switch (c.toLowerCase()) {
-            case 'private': return '<span class=\'badge badge-red\'><b>Private</b></span>';
-            case 'public': return '<span class=\'badge badge-green\'><b>Public</b></span>';
-            case 'protected': return '<span class=\'badge badge-yellow\'><b>Protected</b></span>';
-        }
-        return '<span class=\'badge badge-gray\'><b>' + c + '</b></span>';
-    });
-    return {
-        str: components.join(' '),
-        isPrivate: !!str.match(/.*private.*/gis)
-    };
+function renderPropertyMarkdown (property) {
+    // do not output private methods
+    if (property.private) return '';
+
+    // Create the output
+    const content = [];
+    const titleBadges = [];
+    if (property.private) titleBadges.push("<span class='badge badge-red'><b>Private</b></span>");
+    if (property.public) titleBadges.push("<span class='badge badge-green'><b>Public</b></span>");
+    if (property.protected) titleBadges.push("<span class='badge badge-yellow'><b>Protected</b></span>");
+    if (property.static) titleBadges.push("<span class='badge badge-gray'><b>Static</b></span>");
+    if (property.async) titleBadges.push("<span class='badge badge-gray'><b>Async</b></span>");
+
+    content.push(`#### ${property.name} <span class='member-type'>${property.type}</span> ${titleBadges.join(' ')}`);
+    content.push(property.comment.join('\n'));
+
+    return content.join('\n');
+}
+
+/**
+ * Convert a method object to markdown
+ * @param {*} method
+ * @returns
+ */
+function renderMethodMarkdown (method) {
+    // do not output private methods
+    if (method.private) return '';
+
+    // Create the output
+    const content = [];
+
+    const titleBadges = [];
+    if (method.private) titleBadges.push("<span class='badge badge-red'><b>Private</b></span>");
+    if (method.public) titleBadges.push("<span class='badge badge-green'><b>Public</b></span>");
+    if (method.protected) titleBadges.push("<span class='badge badge-yellow'><b>Protected</b></span>");
+    if (method.static) titleBadges.push("<span class='badge badge-gray'><b>Static</b></span>");
+    if (method.async) titleBadges.push("<span class='badge badge-gray'><b>Async</b></span>");
+
+    content.push(`### ${method.name} ${titleBadges.join(' ')}`);
+    if (method.comment.length) {
+        content.push(method.comment.join('\n'));
+    }
+    if (method.params.length > 0) {
+        content.push('#### Params');
+
+        method.params.forEach(param => {
+            content.push(`**${param.name}** _${param.type}_\n{: .mb-0 }`);
+            if (param.comment) {
+                content.push(`${param.comment.trim()}\n{: .mx-3 .my-0 }`);
+            }
+        });
+    }
+
+    if (method.returns) {
+        content.push('#### Returns');
+        content.push(method.returns);
+    }
+
+    return content.join('\n');
+}
+
+/**
+ * Render repository markdown
+ *
+ * @param {*} properties
+ * @param {*} methods
+ * @returns
+ */
+function renderMarkdown (properties, methods) {
+    const _final = [];
+    if (properties.length) {
+        _final.push('## Properties');
+        properties.forEach(p => _final.push(renderPropertyMarkdown(p)));
+    }
+    if (methods.length) {
+        _final.push('## Methods');
+        methods.forEach(p => _final.push(renderMethodMarkdown(p)));
+    }
+    return _final.join('\n');
 }
 
 module.exports = (src, params) => {
@@ -29,96 +92,113 @@ module.exports = (src, params) => {
     const node = ts.createSourceFile(
         'repository.ts',
         src, // sourceText
-        ts.ScriptTarget.Latest
+        ts.ScriptTarget.ES2018
     );
 
     const properties = [];
     const methods = [];
 
     function processProperty (n) {
-        let str = '#### ' + n.name.escapedText + NEWLINE;
-        if (n.modifiers) {
-            const modifiers = modifiersParser(src.substring(n.modifiers.pos, n.modifiers.end));
-            if (!modifiers.isPrivate) {
-                if (modifiers.str) {
-                    str += modifiers.str + ' ';
-                }
-                str += n.type.typeName.escapedText + NEWLINE;
+        const property = {
+            name: n.name.escapedText,
+            type: src.substring(n.type.pos, n.type.end).trim().replace(/['"’\r\n]/g, '').replace(/ +/g, ' '),
+            comment: [],
+            public: false,
+            private: false,
+            protected: false,
+            static: false
+        };
 
-                (n.jsDoc || []).forEach(comment => {
-                    str = str + comment.comment + NEWLINE;
-                });
-                properties.push(str);
+        (n.modifiers || []).forEach(modifier => {
+            switch (modifier.kind) {
+            case ts.SyntaxKind.PublicKeyword: property.public = true; break;
+            case ts.SyntaxKind.PrivateKeyword: property.private = true; break;
+            case ts.SyntaxKind.ProtectedKeyword: property.protected = true; break;
+            case ts.SyntaxKind.StaticKeyword: property.static = true; break;
             }
-        }
+        });
+
+        (n.jsDoc || []).forEach(comment => {
+            property.comment.push(comment.comment.escapedText);
+        });
+
+        return property;
     }
 
     function processMethodDeclaration (n) {
-        if (n.modifiers) {
-            const modifiers = modifiersParser(src.substring(n.modifiers.pos, n.modifiers.end));
-            if (!modifiers.isPrivate) {
-                const str = '#### ' + n.name.escapedText + NEWLINE;
-                const params = [];
-                (n.parameters || []).forEach(param => {
-                    const p = src.substring(param.pos, param.end);
-                    params.push(p.trim());
-                });
-                let type = '';
-                if (n.type) {
-                    type = ': ' + src.substring(n.type.pos, n.type.end);
-                }
-                const head = n.name.escapedText + '(' + params.join(', ') + ')' + type;
-                let jsDoc = '';
+        const method = {
+            public: false,
+            private: false,
+            protected: false,
+            static: false,
+            async: false,
+            name: n.name.escapedText,
+            params: [],
+            comment: [],
+            return: ''
+        };
 
-                // process the method jsdoc tag
-                (n.jsDoc || []).forEach(comment => {
-                    jsDoc = jsDoc + (comment.comment || '') + NEWLINE;
-                    const params = [];
-                    let returnValue = '';
-                    (comment.tags || []).forEach(t => {
-                        if (t.tagName.escapedText === 'param') {
-                            params.push('*' + t.name.escapedText + '*: ' + (t.comment ? t.comment : 'TODO'));
-                        }
-                        if (t.tagName.escapedText === 'return' && t.comment) {
-                            returnValue = t.comment;
-                        }
-                    });
-                    if (params.length > 0) {
-                        jsDoc += NEWLINE + '##### Parameters' + NEWLINE + NEWLINE + params.join(NEWLINE + NEWLINE) + NEWLINE + NEWLINE;
-                    }
-                    if (returnValue) {
-                        jsDoc += '##### Return value' + NEWLINE + returnValue;
-                    }
-                });
-                methods.push(str + NEWLINE + modifiers.str + NEWLINE + '```ts' + NEWLINE + head + NEWLINE + '```' + NEWLINE + NEWLINE + jsDoc + NEWLINE);
+        (n.modifiers || []).forEach(modifier => {
+            switch (modifier.kind) {
+            case ts.SyntaxKind.AsyncKeyword: method.async = true; break;
+            case ts.SyntaxKind.PublicKeyword: method.public = true; break;
+            case ts.SyntaxKind.PrivateKeyword: method.private = true; break;
+            case ts.SyntaxKind.ProtectedKeyword: method.protected = true; break;
+            case ts.SyntaxKind.StaticKeyword: method.static = true; break;
             }
-        }
+        });
+
+        (n.parameters || []).forEach(p => {
+            const params = {
+                name: src.substring(p.name.pos, p.name.end).trim(),
+                type: src.substring(p.type.pos, p.type.end).trim().replace(/['"’\r\n]/g, '').replace(/ +/g, ' '),
+                comment: ''
+            };
+
+            method.params.push(params);
+        });
+
+        (n.jsDoc || []).forEach(comment => {
+            method.comment.push(comment.escapedText);
+
+            (comment.tags || []).forEach(t => {
+                const tagName = src.substring(t.tagName.pos, t.tagName.end).trim();
+                switch (tagName) {
+                case 'param': {
+                    const paramName = src.substring(t.name.pos, t.name.end).trim();
+                    const comment = t.comment;
+                    if (comment) {
+                        const _p = method.params.find(p => p.name === paramName);
+                        if (_p) {
+                            _p.comment = comment;
+                        }
+                    }
+                    break;
+                }
+                case 'returns': method.return = t.comment;
+                    break;
+                }
+            });
+        });
+        return method;
     }
 
     // process class declarations
     node.forEachChild(child => {
-        if (ts.SyntaxKind[child.kind] === 'ClassDeclaration') {
+        if (child.kind === ts.SyntaxKind.ClassDeclaration) {
             child.members.forEach(n => {
                 if (n.name) {
-                    if (ts.SyntaxKind[n.kind] === 'PropertyDeclaration') {
-                        processProperty(n);
+                    if (n.kind === ts.SyntaxKind.PropertyDeclaration) {
+                        properties.push(processProperty(n));
                     }
-                    if (ts.SyntaxKind[n.kind] === 'MethodDeclaration') {
-                        processMethodDeclaration(n);
+                    if (n.kind === ts.SyntaxKind.MethodDeclaration) {
+                        methods.push(processMethodDeclaration(n));
                     }
                 }
             });
         }
     });
 
-    const _final = [];
-    if (properties.length) {
-        _final.push('## Properties', ...properties);
-    }
-
-    if (methods.length) {
-        _final.push('## Methods ', ...methods);
-    }
-
-    return _final.join(NEWLINE);
+    // render the final repo markdown
+    return renderMarkdown(properties, methods);
 };

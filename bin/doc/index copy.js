@@ -25,9 +25,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 const logger = require('../../lib/logger');
 const onitFileLoader = require('../../lib/onitFileLoader');
-const { generateDoc } = require('./_src/generateDoc');
-const path = require('path');
-
+const { generate } = require('./_src/generate');
 
 module.exports.info = 'Utility generazione documentazione. WARNING: questa funzionalità è sperimentale';
 module.exports.help = [
@@ -38,18 +36,14 @@ module.exports.help = [
 module.exports.cmd = async function (basepath, params) {
     try {
         // check for manual serve file specifed
-        let outputPath = params.get('-o');
-        if (outputPath.found) {
-            outputPath = path.resolve(process.cwd, outputPath);
-        } else {
-            outputPath = path.resolve(process.cwd(), './onit-doc/');
-        }
+        const outputPath = params.get('-o');
+
         // load the buildFile
         const config = await onitFileLoader.load(process.cwd(), 'onitdocumentation.config');
         if (!config) throw new Error('File onitdocumentation.config.[js|json] non trovato');
         logger.warn('Uso file configurazione ' + config.sources.join(', '));
 
-        await generateDoc(config.json, outputPath);
+        await generate(config.json, outputPath);
     } catch (e) {
         logger.error(e);
         // eslint-disable-next-line no-process-exit

@@ -32,7 +32,8 @@ module.exports.parse = (fileContent, filePath, blocks) => {
         params: [],
         title: '',
         doc: '',
-        chapter: ''
+        chapter: '',
+        returns: null
     };
 
     const onitDocLength = '@onitDoc'.length;

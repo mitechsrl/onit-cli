@@ -87,6 +87,9 @@ module.exports.parse = (fileContent, filePath, blocks) => {
         onitBlock.params = onitBlock.params || [];
         onitBlock.params.push(...params);
 
+        const returns = block.tags.find(b => b.tag === 'returns');
+        onitBlock.returns = returns;
+
         blocks.chapters[onitBlock.chapter] = blocks.chapters[onitBlock.chapter] || [];
         blocks.chapters[onitBlock.chapter].push(onitBlock);
     });
