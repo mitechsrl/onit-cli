@@ -3,7 +3,7 @@
  * This processor just use the generic class one
  */
 
-const { GenericClassFileParser } = require('./genericClass');
+const { GenericClassFileParser } = require('./tsClass');
 
 // This file MUST export ProcessorClass since it is managed automatically by other scripts
 module.exports.ProcessorClass = GenericClassFileParser;

@@ -3,7 +3,7 @@
  * This processor just use the generic class one
  */
 
-const { GenericClassFileParser } = require('./genericClass');
+const { GenericClassFileParser } = require('./tsClass');
 
 class LB4ControllerParser extends GenericClassFileParser {
     /**

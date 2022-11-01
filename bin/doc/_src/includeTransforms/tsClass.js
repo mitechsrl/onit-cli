@@ -4,7 +4,9 @@
 const ts = require('typescript');
 const { escapeMarkdownChars } = require('../lib/escapeMarkdownChars');
 
-
+/**
+ * Parse a generic typescript class
+ */
 class GenericClassFileParser {
 
     // internal cache
@@ -145,13 +147,55 @@ class GenericClassFileParser {
     }
 
     /**
+     * Process the current AST node and extract modifiers
+     * @param {*} obj descriptor object
+     * @param {*} n current AST node 
+     * @return the populated descripor object
+     */
+    processModifiers(obj, n){
+        (n.modifiers || []).forEach(modifier => {
+            switch (modifier.kind) {
+            case ts.SyntaxKind.AsyncKeyword: obj.async = true; break;
+            case ts.SyntaxKind.PublicKeyword: obj.public = true; break;
+            case ts.SyntaxKind.PrivateKeyword: obj.private = true; break;
+            case ts.SyntaxKind.ProtectedKeyword: obj.protected = true; break;
+            case ts.SyntaxKind.StaticKeyword: obj.static = true; break;
+            }
+        });
+
+        return obj;
+    }
+
+    /**
+     * Process the current AST node and extract decorators
+     * @param {*} obj  descriptor object
+     * @param {*} n  current AST node 
+     * @return the populated descripor object
+     */
+    processDecorators(obj, src, n){
+        (n.decorators || []).forEach(decorator => {
+            const expression = decorator.expression.expression;
+            const name = expression.escapedText || src.substring(expression.pos, expression.end);
+            const params = decorator.expression.arguments.map(arg => {
+                return src.substring(arg.pos,arg.end)
+            })
+            obj.decorators.push({
+                name: name,
+                params: params,
+            })
+        });
+
+        return obj;
+    }
+    /**
      * Process a method declaration node
+     * 
      * @param {*} src the source file content
      * @param {*} n Current ast node
      * @returns A object describing this property
      */
     processMethodDeclaration (src, n) {
-        const method = {
+        let method = {
             public: false,
             private: false,
             protected: false,
@@ -165,26 +209,8 @@ class GenericClassFileParser {
             decorators: []
         };
 
-        (n.decorators || []).forEach(decorator => {
-            const name = decorator.expression.expression.escapedText;
-            const params = decorator.expression.arguments.map(arg => {
-                return src.substring(arg.pos,arg.end)
-            })
-            method.decorators.push({
-                name: name,
-                params: params
-            })
-        });
-
-        (n.modifiers || []).forEach(modifier => {
-            switch (modifier.kind) {
-            case ts.SyntaxKind.AsyncKeyword: method.async = true; break;
-            case ts.SyntaxKind.PublicKeyword: method.public = true; break;
-            case ts.SyntaxKind.PrivateKeyword: method.private = true; break;
-            case ts.SyntaxKind.ProtectedKeyword: method.protected = true; break;
-            case ts.SyntaxKind.StaticKeyword: method.static = true; break;
-            }
-        });
+        method = this.processDecorators(method, src, n);
+        method = this.processModifiers(method, n);
 
         (n.parameters || []).forEach(p => {
             const params = {
@@ -199,7 +225,9 @@ class GenericClassFileParser {
             method.returnType = src.substring(n.type.pos, n.type.end).trim();
         }
 
-        
+        // call the basic jsdoc parser for generic info
+        method = this.processJSDoc(method, src, n);
+        // add custom parsing for method-specific data
         (n.jsDoc || []).forEach(comment => {
             method.comment.push(comment.comment);
 
@@ -226,41 +254,67 @@ class GenericClassFileParser {
 
 
     /**
+     * Process a property declaration node 
      * 
-     * @param {*} src 
-     * @param {*} n 
+     * @param {*} src the source file content
+     * @param {*} n Current property AST node
      * @returns 
      */
     processProperty (src, n) {
-        const property = {
+        let property = {
             name: n.name.escapedText,
             type: src.substring(n.type.pos, n.type.end).trim().replace(/['"’\r\n]/g, '').replace(/ +/g, ' '),
             comment: [],
             public: false,
             private: false,
             protected: false,
-            static: false
+            static: false,
+            decorators:[]
         };
 
-        (n.modifiers || []).forEach(modifier => {
-            switch (modifier.kind) {
-            case ts.SyntaxKind.PublicKeyword: property.public = true; break;
-            case ts.SyntaxKind.PrivateKeyword: property.private = true; break;
-            case ts.SyntaxKind.ProtectedKeyword: property.protected = true; break;
-            case ts.SyntaxKind.StaticKeyword: property.static = true; break;
-            }
-        });
-
-        (n.jsDoc || []).forEach(comment => {
-            property.comment.push((comment.comment || '').trim());
-        });
+        property = this.processDecorators(property, src, n);
+        property = this.processModifiers(property, n);
+        property = this.processJSDoc(property, src, n);
 
         return property;
     }
 
+    /**
+     * Process some basic jsdoc properties
+     * 
+     * @param {*} obj descriptor object
+     * @param {*} src the source file content
+     * @param {*} n Current property AST node
+     * @return the populated descripor object 
+     */
+    processJSDoc(obj, src, n){
 
+        (n.jsDoc || []).forEach(comment => {
+            if (comment.comment){
+                obj.comment.push(comment.comment);
+            }
+            (comment.tags || []).forEach(tag => {
+                if (tag.comment){
+                    switch(tag.tagName.escapedText){
+                        case 'summary': 
+                            obj.comment.push(tag.comment);
+                            break;
+                        case 'title': 
+                            obj.title = tag.comment;
+                            break;
+                        case 'chapter': 
+                            obj.chapter = tag.comment;
+                            break;
+                    }
+                }
+            })
+        });
+
+        return obj;
+    }
     /**
      * Parse the passed-in src to extract the file info
+     * 
      * @param {*} src 
      */
     extractInfo (src) {
@@ -274,25 +328,35 @@ class GenericClassFileParser {
         // process class declarations
         node.forEachChild(child => {
             if (child.kind === ts.SyntaxKind.ClassDeclaration) {
-                const classDefnition = {
+                let classDefinition = {
                     properties:[],
                     methods: [],
                     name: child.name.escapedText,
-                    
+                    decorators: [],
+                    comment: [],
+                    title:'',
+                    chapter: ''
                 }
 
+                // process decorators if any
+                classDefinition = this.processDecorators(classDefinition, src, child);
+
+                // process jsdoc
+                classDefinition = this.processJSDoc(classDefinition, src, child);
+
+                // process properties and method declarations
                 child.members.forEach(n => {
                     if (n.name) {
                         if (n.kind === ts.SyntaxKind.PropertyDeclaration) {
-                            classDefnition.properties.push(this.processProperty(src,n));
+                            classDefinition.properties.push(this.processProperty(src,n));
                         }
                         if (n.kind === ts.SyntaxKind.MethodDeclaration) {
-                            classDefnition.methods.push(this.processMethodDeclaration(src,n));
+                            classDefinition.methods.push(this.processMethodDeclaration(src,n));
                         }
                     }
                 });
 
-                this.classes.push(classDefnition);
+                this.classes.push(classDefinition);
             }
         });
     }
