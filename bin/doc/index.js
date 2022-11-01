@@ -45,7 +45,8 @@ module.exports.cmd = async function (basepath, params) {
             outputPath = path.resolve(process.cwd(), './onit-doc/');
         }
         // load the buildFile
-        const config = await onitFileLoader.load(process.cwd(), 'onitdocumentation.config');
+        // const config = await onitFileLoader.load(process.cwd(), 'onitdocumentation.config');
+        const config = await onitFileLoader.load('C:\\progetti\\onit-base-workspace\\onit-next', 'onitdocumentation.config');
         if (!config) throw new Error('File onitdocumentation.config.[js|json] non trovato');
         logger.warn('Uso file configurazione ' + config.sources.join(', '));
 

@@ -1,4 +1,5 @@
 const ts = require('typescript');
+const { escapeMarkdownChars } = require('../lib/escapeMarkdownChars');
 
 /**
  * Render model markdown
@@ -19,7 +20,7 @@ function renderModelMarkdown (classes) {
             const titleBadges = [];
 
             const type = memberProp('type');
-            if (type) titleBadges.push(`<span class='member-type'>${type.value.replace(/['"’]/g, '')}</span>`);
+            if (type) titleBadges.push(`<span class='member-type'>${escapeMarkdownChars(type.value.replace(/['"’]/g, ''))}</span>`);
 
             const id = memberProp('id');
             if (id && id.value.indexOf('true') >= 0) {
@@ -39,12 +40,12 @@ function renderModelMarkdown (classes) {
             content.push(`##### ${member.name} ${titleBadges.join(' ')}`);
 
             const description = memberProp('description');
-            if (description > 0) {
+            if (description) {
                 content.push(description.value + '\n');
             }
 
             member.modelProperty.forEach(p => {
-                content.push(`${p.name}: ${p.value}`);
+                content.push(`${escapeMarkdownChars(p.name)}: ${escapeMarkdownChars(p.value)}`);
             });
 
             if (member.modelPropertyRaw) {
@@ -81,6 +82,33 @@ module.exports = (src, params) => {
                         modelProperty: [],
                         modelPropertyRaw: ''
                     };
+                    // decorator processor. Appear that sometimes they are under decorators,sometimes under modifiers
+                    const processDecorator = (d) => {
+                        if (((d.expression || {}).arguments || [])[0]) {
+                            const argument = d.expression.arguments[0];
+                            // TODO: processare le singole voci
+                            (argument.properties || []).forEach(p => {
+                                // ultra-custom trim
+                                const name = src.substring(p.name.pos, p.name.end).trim()
+                                    .replace(/['"’‘]*$/g, '')
+                                    .replace(/^['"’‘]*/g, '');
+                                const value = src.substring(p.initializer.pos, p.initializer.end).trim()
+                                    .replace(/['"’‘]*$/g, '')
+                                    .replace(/^['"’‘]*/g, '');
+
+                                member.modelProperty.push({
+                                    name: name,
+                                    value: value
+                                });
+                            });
+                        } else {
+                            member.modelPropertyRaw = src.substring(d.pos, d.end).trim();
+                        }
+                    };
+
+                    (n.decorators || []).forEach(decorator => {
+                        processDecorator(decorator);
+                    });
 
                     (n.modifiers || []).forEach(modifier => {
                         switch (modifier.kind) {
@@ -97,18 +125,7 @@ module.exports = (src, params) => {
                             member.protected = true;
                             break;
                         case ts.SyntaxKind.Decorator:
-                            if (((modifier.expression || {}).arguments || [])[0]) {
-                                const argument = modifier.expression.arguments[0];
-                                // TODO: processare le singole voci
-                                (argument.properties || []).forEach(p => {
-                                    member.modelProperty.push({
-                                        name: src.substring(p.name.pos, p.name.end).trim().replace(/['"’]/g, ''),
-                                        value: src.substring(p.initializer.pos, p.initializer.end).trim()
-                                    });
-                                });
-                            } else {
-                                member.modelPropertyRaw = src.substring(modifier.pos, modifier.end).trim();
-                            }
+                            processDecorator(modifier);
                             break;
                         }
                     });

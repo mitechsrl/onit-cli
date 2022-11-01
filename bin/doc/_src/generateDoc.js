@@ -9,8 +9,8 @@ const { DocBuilder } = require('./DocBuilder');
  * @param {*} outDir
  */
 async function generateDoc (config, outDir) {
-    const scanTargetDir = process.cwd();
-    // const scanTargetDir ='C:\\progetti\\onit-base-workspace\\onit-next';
+    // const scanTargetDir = process.cwd();
+    const scanTargetDir = 'C:\\progetti\\onit-base-workspace\\onit-next';
 
     const parsers = {
         typescript: new TypescriptCommentParser(),

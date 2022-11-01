@@ -111,7 +111,13 @@ class DocBuilder {
             const transformFunctionPath = path.join(__dirname, './includeTransforms/', './' + transformFunction);
             try {
                 const fn = require(transformFunctionPath);
-                replace = fn(fileContent, params);
+                // this is needed to support class-style includeTransforms
+                if (typeof fn.ProcessorClass === 'function'){
+                    const processor = new fn.ProcessorClass();
+                    replace = processor.parse(fileContent, filename, params);
+                }else{
+                    replace = fn(fileContent, params);
+                }
             } catch (e) {
                 console.warn('Transform of ' + found + ' failed, error:' + e);
             }
