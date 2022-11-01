@@ -112,28 +112,32 @@ class GenericClassFileParser {
      * @returns Array of markdown lines
      */
     renderMarkdown () {
-        const _final = [];
+        const content = [];
         this.classes.forEach(classDefinition => {
-            _final.push('## '+classDefinition.name);
+            content.push('## '+classDefinition.name +' class');
             if (classDefinition.properties.length) {
-                _final.push('## Properties');
-                classDefinition.properties.forEach(p => _final.push(...this.renderPropertyMarkdown(p)));
+                content.push('## Properties');
+                classDefinition.properties.forEach(p => content.push(...this.renderPropertyMarkdown(p)));
             }
             if (classDefinition.methods.length) {
-                _final.push('## Methods');
-                classDefinition.methods.forEach(p => _final.push(...this.renderMethodMarkdown(p)));
+                content.push('## Methods');
+                classDefinition.methods.forEach(p => content.push(...this.renderMethodMarkdown(p)));
             }
         })
-        return _final;
+        return content;
     }
 
+ 
     /**
      * Process thepassed-in src file andproduces a markdown output
-     * @param {*} src 
-     * @returns 
+     *
+     * @param {*} src The source file content
+     * @param {*} filename The source filename
+     * @param {*} params 
+     * @returns the built markdown string
      */
-    parse(src ,  filename, params){
-        // extract file infoin internal cache
+    parse(src, filename, params){
+        // extract file info in internal cache
         this.extractInfo(src);
 
         // render the final repo markdown
@@ -141,9 +145,10 @@ class GenericClassFileParser {
     }
 
     /**
-     * 
-     * @param {*} n 
-     * @returns 
+     * Process a method declaration node
+     * @param {*} src the source file content
+     * @param {*} n Current ast node
+     * @returns A object describing this property
      */
     processMethodDeclaration (src, n) {
         const method = {
