@@ -114,7 +114,7 @@ class DocBuilder {
                 // this is needed to support class-style includeTransforms
                 if (typeof fn.ProcessorClass === 'function'){
                     const processor = new fn.ProcessorClass();
-                    replace = processor.parse(fileContent, filename, params);
+                    replace = processor.parse(fileContent, file, params);
                 }else{
                     replace = fn(fileContent, params);
                 }
