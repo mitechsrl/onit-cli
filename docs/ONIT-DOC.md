@@ -35,7 +35,7 @@ Chapters identifica la lista di capitoli e le loro proprietà. *chapter* è un o
 ```js
 chapter = {
     title: string, // REQUIRED, titolo del capitolo
-    label: string // REQUIRED, label utilizzata per indirizzare i blocchi dei commenti,
+    chapter: string // REQUIRED, label utilizzata per indirizzare i blocchi dei commenti,
     index: object, // OPTIONAL, se valorizzato, crea un file di indice per la voce corrente. Le coppie chiave-valore di object verranno inserite nell'header jackill del file index generato senza subire alterazioni. Il file di index viene automaticamente generto se esistono dei fligli della voce corrente (in base a children)
     page: object, // OPTIONAL, se valorizzato, crea un file di pagina per la voce corrente. Le coppie chiave-valore di object verranno inserite nell'header jackill del file generato senza subire alterazioni. Il file page viene automaticamente generato se la scansione del progetto rileva dei frammenti di codice-commento per la rispettiva label 
     children: [chapter] // OPTIONAL, eventuali chapter figli
@@ -47,67 +47,44 @@ chapter = {
 Oltre ai tag di [JsDoc](https://jsdoc.app/), sono disponibili alcuni tag aggiuntivi per la definizione della struttura di documentazione proprietaria di Onit.
 
 
-**@onitTitle**
+**@title**
 Definisce il titolo della sezione di commento
 
 ```js
 /**
-* @onitTitle this is a title!
+* @title this is a title!
 */
 ```
 
-Aggiungere, subito dopo il tag @onitTitle, uno dei valori **h2, h3, h4** per pilotare la dimensione del titolo.
-
+E' possibile definire la dimensione del titolo con uno o più #: #=h1, ##=h2, ###=h3 e così via.
 ```js
 /**
-* @onitTitle h3 this is a title!
+* @title ### this is a title!
 */
 ```
 Il default di tale valore è **h2**
 
-**@onitChapter** 
-Definisce il capitolo di appartenenza della sezione di commento corrente. Accetta un unico valore, corrispondente ad una label come definita in *onitdocumentation.config.js -> chapters*
+**@chapter** 
+Definisce il capitolo di appartenenza della sezione di commento corrente. Accetta un unico valore, corrispondente ad una label chapter come definita in *onitdocumentation.config.js -> chapters*
 
 ```js
 /**
-* @onitChapter label
+* @chapter label
 */
 ```
 
-**@onitPriority**
+**@priority**
 Definisce l'ordinamento con cui inserire blocchi di codice referenti allo stesso capitolo. Accetta un solo parametro, il valore numerico dell'ordine.
 
 ```js
 /**
-* @onitPriority 2000
+* @priority 2000
 */
 ```
 
-**@onitDoc** 
-Definisce l'inizio del blocco di testo contente la documentazione da estrapolare. Il blocco di testo termina quando occorre una delle seguenti ragioni:
-
-- Chiusura del blocco del commento
-
-    ```js
-    /**
-    * @onitDoc 
-    * testo
-    * testo
-    * testo
-    */
-    ```
-
-- Occorrenza di un tag JSDoc
-
-    ```js
-    /**
-    * @onitDoc 
-    * testo estrapolato
-    * testo estrapolato
-    * @param ...
-    * Testo non estrapolato
-    */
-    ```
+**@summary** 
+Definisce l'inizio del blocco di testo contente la documentazione da estrapolare.
+Il tag è opzionale se il testo del summary è la prima entità all'interno del blocco commento. Nel caso come prima entità vengano inseriti diversi altri tags, allora per **iniziare** il blocco del summary è necessario l'uso del tag
 
 #### Immagini
 Utiluzzare il classito tag markdown per la gestione delle immagini:
@@ -116,27 +93,27 @@ Utiluzzare il classito tag markdown per la gestione delle immagini:
 ![Stormtroopocat](/path/to/image.png)
 ```
 
-NOTA: il path dell'immagine deve essere relativo al path del file **onitdocumentation.config.[js|json]** utilizzato
+Il path dell'immagine deve essere relativo al path del file in cui si va a inserire il commento.
 
 ##### Riferimenti interni
-In relazione all'uso di **@onitDoc**, è possibile inserire in un qualsiasi punto del testo del commento uno dei tag seguenti:
+In relazione all'uso di **@summary**, è possibile inserire in un qualsiasi punto del testo del commento uno dei tag seguenti:
 
-**[@onitChapter n1.n2.n3#Info](for more info)**
-Viene risolto con un link verso il capitolo *n1.n2.n3*, con anchor *#Info*. Il testo visualizzato è *for more info*.
+**[@link chapterLabel#Info](for more info)**
+Viene risolto con un link verso il capitolo *chapterLabel*, con anchor *#Info*. Il testo visualizzato è *for more info*.
 
-**[@onitChapter n1.n2.n3](for more info)**
-Viene risolto con un link verso il capitolo *n1.n2.n3*. Il testo visualizzato è *for more info*.
+**[@link chapterLabel](for more info)**
+Viene risolto con un link verso il capitolo *chapterLabel*. Il testo visualizzato è *for more info*.
 
-**[@onitChapter n1.n2.n3#Info]**
-Viene risolto con un link verso il capitolo *n1.n2.n3*, con anchor *#Info*. Il testo visualizzato è l'url web del capitolo selezionato.
+**[@link chapterLabel#Info]**
+Viene risolto con un link verso il capitolo *chapterLabel*, con anchor *#Info*. Il testo visualizzato è l'url web del capitolo selezionato.
 
-**[@onitChapter n1.n2.n3]**
-Viene risolto con un link verso il capitolo *n1.n2.n3*. Il testo visualizzato è l'url web del capitolo selezionato.
+**[@link chapterLabel]**
+Viene risolto con un link verso il capitolo *chapterLabel*. Il testo visualizzato è l'url web del capitolo selezionato.
 
 #### Include di codice sorgente
 Utilizzare il tag 
 ```
-[@onitSrc path transformFunction]
+[@src path transformFunction]
 ```
 
 Per includere nel punto di chiamata un file esterno rappresentato da **path**. 
@@ -154,18 +131,19 @@ NOTA: la risoluzione delle inclusioni è ricorsiva, pertanto soggetta a dipenden
   
 #### Files processati
 
-*.js, *.md, *.jsx *.ts
+*.md, *.ts
 
-NOTA: Il supporto ai tag @onit è limitato nei files markdown. Utilizzare un unico @onitChapter per file markdown.
+NOTA: I files .md vengono processati come un unico blocco commento. Utilizzare un unico @chapter per file markdown.
+
 #### Esempio 
 
 **Codice commento**
 ```
 /**
-* @onitTitle This is a title
-* @onitChapter LABEL
-* @onitDoc 
-* Hello, this is a markdown-formatted comment. If you want to go to chaper 1.2.3, [@onitChapter 1.2.3#hello](click here)
+* @title This is a title
+* @chapter LABEL
+* @summary 
+* Hello, this is a markdown-formatted comment. If you want to go to chaper 1.2.3, [@chapter 1.2.3#hello](click here)
 * Some other text
 * **i'm bold**
 * Use triple backquote for code blocks
