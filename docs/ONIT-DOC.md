@@ -121,11 +121,14 @@ Per includere nel punto di chiamata un file esterno rappresentato da **path**.
 
 Esempi di **transformFunction** disponibili:
 
-- **lb4model**: se path rappresenta un file **json** di modello, model ne esegue l'estrazione dei valori delle **properties** e delle **relazioni**
+- **lb4model**: 
+    Processa il file indicato ed esrapola le proprietà del modello con relativi commenti, producendo una pagina di documentazione human-readable.
 
 - **lb4repository**
+    Processa il file indicato ed estapola le definizioni dei metodi/proprietà con relativi commenti, producendo una pagina di documentazione human-readable.
 
 - **includeFullFile**
+    Include il codice sorgente del file indicato
 
 NOTA: la risoluzione delle inclusioni è ricorsiva, pertanto soggetta a dipendenza ciclica.
   
@@ -164,18 +167,18 @@ const config = {
     chapters: [
 
         {
-            label:'LABEL1', 
+            chapter:'LABEL1', 
             title:'title', 
             children: [
-                {label:'LABEL2', title:'title'}
+                {chapter:'LABEL2', title:'title'}
             ]
         },
         {
-            label:'LABEL3', 
+            chapter:'LABEL3', 
             title:'title', 
             index: { nav_order: 1 }
             children: [
-                {label:'LABEL4', title:'title'}
+                {chapter:'LABEL4', title:'title'}
             ]
         }
     ]
