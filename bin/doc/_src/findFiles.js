@@ -15,6 +15,7 @@ function findFiles (config, cwd = process.cwd()) {
         ignore: [
             './node_modules/**/*',
             './dist/**/*',
+            './dist-fe/**/*',
             ...(config.ignore || [])
         ],
         cwd: cwd

@@ -1,6 +1,7 @@
 /**
  * Process a repository TS file and produces a markdown document
  */
+const { writeFileSync } = require('fs-extra');
 const ts = require('typescript');
 const { escapeMarkdownChars } = require('../lib/escapeMarkdownChars');
 
@@ -131,7 +132,7 @@ class GenericClassFileParser {
 
  
     /**
-     * Process thepassed-in src file andproduces a markdown output
+     * Process the passed-in src file andproduces a markdown output
      *
      * @param {*} src The source file content
      * @param {*} filename The source filename
@@ -228,9 +229,7 @@ class GenericClassFileParser {
         // call the basic jsdoc parser for generic info
         method = this.processJSDoc(method, src, n);
         // add custom parsing for method-specific data
-        (n.jsDoc || []).forEach(comment => {
-            method.comment.push(comment.comment);
-
+        (n.jsDoc || []).forEach(comment => {            
             (comment.tags || []).forEach(t => {
                 const tagName = src.substring(t.tagName.pos, t.tagName.end).trim();
                 switch (tagName) {
@@ -290,8 +289,8 @@ class GenericClassFileParser {
     processJSDoc(obj, src, n){
 
         (n.jsDoc || []).forEach(comment => {
-            if (comment.comment){
-                obj.comment.push(comment.comment);
+            if (comment.comment && comment.comment.trim()){
+                obj.comment.push(comment.comment.trim());
             }
             (comment.tags || []).forEach(tag => {
                 if (tag.comment){
@@ -304,6 +303,18 @@ class GenericClassFileParser {
                             break;
                         case 'chapter': 
                             obj.chapter = tag.comment;
+                            break;
+                        case 'see': 
+                            obj.see = obj.see || []
+                            obj.see.push(tag.comment);
+                            break;
+                        case 'throws': 
+                            obj.throws = obj.throws || []
+                            obj.throws.push(tag.comment);
+                            break;
+                        case 'deprecated': 
+                            obj.deprecated = obj.deprecated || []
+                            obj.deprecated.push(tag.comment);
                             break;
                     }
                 }
@@ -343,6 +354,8 @@ class GenericClassFileParser {
 
                 // process jsdoc
                 classDefinition = this.processJSDoc(classDefinition, src, child);
+                // remove @src tags. We don0t want them to appear in the documentation text
+                classDefinition.comment = classDefinition.comment.map(c => c.replace(/\[ *@src[^\]]+\]/gmi,'').trim());
 
                 // process properties and method declarations
                 child.members.forEach(n => {

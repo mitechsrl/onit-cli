@@ -1,10 +1,18 @@
+[IT](./ONIT-DOC-IT.md), [EN](./ONIT-DOC.md)
+
 # Onit doc
 
-Onit documentation generator tool
+Onit documentation generator tool.
+
+The onit documentation ecosystem is based on [tsdoc](https://tsdoc.org/), [jsdoc](https://jsdoc.app/).
+The **onit doc** tool uses industry standard libraries to find and process process jsdoc comment blocks in the reference project, then build a series of markdown files which can be converted to html with jekill.
+
+
+See the **examples** section for more into
 
 ## Config file
 
-Il comando **onit doc** richiede la definizione del file **onitdocumentation.config.js**, il quale presenta una struttura come definita:
+The **onit doc** command needs a **onitdocumentation.config.js** config file, which describes a structure like the following one:
 
 ```js
 module.export = {
@@ -14,58 +22,50 @@ module.export = {
 ```
 
 #### ignore
-Array di stringhe, descrive, utilizzando il formato [gitignore](https://git-scm.com/docs/gitignore), la lista dei files/directory da non scansionare per la ricerca di documentazione.
+String array, describes the files/directories which must not be processed. The lines must follows the [gitignore](https://git-scm.com/docs/gitignore) format.
 
-E' vivamente consigliato l'inserimento dei seguenti valori di default: 
-```js
-    [
-        './node_modules/**/*',
-        './build/**/*',
-        './assets/**/*',
-        './dist/**/*',
-        './dist-fe/**/*',
-        './docs/**/*',
-        './onit-doc/**/*'
-    ]
+The default ignore includes
+```
+./node_modules/**/*
+./dist/**/*
+./dist-fe/**/*
 ```
 
+You also should include your documentation outpuit directory to avoid output files to be processed again.
+
 #### chapters
-Chapters identifica la lista di capitoli e le loro proprietà. *chapter* è un oggetto contenente le seguenti proprietà:
+Chapters defines a nested tree which describes the chapter structure, properties and children.
+A single *chapter* object is an object defined as follows:
 
 ```js
 chapter = {
-    title: string, // REQUIRED, titolo del capitolo
-    chapter: string // REQUIRED, label utilizzata per indirizzare i blocchi dei commenti,
-    index: object, // OPTIONAL, se valorizzato, crea un file di indice per la voce corrente. Le coppie chiave-valore di object verranno inserite nell'header jackill del file index generato senza subire alterazioni. Il file di index viene automaticamente generto se esistono dei fligli della voce corrente (in base a children)
-    page: object, // OPTIONAL, se valorizzato, crea un file di pagina per la voce corrente. Le coppie chiave-valore di object verranno inserite nell'header jackill del file generato senza subire alterazioni. Il file page viene automaticamente generato se la scansione del progetto rileva dei frammenti di codice-commento per la rispettiva label 
-    children: [chapter] // OPTIONAL, eventuali chapter figli
+    title: string, // REQUIRED, chapter title
+    chapter: string // REQUIRED, chaper label, used to link a block comment to this specific object,
+    index: object, // OPTIONAL, if defined, create a index file for the current object. This is a key-value object whose properties-values are added to jeckill index file without alterations. The index file is automaically added if this object includes the children property.
+    page: object, // OPTIONAL, if defined, create a page file for the current object.  This is a key-value object whose properties-values are added to jeckill index file without alterations. The page file is automatically added if the project scan finds comment blocks matching this object chapter label. 
+    children: [chapter] // OPTIONAL, Array of children chapters definitions. 
 }
 ```
 
-## Custom tags
-
-Oltre ai tag di [JsDoc](https://jsdoc.app/), sono disponibili alcuni tag aggiuntivi per la definizione della struttura di documentazione proprietaria di Onit.
-
+## Custom jsdoc tags
+This tool implements some custom jsdoc tags that you can use toghjeter with [JsDoc](https://jsdoc.app/) ones: 
 
 **@title**
-Definisce il titolo della sezione di commento
+Defines the block comment title
 
 ```js
 /**
 * @title this is a title!
+* @title # This is a h1 title
+* @title ## This is a h2 title
+* @title ### This is a h3 title
+* @title #### This is a h4 title
 */
 ```
-
-E' possibile definire la dimensione del titolo con uno o più #: #=h1, ##=h2, ###=h3 e così via.
-```js
-/**
-* @title ### this is a title!
-*/
-```
-Il default di tale valore è **h2**
+You can use '#' to define the 'hX' of the title as defined by [markdown](https://www.markdownguide.org/basic-syntax/). The default is h2.
 
 **@chapter** 
-Definisce il capitolo di appartenenza della sezione di commento corrente. Accetta un unico valore, corrispondente ad una label chapter come definita in *onitdocumentation.config.js -> chapters*
+Defines the chapter label of the current commen block. It accepts a string value which must match one of the *onitdocumentation.config.js -> chapters* defined chapter labels.
 
 ```js
 /**
@@ -74,7 +74,7 @@ Definisce il capitolo di appartenenza della sezione di commento corrente. Accett
 ```
 
 **@priority**
-Definisce l'ordinamento con cui inserire blocchi di codice referenti allo stesso capitolo. Accetta un solo parametro, il valore numerico dell'ordine.
+Defines the sorting priority of this comment block when more comment blocks match the same chapter label. It accept a single integer value.
 
 ```js
 /**
@@ -83,64 +83,64 @@ Definisce l'ordinamento con cui inserire blocchi di codice referenti allo stesso
 ```
 
 **@summary** 
-Definisce l'inizio del blocco di testo contente la documentazione da estrapolare.
-Il tag è opzionale se il testo del summary è la prima entità all'interno del blocco commento. Nel caso come prima entità vengano inseriti diversi altri tags, allora per **iniziare** il blocco del summary è necessario l'uso del tag
+Defines the comment block main text. This tag is optional in case you just start with the main documentation after opening a comment block. 
+If you use other tags before the main text, you needs to instruct jsdoc where this block will start.
 
-#### Immagini
-Utiluzzare il classito tag markdown per la gestione delle immagini:
+#### Images
+You can use standard markdown syntax to define images:
 
 ```
-![Stormtroopocat](/path/to/image.png)
+![Stormtroopocat](../relative/path/to/image.png)
 ```
 
-Il path dell'immagine deve essere relativo al path del file in cui si va a inserire il commento.
+The path image must be relative to the file including the image tag.
 
-##### Riferimenti interni
-In relazione all'uso di **@summary**, è possibile inserire in un qualsiasi punto del testo del commento uno dei tag seguenti:
+#### Internal references
+You can insert internal referneces to your main text (**@summary**), which will be resolved to hypertext links to navigate into the documentation
 
 **[@link chapterLabel#Info](for more info)**
-Viene risolto con un link verso il capitolo *chapterLabel*, con anchor *#Info*. Il testo visualizzato è *for more info*.
+Resolved with a link to the *chapterLabel* page, to *#info* anchor. The displayed text is *for more info*.
 
 **[@link chapterLabel](for more info)**
-Viene risolto con un link verso il capitolo *chapterLabel*. Il testo visualizzato è *for more info*.
+Resolved with a link to the *chapterLabel* page. The displayed text is *for more info*.
 
 **[@link chapterLabel#Info]**
-Viene risolto con un link verso il capitolo *chapterLabel*, con anchor *#Info*. Il testo visualizzato è l'url web del capitolo selezionato.
+Resolved with a link to the *chapterLabel* page, to *#info* anchor. The displayed text is the destination webpage url.
 
 **[@link chapterLabel]**
-Viene risolto con un link verso il capitolo *chapterLabel*. Il testo visualizzato è l'url web del capitolo selezionato.
+Resolved with a link to the *chapterLabel* page. The displayed text is the destination webpage url.
 
-#### Include di codice sorgente
-Utilizzare il tag 
+#### Include file with preprocess
+Using the tag
 ```
 [@src path transformFunction]
 ```
+You can include the source code of **path** file.
+**path** must be relative to the file using the @src tag. You can use a **transformFunction** parameter, which will process the source code before adding the result to the current comment block. By default, the transform function will include the source code without any modification as standard markdown code block.
 
-Per includere nel punto di chiamata un file esterno rappresentato da **path**. 
-**path** deve essere uin path relativo al file in cui si richiede tale inclusione. E' possibile utilizzare un parametero aggiuntivo, **transformFunction** per preprocessare il contenuto del file prima della sua inclusione. Se omesso, il file viene incluso in toto senza alcuna trasformazione.
-
-Esempi di **transformFunction** disponibili:
+Available **transformFunction**:
 
 - **lb4model**: 
-    Processa il file indicato ed esrapola le proprietà del modello con relativi commenti, producendo una pagina di documentazione human-readable.
+    Process the file to extract lb4 model properties, then output a structured, human-readable model documentation,
 
 - **lb4repository**
-    Processa il file indicato ed estapola le definizioni dei metodi/proprietà con relativi commenti, producendo una pagina di documentazione human-readable.
+    Process the file to exract repository properties and methods, then output a structured, human-readable model documentation.
 
 - **includeFullFile**
-    Include il codice sorgente del file indicato
+    Include the file source code without any changes.
 
-NOTA: la risoluzione delle inclusioni è ricorsiva, pertanto soggetta a dipendenza ciclica.
-  
-#### Files processati
 
+#### Processed files
+
+```
 *.md, *.ts
+```
 
-NOTA: I files .md vengono processati come un unico blocco commento. Utilizzare un unico @chapter per file markdown.
+NOTE: **.md** files are processed like a single comment block. Use a single **@chapter** for markdown file.
 
-#### Esempio 
+#### Examples
 
-**Codice commento**
+**Comment block**
 ```
 /**
 * @title This is a title

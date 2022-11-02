@@ -1,14 +1,12 @@
-const { TSDocParser, DocExcerpt, TSDocConfiguration, TSDocTagSyntaxKind, TSDocTagDefinition } = require("@microsoft/tsdoc");
-const { forEachComment } = require("tsutils");
+const { TSDocParser, DocExcerpt, TSDocConfiguration, TSDocTagSyntaxKind, TSDocTagDefinition } = require('@microsoft/tsdoc');
+const { forEachComment } = require('tsutils');
 const ts = require('typescript');
 
 class TypescriptCommentParser {
-
-
-    constructor() {
+    constructor () {
         const config = new TSDocConfiguration();
 
-        const customTags = ['@chapter','@title','@summary','@priority'];
+        const customTags = ['@chapter', '@title', '@summary', '@priority'];
         customTags.forEach(tagString => {
             const tag = new TSDocTagDefinition({
                 tagName: tagString,
@@ -16,8 +14,8 @@ class TypescriptCommentParser {
             });
             config.addTagDefinition(tag);
             config.setSupportForTag(tag, true);
-        })
-    /*
+        });
+        /*
         const tag2 = new TSDocTagDefinition({
             tagName: '@title',
             syntaxKind: TSDocTagSyntaxKind.BlockTag
@@ -42,7 +40,7 @@ class TypescriptCommentParser {
         this.tsdocParser = new TSDocParser(config);
     }
 
-    renderDocNode(docNode) {
+    renderDocNode (docNode) {
         let result = '';
         if (docNode) {
             if (docNode instanceof DocExcerpt) {
@@ -55,7 +53,7 @@ class TypescriptCommentParser {
         return result;
     }
 
-    renderDocNodes(docNodes) {
+    renderDocNodes (docNodes) {
         let result = '';
         for (const docNode of docNodes) {
             result += this.renderDocNode(docNode);
@@ -63,9 +61,7 @@ class TypescriptCommentParser {
         return result;
     }
 
-
-    parseCommentText(commentText, filename) {
-
+    parseCommentText (commentText, filename) {
         const parserContext = this.tsdocParser.parseString(commentText);
         const docComment = parserContext.docComment;
 
@@ -100,9 +96,9 @@ class TypescriptCommentParser {
         for (const throwsBlock of docComment.getChildNodes().filter(n => (n.blockTag || {}).tagName === '@throws')) {
             block.throws.push(this.renderDocNode(throwsBlock.content).trim());
         }
-        
+
         for (const priorityBlock of docComment.getChildNodes().filter(n => (n.blockTag || {}).tagName === '@priority')) {
-            block.priority = parseInt(this.renderDocNode(priorityBlock.content).trim())
+            block.priority = parseInt(this.renderDocNode(priorityBlock.content).trim());
         }
         for (const exampleBlock of docComment.getChildNodes().filter(n => (n.blockTag || {}).tagName === '@example')) {
             block.example.push(this.renderDocNode(exampleBlock.content).trim());
@@ -118,12 +114,12 @@ class TypescriptCommentParser {
 
         for (const customBlock of docComment.customBlocks) {
             switch (customBlock.blockTag.tagName) {
-                case '@summary': block.summary.push(this.renderDocNode(customBlock.content).trim());
-                    break;
-                case '@title': block.title = this.renderDocNode(customBlock.content).trim();
-                    break;
-                case '@chapter': block.chapter = this.renderDocNode(customBlock.content).trim();
-                    break;
+            case '@summary': block.summary.push(this.renderDocNode(customBlock.content).trim());
+                break;
+            case '@title': block.title = this.renderDocNode(customBlock.content).trim();
+                break;
+            case '@chapter': block.chapter = this.renderDocNode(customBlock.content).trim();
+                break;
             }
         }
 
@@ -132,17 +128,14 @@ class TypescriptCommentParser {
         }
 
         for (const paramBlock of docComment.params.blocks) {
-
             block.params.push({
                 name: paramBlock.parameterName,
                 description: this.renderDocNode(paramBlock.content).trim()
             });
-
         }
 
         if (docComment.returnsBlock) {
             block.return = this.renderDocNode(docComment.returnsBlock.content).trim();
-
         }
 
         block.summary = block.summary.join('\n');
@@ -154,15 +147,14 @@ class TypescriptCommentParser {
         return null;
     }
 
-    parseFile(files) {
+    parseFile (files) {
         const program = ts.createProgram(files, {
-            target: ts.ScriptTarget.ES2018,
+            target: ts.ScriptTarget.ES2018
         });
 
         const blocks = [];
 
         for (const file of files) {
-            
             const sourceFile = program.getSourceFile(file);
             if (!sourceFile) {
                 throw new Error('Error retrieving source file');
@@ -174,7 +166,7 @@ class TypescriptCommentParser {
                     const commentText = text.substring(comment.pos, comment.end);
                     const block = this.parseCommentText(commentText, file);
                     if (block) {
-                        blocks.push(block)
+                        blocks.push(block);
                     }
                 }
             });
