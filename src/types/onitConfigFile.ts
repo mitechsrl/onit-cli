@@ -57,6 +57,12 @@ export type OnitConfigFileCopyFile = {
     from?:string,
     glob?:string[]
 };
+
+export type OnitConfigFileBuild = {
+    // serve version
+    version?:string,
+};
+
 export type OnitConfigFile = {
 
     json: {
@@ -73,6 +79,8 @@ export type OnitConfigFile = {
         link?: OnitConfigFileLink[],
         // serve config
         serve?: OnitConfigFileServe,
+        // build config
+        build?: OnitConfigFileBuild, 
         // test config
         test?: { [k:string]: OnitConfigFileTestTarget }
     },

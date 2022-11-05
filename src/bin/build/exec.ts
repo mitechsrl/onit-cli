@@ -34,7 +34,7 @@ import maxSatisfying from 'semver/ranges/max-satisfying';
 const exec: CommandExecFunction = async (argv: yargs.ArgumentsCamelCase<unknown>) => {
 
     try {
-        // check for manual serve file specifed
+        // check for manual build file specifed
         const manualConfigFile: string | null = (argv.c as string) ?? null;
 
         // load the buildFile
@@ -42,11 +42,11 @@ const exec: CommandExecFunction = async (argv: yargs.ArgumentsCamelCase<unknown>
         const onitConfigFile = await onitFileLoader(process.cwd(), manualConfigFile);
         logger.warn('Using config files: ' + onitConfigFile.sources.join(', '));
 
-        if (!onitConfigFile.json.serve) {
-            throw new Error('Serve is not available. Check your onit config file at <serve> property.');
+        if (!onitConfigFile.json.build) {
+            throw new Error('Build is not available. Check your onit config file at <build> property.');
         }
         // lock to the required builder version or get the most recent one
-        const requiredVersion = onitConfigFile.json.serve.version ?? '*';
+        const requiredVersion = onitConfigFile.json.build.version ?? '*';
 
         // get a list of the available versions (each dir describe one version)
         const availableVersions = fs.readdirSync(path.join(__dirname, './versions'));
@@ -55,23 +55,23 @@ const exec: CommandExecFunction = async (argv: yargs.ArgumentsCamelCase<unknown>
         const version = maxSatisfying(availableVersions, requiredVersion);
 
         if (!version){
-            throw new Error('No compatible serve version found for required ' + requiredVersion + '. Check your onit config file serve.version value.');
+            throw new Error('No compatible build version found for required ' + requiredVersion + '. Check your onit config file build.version value.');
         }
 
         // version found: Load that builder and use it.
-        logger.info('Using serve version ' + version);
+        logger.info('Using build version ' + version);
         // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const serve = require(path.join(__dirname, './versions/' + version + '/index.js'));
+        const build = require(path.join(__dirname, './versions/' + version + '/index.js'));
 
         // autoset the hardcoded params
         /*
-        if (Array.isArray(onitConfigFile.json.serve.params)) {
-            params.push(...onitConfigFile.json.serve.params);
+        if (Array.isArray(onitConfigFile.json.build.params)) {
+            params.push(...onitConfigFile.json.build.params);
         }*/
 
-        await serve.start(onitConfigFile, version, argv);
+        await build.start(onitConfigFile, version, argv);
     } catch (e) {
-        logger.error('Serve aborted');
+        logger.error('Build aborted');
         throw e;
     }
 };
