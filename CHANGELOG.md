@@ -1,3 +1,6 @@
+## 2.4.0
+- Updated **onit doc** command for better comment blocks management. 
+
 ## 2.3.0
 - Added commands **onit create app**, **onit create service**, **onit create model**, **onit create relation**, **onit create repository**, **onit create service**    
 
