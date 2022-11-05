@@ -1,8 +1,4 @@
 import { GenericObject } from '.';
-export declare type OnitConfigFileTestTarget = {
-    grep?: string;
-    key?: string;
-};
 export declare type OnitConfigFileServeOnFirstTscCompilationSuccess = {
     name?: string;
     cmd?: string;
@@ -18,6 +14,15 @@ export declare type OnitConfigFileServe = {
     nodeArgs?: string[];
     onFirstTscCompilationSuccess?: OnitConfigFileServeOnFirstTscCompilationSuccess[];
     'pm2-dev-ecosystem'?: GenericObject;
+};
+export declare type OnitConfigFileTestTarget = OnitConfigFileServe & {
+    grep?: string;
+    key?: string;
+    launchOnit?: boolean;
+    startup?: string;
+    beforeTest?: string;
+    shutdown?: string;
+    testFilesDirectories?: string[];
 };
 export declare type OnitConfigFileLink = {
     link: string;

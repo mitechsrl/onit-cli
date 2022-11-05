@@ -31,11 +31,17 @@ exports.pm2start = exports.pm2stop = void 0;
 const fs_1 = __importDefault(require("fs"));
 const lodash_1 = __importDefault(require("lodash"));
 const spawn_1 = require("../../../../../lib/spawn");
+const child_process_1 = require("child_process");
 // windows fa il windows percui lui vuole 'pm2.cmd' anzichè 'pm2' come comando di avvio
 const isWindows = (process.env.OS || '').toUpperCase().includes('WIN');
 const pm2exec = isWindows ? 'pm2.cmd' : 'pm2';
 async function pm2stop() {
-    return (0, spawn_1.spawn)(pm2exec, ['stop', 'all'], true);
+    // launch this detached so the cli can exit quickly while pm2 is still stopping apps
+    const subprocess = (0, child_process_1.spawn)(pm2exec, ['stop', 'all'], {
+        detached: true,
+        stdio: 'ignore'
+    });
+    subprocess.unref();
 }
 exports.pm2stop = pm2stop;
 async function pm2start(onitConfigFile) {

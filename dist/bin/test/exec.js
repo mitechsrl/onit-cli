@@ -24,35 +24,29 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
 Object.defineProperty(exports, "__esModule", { value: true });
+const logger_1 = require("../../lib/logger");
+const onitFileLoader_1 = require("../../lib/onitFileLoader");
+const types_1 = require("../../types");
+const selectTest_1 = require("./lib/selectTest");
+const test_1 = require("./lib/test");
 const exec = async (argv) => {
-    /*try {
-        // check for manual serve file specifed
-        const manualConfigFile = argv.c as string|undefined;
-
-        // load the buildFile
-        const onitConfigFile = await onitFileLoader(process.cwd(), manualConfigFile);
-        logger.warn('Uso file(s) config ' + onitConfigFile.sources.join(', '));
-
-        if (!onitConfigFile.json.test) {
-            throw new Error('Il test non è disponibile. Verifica di avere la proprietà <test> nel file di configurazioen di onit.');
-        }
-
-        // prompt the user to elect a test set
-        const testTarget = await selectTest(onitConfigFile);
-        const test = require('./_src/index');
-
-        // quick replace the tag from testTarget
-        const overrideMatchTag = argv.t as string;
-        if (overrideMatchTag) {
-            testTarget.grep = overrideMatchTag;
-        }
-
-        // launch test
-        await test.start(onitConfigFile, testTarget, basepath, params);
-    } catch (e) {
-        logger.error('Test interrotto');
-        throw e;
-    }*/
+    // check for manual serve file specifed
+    const manualConfigFile = argv.c;
+    // load the buildFile
+    const onitConfigFile = await (0, onitFileLoader_1.onitFileLoader)(process.cwd(), manualConfigFile);
+    logger_1.logger.warn('Uso file(s) config ' + onitConfigFile.sources.join(', '));
+    if (!onitConfigFile.json.test) {
+        throw new types_1.StringError('No test defined. You should have the test property in your onit configuration file: ' + onitConfigFile.sources.join(', '));
+    }
+    // prompt the user to elect a test set
+    const testTarget = await (0, selectTest_1.selectTest)(onitConfigFile);
+    // quick replace the tag from testTarget
+    const overrideMatchTag = argv.t;
+    if (overrideMatchTag) {
+        testTarget.grep = overrideMatchTag;
+    }
+    // launch test
+    await (0, test_1.startTest)(onitConfigFile, testTarget, argv);
 };
 exports.default = exec;
 //# sourceMappingURL=exec.js.map

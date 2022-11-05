@@ -1,10 +1,5 @@
 import { GenericObject } from '.';
 
-export type OnitConfigFileTestTarget = {
-    grep?:string,
-    key?: string
-};
-
 export type OnitConfigFileServeOnFirstTscCompilationSuccess = {
     // name of subprocess
     name?: string,
@@ -34,6 +29,22 @@ export type OnitConfigFileServe = {
     // pm2 ecosystem config to be launched before serving
     // eslint-disable-next-line @typescript-eslint/naming-convention
     'pm2-dev-ecosystem'?: GenericObject
+};
+
+export type OnitConfigFileTestTarget = OnitConfigFileServe & {
+    // yargs grep 
+    grep?:string,
+    key?: string,
+    // launch onit for test. Defaults to true
+    launchOnit?:boolean,
+    // Run at test startup. Run before launching onit eventually
+    startup?: string,
+    // run just before running the tests. Run after startup and after launching onit eventually
+    beforeTest?:string,
+    //shutdown script. Run after test completion
+    shutdown?:string,
+    // array of directorues to scan for test files
+    testFilesDirectories?:string[]
 };
 
 export type OnitConfigFileLink = {

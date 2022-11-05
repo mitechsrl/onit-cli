@@ -31,11 +31,13 @@
         "@babel/preset-env": "^7.16.11",
         "@babel/preset-react": "^7.16.7",
         "@loopback/cli": "^3.2.0",
+        "@phenomnomnominal/tsquery": "^4.2.0",
         "@soda/friendly-errors-webpack-plugin": "^1.8.1",
         "@types/case-sensitive-paths-webpack-plugin": "^2.1.6",
         "@types/find": "^0.2.1",
         "@types/inquirer": "^9.0.1",
         "@types/lodash": "^4.14.185",
+        "@types/mocha": "^10.0.0",
         "@types/node-emoji": "^1.8.2",
         "@types/progress-bar-webpack-plugin": "^2.1.2",
         "@types/semver": "^7.3.12",
@@ -63,6 +65,7 @@
         "inquirer": "^7.3.3",
         "lodash": "^4.17.21",
         "mini-css-extract-plugin": "^2.6.0",
+        "mocha": "^10.1.0",
         "ncp": "^2.0.0",
         "node-emoji": "^1.11.0",
         "progress-bar-webpack-plugin": "^2.1.0",
@@ -82,8 +85,7 @@
         "webpack": "^5.67.0",
         "webpack-merge": "^5.8.0",
         "webpack-subresource-integrity": "^5.1.0",
-        "yargs": "^17.5.1",
-        "@phenomnomnominal/tsquery": "^4.2.0"
+        "yargs": "^17.5.1"
     },
     "devDependencies": {
         "@babel/eslint-parser": "^7.16.5",

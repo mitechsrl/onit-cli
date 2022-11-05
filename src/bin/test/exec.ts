@@ -26,39 +26,35 @@ OTHER DEALINGS IN THE SOFTWARE.
 import yargs from 'yargs';
 import { logger } from '../../lib/logger';
 import { onitFileLoader } from '../../lib/onitFileLoader';
-import { CommandExecFunction } from '../../types';
-import { selectTest } from './_lib/selectTest';
+import { CommandExecFunction, StringError } from '../../types';
+import { selectTest } from './lib/selectTest';
+import { startTest } from './lib/test';
 
-const exec: CommandExecFunction = async (argv: yargs.ArgumentsCamelCase<{}>) => {
+const exec: CommandExecFunction = async (argv: yargs.ArgumentsCamelCase<unknown>) => {
 
-    /*try {
-        // check for manual serve file specifed
-        const manualConfigFile = argv.c as string|undefined;
+    // check for manual serve file specifed
+    const manualConfigFile = argv.c as string|undefined;
 
-        // load the buildFile
-        const onitConfigFile = await onitFileLoader(process.cwd(), manualConfigFile);
-        logger.warn('Uso file(s) config ' + onitConfigFile.sources.join(', '));
+    // load the buildFile
+    const onitConfigFile = await onitFileLoader(process.cwd(), manualConfigFile);
+    logger.warn('Using config files: ' + onitConfigFile.sources.join(', '));
 
-        if (!onitConfigFile.json.test) {
-            throw new Error('Il test non è disponibile. Verifica di avere la proprietà <test> nel file di configurazioen di onit.');
-        }
+    if (!onitConfigFile.json.test) {
+        throw new StringError('No test defined. You should have the test property in your onit configuration file: ' + onitConfigFile.sources.join(', '));
+    }
 
-        // prompt the user to elect a test set
-        const testTarget = await selectTest(onitConfigFile);
-        const test = require('./_src/index');
+    // prompt the user to elect a test set
+    const testTarget = await selectTest(onitConfigFile);
+        
+    // quick replace the tag from testTarget
+    const overrideMatchTag = argv.t as string | undefined;
+    if (overrideMatchTag) {
+        testTarget.grep = overrideMatchTag;
+    }
 
-        // quick replace the tag from testTarget
-        const overrideMatchTag = argv.t as string;
-        if (overrideMatchTag) {
-            testTarget.grep = overrideMatchTag;
-        }
-
-        // launch test
-        await test.start(onitConfigFile, testTarget, basepath, params);
-    } catch (e) {
-        logger.error('Test interrotto');
-        throw e;
-    }*/
+    // launch test
+    await startTest(onitConfigFile, testTarget, argv);
+   
 };
 
 export default exec;
