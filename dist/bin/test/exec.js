@@ -34,7 +34,7 @@ const exec = async (argv) => {
     const manualConfigFile = argv.c;
     // load the buildFile
     const onitConfigFile = await (0, onitFileLoader_1.onitFileLoader)(process.cwd(), manualConfigFile);
-    logger_1.logger.warn('Uso file(s) config ' + onitConfigFile.sources.join(', '));
+    logger_1.logger.warn('Using config files: ' + onitConfigFile.sources.join(', '));
     if (!onitConfigFile.json.test) {
         throw new types_1.StringError('No test defined. You should have the test property in your onit configuration file: ' + onitConfigFile.sources.join(', '));
     }

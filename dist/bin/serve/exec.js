@@ -39,9 +39,9 @@ const exec = async (argv) => {
         const manualConfigFile = (_a = argv.c) !== null && _a !== void 0 ? _a : null;
         // load the buildFile
         const onitConfigFile = await (0, onitFileLoader_1.onitFileLoader)(process.cwd(), manualConfigFile);
-        logger_1.logger.warn('Uso file(s) config ' + onitConfigFile.sources.join(', '));
+        logger_1.logger.warn('Using config files: ' + onitConfigFile.sources.join(', '));
         if (!onitConfigFile.json.serve) {
-            throw new Error('Il serve non è disponibile. Verifica di avere la proprietà <serve> nel file di configurazioen di onit.');
+            throw new Error('Serve is not available. Check your onit config file at <serve> property.');
         }
         // lock to the required builder version or get the most recent one
         const requiredVersion = (_b = onitConfigFile.json.serve.version) !== null && _b !== void 0 ? _b : '*';
@@ -50,10 +50,10 @@ const exec = async (argv) => {
         // use npm semver to select the most recent usable version
         const version = (0, max_satisfying_1.default)(availableVersions, requiredVersion);
         if (!version) {
-            throw new Error('No compatible server version found for required ' + requiredVersion + '. Check your onit config file serve.version value.');
+            throw new Error('No compatible serve version found for required ' + requiredVersion + '. Check your onit config file serve.version value.');
         }
         // version found: Load that builder and use it.
-        logger_1.logger.info('Uso serve V' + version);
+        logger_1.logger.info('Using serve version ' + version);
         // eslint-disable-next-line @typescript-eslint/no-var-requires
         const serve = require(path_1.default.join(__dirname, './versions/' + version + '/index.js'));
         // autoset the hardcoded params
@@ -64,7 +64,7 @@ const exec = async (argv) => {
         await serve.start(onitConfigFile, version, argv);
     }
     catch (e) {
-        logger_1.logger.error('Serve interrotto');
+        logger_1.logger.error('Serve aborted');
         throw e;
     }
 };

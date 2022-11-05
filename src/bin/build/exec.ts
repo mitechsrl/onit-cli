@@ -69,7 +69,7 @@ const exec: CommandExecFunction = async (argv: yargs.ArgumentsCamelCase<unknown>
             params.push(...onitConfigFile.json.build.params);
         }*/
 
-        await build.start(onitConfigFile, version, argv);
+        await build.default(onitConfigFile, argv);
     } catch (e) {
         logger.error('Build aborted');
         throw e;

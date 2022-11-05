@@ -58,9 +58,29 @@ export type OnitConfigFileCopyFile = {
     glob?:string[]
 };
 
+export type OnitConfigFileBuildExtraStep = {
+    name?:string, 
+    cwd?:string,
+    cmd?: string|string[] 
+};
+
+export type OnitConfigFileBuildTarget = {
+    key?:string,
+    mode?:string,
+    version?: {
+        propose?:boolean,
+        additional?: {
+            name?: string,
+            cmd?: string
+        }
+    },
+    beforeSteps?:OnitConfigFileBuildExtraStep[],
+    afterSteps?:OnitConfigFileBuildExtraStep[]
+};
 export type OnitConfigFileBuild = {
     // serve version
     version?:string,
+    targets?: { [k:string]:OnitConfigFileBuildTarget }
 };
 
 export type OnitConfigFile = {

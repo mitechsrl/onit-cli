@@ -21,6 +21,7 @@ export declare type NpmRegistry = {
     [k: string]: any;
 };
 export declare const npmExecutable: string;
+export declare const npxExecutable: string;
 /**
  * ottiene url del registry per lo scope scelto
  */

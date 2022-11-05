@@ -32,6 +32,7 @@ export type NpmRegistry = {
 // windows fa il windows percui lui vuole 'npm.cmd' anzichè 'npm' come comando di avvio
 const isWindows = (process.env.OS || '').toUpperCase().includes('WIN');
 export const npmExecutable = isWindows ? 'npm.cmd' : 'npm';
+export const npxExecutable = isWindows ? 'npx.cmd' : 'npm';
 
 /**
  * ottiene url del registry per lo scope scelto

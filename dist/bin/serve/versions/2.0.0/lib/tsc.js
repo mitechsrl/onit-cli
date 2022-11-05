@@ -33,7 +33,7 @@ const spawnNodeProcess_1 = require("./spawnNodeProcess");
 const spawnSubprocess_1 = require("./spawnSubprocess");
 const readline_1 = __importDefault(require("readline"));
 const lodash_1 = __importDefault(require("lodash"));
-const copyExtraFiles_1 = require("./copyExtraFiles");
+const copyExtraFiles_1 = require("../../../../build/versions/2.0.0/lib/copyExtraFiles");
 const client_1 = __importDefault(require("tsc-watch/client"));
 /*
 const TscWatchClient = require('tsc-watch/client');

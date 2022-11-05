@@ -25,8 +25,8 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 import { GenericObject } from '../../../../../types';
 import path from 'path';
-import { mixinFromFile } from '../lib/mixinFromFile';
-import { progressHandler } from '../lib/progressHandler';
+import { mixinFromFile } from '../../../../build/versions/2.0.0/lib/mixinFromFile';
+import { progressHandler } from '../../../../build/versions/2.0.0/lib/progressHandler';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
@@ -34,7 +34,7 @@ import TerserPlugin from 'terser-webpack-plugin';
 import CaseSensitivePathsPlugin from 'case-sensitive-paths-webpack-plugin';
 import { CleanWebpackPlugin } from 'clean-webpack-plugin';
 import { ProgressPlugin } from 'webpack';
-import { babelConfig } from './babel.config';
+import { babelConfig } from '../../../../build/versions/2.0.0/configFiles/babel.config';
 
 // No tpescript for this package.
 // eslint-disable-next-line @typescript-eslint/no-var-requires

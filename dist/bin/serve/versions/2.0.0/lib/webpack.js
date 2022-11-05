@@ -30,9 +30,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.webpackDevBuildAndWatch = void 0;
 const lodash_1 = __importDefault(require("lodash"));
 const webpack_config_1 = require("../configFiles/webpack.config");
-const buildWebpackConfig_1 = require("./buildWebpackConfig");
-const searchEntryPoints_1 = require("./searchEntryPoints");
+const buildWebpackConfig_1 = require("../../../../build/versions/2.0.0/lib/buildWebpackConfig");
 const webpackWatcher_1 = require("./webpackWatcher");
+const searchEntryPoints_1 = require("../../../../build/versions/2.0.0/lib/searchEntryPoints");
 /**
  * Launch a webpack build & watch. Resolve when the user trigger SIGINT (since this is a cli,
  * the user acan stop it by pressing ctrl+c)

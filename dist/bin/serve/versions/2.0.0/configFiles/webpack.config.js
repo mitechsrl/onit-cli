@@ -29,8 +29,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.webpackConfigFactory = void 0;
 const path_1 = __importDefault(require("path"));
-const mixinFromFile_1 = require("../lib/mixinFromFile");
-const progressHandler_1 = require("../lib/progressHandler");
+const mixinFromFile_1 = require("../../../../build/versions/2.0.0/lib/mixinFromFile");
+const progressHandler_1 = require("../../../../build/versions/2.0.0/lib/progressHandler");
 const html_webpack_plugin_1 = __importDefault(require("html-webpack-plugin"));
 const mini_css_extract_plugin_1 = __importDefault(require("mini-css-extract-plugin"));
 const css_minimizer_webpack_plugin_1 = __importDefault(require("css-minimizer-webpack-plugin"));
@@ -38,7 +38,7 @@ const terser_webpack_plugin_1 = __importDefault(require("terser-webpack-plugin")
 const case_sensitive_paths_webpack_plugin_1 = __importDefault(require("case-sensitive-paths-webpack-plugin"));
 const clean_webpack_plugin_1 = require("clean-webpack-plugin");
 const webpack_1 = require("webpack");
-const babel_config_1 = require("./babel.config");
+const babel_config_1 = require("../../../../build/versions/2.0.0/configFiles/babel.config");
 // No tpescript for this package.
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const FriendlyErrorsWebpackPlugin = require('@soda/friendly-errors-webpack-plugin');

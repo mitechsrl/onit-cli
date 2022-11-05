@@ -4,7 +4,7 @@ const config: Command = {
 
     description: 'Build utility',
     exec: './exec',
-    params: [    ]
+    params: [ ]
 };
 
 export default config;

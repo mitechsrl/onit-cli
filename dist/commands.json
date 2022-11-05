@@ -1,5 +1,10 @@
 [
     {
+        "cmd": "build",
+        "file": "bin\\build\\commandConfig.js",
+        "children": []
+    },
+    {
         "cmd": "serve",
         "file": "bin\\serve\\commandConfig.js",
         "children": []

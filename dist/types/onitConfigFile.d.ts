@@ -33,6 +33,30 @@ export declare type OnitConfigFileCopyFile = {
     from?: string;
     glob?: string[];
 };
+export declare type OnitConfigFileBuildExtraStep = {
+    name?: string;
+    cwd?: string;
+    cmd?: string | string[];
+};
+export declare type OnitConfigFileBuildTarget = {
+    key?: string;
+    mode?: string;
+    version?: {
+        propose?: boolean;
+        additional?: {
+            name?: string;
+            cmd?: string;
+        };
+    };
+    beforeSteps?: OnitConfigFileBuildExtraStep[];
+    afterSteps?: OnitConfigFileBuildExtraStep[];
+};
+export declare type OnitConfigFileBuild = {
+    version?: string;
+    targets?: {
+        [k: string]: OnitConfigFileBuildTarget;
+    };
+};
 export declare type OnitConfigFile = {
     json: {
         component?: boolean;
@@ -41,6 +65,7 @@ export declare type OnitConfigFile = {
         webpackEntryPointPaths?: string[];
         link?: OnitConfigFileLink[];
         serve?: OnitConfigFileServe;
+        build?: OnitConfigFileBuild;
         test?: {
             [k: string]: OnitConfigFileTestTarget;
         };
