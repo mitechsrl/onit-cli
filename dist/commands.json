@@ -9,13 +9,28 @@
         "file": "bin\\create\\commandConfig.js",
         "children": [
             {
+                "cmd": "controller",
+                "file": "bin\\create\\controller\\commandConfig.js",
+                "children": []
+            },
+            {
                 "cmd": "model",
                 "file": "bin\\create\\model\\commandConfig.js",
                 "children": []
             },
             {
+                "cmd": "relation",
+                "file": "bin\\create\\relation\\commandConfig.js",
+                "children": []
+            },
+            {
                 "cmd": "repository",
                 "file": "bin\\create\\repository\\commandConfig.js",
+                "children": []
+            },
+            {
+                "cmd": "service",
+                "file": "bin\\create\\service\\commandConfig.js",
                 "children": []
             }
         ]

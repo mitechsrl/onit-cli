@@ -1,6 +1,6 @@
 import { CommandExecFunction, GenericObject } from '../../../types';
 /**
- * Prompt the user tfor repository generation
+ * Prompt the user for repository generation
  *
  * @param repoGeneratorParams
  */
