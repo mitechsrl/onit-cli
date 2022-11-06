@@ -1,10 +1,11 @@
-const { readFileSync, writeFileSync } = require('fs');
-const { snakeCase, camelCase, capitalize, upperFirst } = require('lodash');
-const { readdir } = require('fs').promises;
-const { resolve, join } = require('path');
+import { readFileSync, writeFileSync } from 'fs';
+import { upperFirst } from 'lodash';
+import { readdir } from 'fs/promises';
+import { resolve, join } from 'path';
+import { GenericObject } from '../../../../types';
 
-async function getFiles (dir) {
-    const files = [];
+async function getFiles(dir:string) {
+    const files: string[] = [];
     const dirents = await readdir(dir, { withFileTypes: true });
     for (const dirent of dirents) {
         const res = resolve(dir, dirent.name);
@@ -17,7 +18,7 @@ async function getFiles (dir) {
     return files;
 }
 
-module.exports.replaceValues = async function (cwd, answers) {
+export async function replaceValues(cwd:string, answers:GenericObject) {
     const originalCwd = process.cwd();
     process.chdir(cwd);
     const replacements = [ // find & replace in files di src
@@ -48,4 +49,4 @@ module.exports.replaceValues = async function (cwd, answers) {
     });
 
     process.chdir(originalCwd);
-};
+}

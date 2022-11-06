@@ -1,7 +1,8 @@
-const { writeFileSync, unlinkSync, statSync, rmSync } = require('fs');
-const { join } = require('path');
+import { writeFileSync, unlinkSync, statSync, rmSync } from 'fs';
+import { join } from 'path';
+import { GenericObject } from '../../../../types';
 
-module.exports.removeUnwantedFiles = async function (cwd, answers) {
+export async function removeUnwantedFiles(cwd:string, answers: GenericObject) {
     // files to be deleted
     const deleteFiles = [
         './src/controllers/onit-demo',
@@ -30,4 +31,4 @@ module.exports.removeUnwantedFiles = async function (cwd, answers) {
         const filename = join(cwd, file);
         writeFileSync(filename, '');
     }
-};
+}

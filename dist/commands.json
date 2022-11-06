@@ -9,6 +9,11 @@
         "file": "bin\\create\\commandConfig.js",
         "children": [
             {
+                "cmd": "app",
+                "file": "bin\\create\\app\\commandConfig.js",
+                "children": []
+            },
+            {
                 "cmd": "controller",
                 "file": "bin\\create\\controller\\commandConfig.js",
                 "children": []

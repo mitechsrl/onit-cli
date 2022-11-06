@@ -23,27 +23,22 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
 
-const { existsSync } = require('fs-extra');
-const path = require('path');
-const inquirer = require('inquirer');
-const spawn = require('../../../lib/spawn');
-const logger = require('../../../lib/logger');
-const { replaceValues } = require('./_lib/replaceValues');
-const { fixPackageJson } = require('./_lib/fixPackageJson');
-const { removeUnwantedFiles } = require('./_lib/removeUnwantedFiles');
-const { relpaceInFile } = require('./_lib/replaceInFile');
-const { camelCase, snakeCase, upperFirst } = require('lodash');
-const { fixOnitConfig } = require('./_lib/fixOnitConfig');
-const { unlinkGitRepo, commitRepo } = require('./_lib/git');
+import inquirer from 'inquirer';
+import { camelCase, snakeCase, upperFirst } from 'lodash';
+import yargs from 'yargs';
+import { join } from 'path';
+import { CommandExecFunction, GenericObject } from '../../../types';
+import { existsSync } from 'fs';
+import { logger } from '../../../lib/logger';
+import { spawn } from '../../../lib/spawn';
+import { commitRepo, unlinkGitRepo } from './lib/git';
+import { replaceValues } from './lib/replaceValues';
+import { fixPackageJson } from './lib/fixPackageJson';
+import { removeUnwantedFiles } from './lib/removeUnwantedFiles';
+import { fixOnitConfig } from './lib/fixOnitConfig';
+import { replaceInFile } from './lib/replaceInFile';
 
-module.exports.info = 'Create a new empty onit-based app';
-module.exports.help = [
-    'Create a new empty onit-based app by cloning the @mitech/onit-next-example-webcomponent repository.',
-    'NOTE: this command requires read permissions on such repository'
-];
-
-module.exports.cmd = async function (basepath, params) {
-    // await spawn('git', ['clone', 'https://github.com/mitechsrl/onit-next-example-webcomponent.git','ciaooo']);
+const exec: CommandExecFunction = async (argv: yargs.ArgumentsCamelCase<unknown>) => {
     const nameMatch = /^(@[a-zA-Z0-9-_]+\/){0,1}([a-zA-Z0-9-_]+)$/g;
     const answers = await inquirer.prompt([
         {
@@ -62,7 +57,7 @@ module.exports.cmd = async function (basepath, params) {
             type: 'input',
             name: 'componentClassName',
             message: 'Component class name',
-            default: (answers) => {
+            default: (answers: GenericObject) => {
                 return 'Onit' + upperFirst(camelCase(answers.appName.replace(nameMatch, '$2'))) + 'Component';
             },
             validate: (v) => {
@@ -76,7 +71,7 @@ module.exports.cmd = async function (basepath, params) {
             type: 'input',
             name: 'databaseName',
             message: 'Database name for local serve',
-            default: (answers) => {
+            default: (answers: GenericObject) => {
                 return snakeCase(answers.appName.replace(nameMatch, '$2')).replace(/_/g, '-');
             }
         }
@@ -113,7 +108,7 @@ module.exports.cmd = async function (basepath, params) {
     answers.appNameWithoutScope = answers.appName.replace(/^@[^/]+\//, '');
     console.warn('Name without scope: ' + answers.appNameWithoutScope);
 
-    const directory = path.join(process.cwd(), './' + answers.appNameWithoutScope);
+    const directory = join(process.cwd(), './' + answers.appNameWithoutScope);
     if (existsSync(directory)) {
         throw new Error(`Directory ${directory} already exists. Please select another name`);
     }
@@ -135,8 +130,8 @@ module.exports.cmd = async function (basepath, params) {
     await fixOnitConfig(directory, answers);
 
     // replace some code lines
-    await relpaceInFile(
-        path.join(directory, './src/client/routes/main.ts'),
+    await replaceInFile(
+        join(directory, './src/client/routes/main.ts'),
         /^.+demoRouter.+;/mg,
         '');
 
@@ -149,3 +144,5 @@ module.exports.cmd = async function (basepath, params) {
     logger.log(' > npm install');
     logger.log(' > onit serve');
 };
+
+export default exec;
