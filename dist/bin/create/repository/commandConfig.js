@@ -25,7 +25,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 */
 Object.defineProperty(exports, "__esModule", { value: true });
 const config = {
-    description: 'Repository creation utility',
+    description: 'Create a repository',
     longHelp: 'Interctive repository creation tool.  This tool must be run into a onit-based app directory',
     exec: './exec',
     params: []

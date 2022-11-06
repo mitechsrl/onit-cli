@@ -27,7 +27,7 @@ import { Command } from '../../../types';
 
 const config: Command = {
 
-    description: 'Service creation utility',
+    description: 'Create a service',
     longHelp:'Interctive service creation tool. This tool must be run into a onit-based app directory',
     exec: './exec',
     params: [ ]

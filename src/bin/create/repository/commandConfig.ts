@@ -27,7 +27,7 @@ import { Command } from '../../../types';
 
 const config: Command = {
 
-    description: 'Repository creation utility',
+    description: 'Create a repository',
     longHelp:'Interctive repository creation tool.  This tool must be run into a onit-based app directory',
     exec: './exec',
     params: [ ]

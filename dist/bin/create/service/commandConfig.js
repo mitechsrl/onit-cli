@@ -25,7 +25,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 */
 Object.defineProperty(exports, "__esModule", { value: true });
 const config = {
-    description: 'Service creation utility',
+    description: 'Create a service',
     longHelp: 'Interctive service creation tool. This tool must be run into a onit-based app directory',
     exec: './exec',
     params: []
