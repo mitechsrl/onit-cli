@@ -1,3 +1,4 @@
+"use strict";
 /*
 Copyright (c) 2021 Mitech S.R.L.
 
@@ -22,13 +23,10 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
-
-const logger = require('../../lib/logger');
-
-module.exports.info = 'Artifact creation utility';
-module.exports.help = [
-];
-
-module.exports.cmd = async function (basepath, params) {
-    logger.log('Nothing to do here. Add -h for help');
+Object.defineProperty(exports, "__esModule", { value: true });
+const logger_1 = require("../../lib/logger");
+const exec = async (argv) => {
+    logger_1.logger.log('Nothing to do here. Add -h for help');
 };
+exports.default = exec;
+//# sourceMappingURL=exec.js.map

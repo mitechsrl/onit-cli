@@ -22,41 +22,38 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
-const ModelGenerator = require('@loopback/cli/generators/model/index');
-const { repoGenerator } = require('../repository');
-const { CustomModelGenerator } = require('./_lib/CustomModelGenerator');
-const inquirer = require('inquirer');
 
-module.exports.info = 'Create a model';
-module.exports.help = [
-    'Interctive model creation tool. This tool must be runinto a onit-based app directory'
-];
+import yargs from 'yargs';
+import { CommandExecFunction, GenericObject } from '../../../types';
+import { CustomRepositoryGenerator } from './lib/CustomRepositoryGenerator';
 
-module.exports.cmd = async function (basepath, params) {
-    const modelGenerator = new CustomModelGenerator();
+// @loopback-cli is not a library, there's not typings
+// We are just leveraging on some implementation to reuse them
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const RepositoryGenerator = require('@loopback/cli/generators/repository/index');
+
+/**
+ * Prompt the user for repository generation
+ * 
+ * @param repoGeneratorParams 
+ */
+export async function repoGenerator (repoGeneratorParams?: GenericObject) {
+    const repoGenerator = new CustomRepositoryGenerator();
+    if (repoGeneratorParams) repoGenerator.presetValues(repoGeneratorParams);
 
     // NOTE: the orignal class methods were run with yeoman.
     // Yeoman runs sequentially the class mehods. Imitating it with this code.
-    for (const method of Object.getOwnPropertyNames(ModelGenerator.prototype)) {
+    for (const method of Object.getOwnPropertyNames(RepositoryGenerator.prototype)) {
         // NOTE1: skipping checkLoopBackProject to avoid dependency checks. We just need to create the model file
         // NOTE2: skipping methods starting with _. Those are private.
         if (['constructor', 'checkLoopBackProject'].includes(method) || method.startsWith('_')) continue;
 
-        await modelGenerator[method]();
+        await repoGenerator[method]();
     }
+}
 
-    // Ask the user if he wants to create the relative repository
-    const answers = await inquirer.prompt([{ type: 'confirm', name: 'createRepo', message: 'Do you want to create a repository for this model?', default: false }]);
-    if (answers.createRepo) {
-        // pass these values to the repo generators, so we can skip inquirer prompts
-        const presets = {
-            modelNameList: [modelGenerator.artifactInfo.className],
-            mixins: modelGenerator.artifactInfo.mixins,
-            idProperty: Object.keys(modelGenerator.artifactInfo.properties).find(k => {
-                if (modelGenerator.artifactInfo.properties[k].id) return true;
-                return false;
-            })
-        };
-        await repoGenerator(presets);
-    }
+const exec: CommandExecFunction = async (argv: yargs.ArgumentsCamelCase<unknown>) => {
+    await repoGenerator();
 };
+
+export default exec;

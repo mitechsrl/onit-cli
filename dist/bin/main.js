@@ -10,7 +10,9 @@ const logger_1 = require("../lib/logger");
 const packageJson_1 = require("../lib/packageJson");
 exports.cli = yargs_1.default.scriptName('onit')
     .usage('$0 <cmd> [args]')
+    // NOTE: the help message is auto-translated based on OS language. No need to change it.
     .option('h', { alias: 'help' })
+    // THose are global parameters valid everywhere
     .option('verbose', { describe: 'Enable verbose log', type: 'boolean' })
     .option('log-to-file', { describe: 'Save output to log file', type: 'boolean' })
     .version(false)

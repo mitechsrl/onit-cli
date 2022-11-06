@@ -1,3 +1,4 @@
+"use strict";
 /*
 Copyright (c) 2021 Mitech S.R.L.
 
@@ -22,30 +23,35 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
-
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.repoGenerator = void 0;
+const CustomRepositoryGenerator_1 = require("./lib/CustomRepositoryGenerator");
+// @loopback-cli is not a library, there's not typings
+// We are just leveraging on some implementation to reuse them
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const RepositoryGenerator = require('@loopback/cli/generators/repository/index');
-const { CustomRepositoryGenerator } = require('./_lib/CustomRepositoryGenerator');
-
-module.exports.info = 'Create a repository';
-module.exports.help = [
-    'Interctive repository creation tool.  This tool must be run into a onit-based app directory'
-];
-
-async function repoGenerator (repoGeneratorParams) {
-    const repoGenerator = new CustomRepositoryGenerator();
-    if (repoGeneratorParams) repoGenerator.presetValues(repoGeneratorParams);
-
+/**
+ * Prompt the user tfor repository generation
+ *
+ * @param repoGeneratorParams
+ */
+async function repoGenerator(repoGeneratorParams) {
+    const repoGenerator = new CustomRepositoryGenerator_1.CustomRepositoryGenerator();
+    if (repoGeneratorParams)
+        repoGenerator.presetValues(repoGeneratorParams);
     // NOTE: the orignal class methods were run with yeoman.
     // Yeoman runs sequentially the class mehods. Imitating it with this code.
     for (const method of Object.getOwnPropertyNames(RepositoryGenerator.prototype)) {
         // NOTE1: skipping checkLoopBackProject to avoid dependency checks. We just need to create the model file
         // NOTE2: skipping methods starting with _. Those are private.
-        if (['constructor', 'checkLoopBackProject'].includes(method) || method.startsWith('_')) continue;
-
+        if (['constructor', 'checkLoopBackProject'].includes(method) || method.startsWith('_'))
+            continue;
         await repoGenerator[method]();
     }
 }
-module.exports.repoGenerator = repoGenerator;
-module.exports.cmd = async function (basepath, params) {
+exports.repoGenerator = repoGenerator;
+const exec = async (argv) => {
     await repoGenerator();
 };
+exports.default = exec;
+//# sourceMappingURL=exec.js.map
