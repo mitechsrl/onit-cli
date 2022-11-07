@@ -45,7 +45,7 @@ const copyExtraFiles = require('../../../../../shared/2.0.0/lib/copyExtraFiles')
 const subProcesses = [];
 async function tscWatchAndRun(onitConfigFile, argv) {
     const exitAfterTsc = argv.exit;
-    const launchNode = argv.watch;
+    const launchNode = !argv.watch;
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve) => {
         const fileCopy = await (0, copyExtraFiles_1.copyExtraFiles)(onitConfigFile);

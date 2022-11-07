@@ -61,6 +61,13 @@ const config = {
             }
         },
         {
+            name: 'watch',
+            config: {
+                type: 'boolean',
+                description: 'Watch on build'
+            }
+        },
+        {
             name: 'c',
             config: {
                 description: 'Utilizza il file di serve specificato',

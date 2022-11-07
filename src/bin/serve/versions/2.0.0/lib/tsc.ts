@@ -44,7 +44,7 @@ const subProcesses: SpawnSubprocessResult[]= [];
 
 export async function tscWatchAndRun(onitConfigFile: OnitConfigFile, argv: yargs.ArgumentsCamelCase<unknown>): Promise<void>{
     const exitAfterTsc = argv.exit;
-    const launchNode = argv.watch;
+    const launchNode = !argv.watch;
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async resolve => {
         const fileCopy = await copyExtraFiles(onitConfigFile);
@@ -58,7 +58,6 @@ export async function tscWatchAndRun(onitConfigFile: OnitConfigFile, argv: yargs
 
         const launchOrReload = () => {
             if (!launchNode) return;
-
             if (nodeProcess) {
                 // we have an already running node porcess. kill it and respawn
                 console.log('Reloading node app...');

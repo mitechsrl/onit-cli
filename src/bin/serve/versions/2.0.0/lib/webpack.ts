@@ -50,7 +50,7 @@ export async function webpackDevBuildAndWatch (onitConfigFile: OnitConfigFile, c
     const thisProjectWebpackExports = await buildWebpackConfig(process.cwd(), onitConfigFile);
 
     // create a webpack config for the current path project
-    let webpackConfig = webpackConfigFactory(process.cwd(), {
+    let webpackConfig = await webpackConfigFactory(process.cwd(), {
         entryPoints: entryPoints,
         minimize: argv.minimize,
         production: argv.prod,

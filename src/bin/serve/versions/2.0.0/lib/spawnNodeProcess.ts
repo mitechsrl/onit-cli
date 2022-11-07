@@ -11,7 +11,7 @@ import { spawn, ChildProcessWithoutNullStreams } from 'child_process';
  * @param {*} serveConfig
  * @returns
  */
-export function buildEnvironment (onitConfigFile: OnitConfigFile, serveConfig: OnitConfigFileServe, argv: yargs.ArgumentsCamelCase<{}>) {
+export function buildEnvironment (onitConfigFile: OnitConfigFile, serveConfig: OnitConfigFileServe, argv: yargs.ArgumentsCamelCase<unknown>) {
     // Prepare the env variables
     let env = serveConfig.environment || {};
 
@@ -95,7 +95,7 @@ export type SpawnNodeProcessResult = {
 export function spawnNodeProcess (
     onitConfigFile: OnitConfigFile,
     serveConfig: OnitConfigFileServe,
-    argv: yargs.ArgumentsCamelCase<{}>,
+    argv: yargs.ArgumentsCamelCase<unknown>,
     nodeParams: string[] = [],
     spawnOptions: GenericObject = {}
 ):SpawnNodeProcessResult {
@@ -116,7 +116,7 @@ export function spawnNodeProcess (
     });
 
     // finally launch the node process
-    let proc: ChildProcessWithoutNullStreams |null = spawn('node', finalParams,_spawnOptions );
+    let proc: ChildProcessWithoutNullStreams |null = spawn('node', finalParams, _spawnOptions );
 
     // attach a exit callback.
     let afterKillCb: (()=> void) | boolean = false; // valid only when the user kill the app (basically by reload)
@@ -150,7 +150,7 @@ export function spawnNodeProcess (
  * @param {*} nodeParams
  * @returns
  */
-export async function spawnNodeProcessPromise (onitConfigFile: OnitConfigFile, serveConfig: OnitConfigFileServe, argv: yargs.ArgumentsCamelCase<{}>, nodeParams: string[]): Promise<void> {
+export async function spawnNodeProcessPromise (onitConfigFile: OnitConfigFile, serveConfig: OnitConfigFileServe, argv: yargs.ArgumentsCamelCase<unknown>, nodeParams: string[]): Promise<void> {
     return new Promise(resolve => {
         const nodeProcess = spawnNodeProcess(onitConfigFile, serveConfig, argv, nodeParams);
 

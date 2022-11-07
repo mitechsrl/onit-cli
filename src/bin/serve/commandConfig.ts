@@ -9,7 +9,7 @@ const config: Command = {
             name: 't',
             config: {
                 type:'boolean',
-                description:'Esegui tsc e node' 
+                description:'Run tsc and node only' 
             } 
         },
         {
@@ -51,20 +51,27 @@ const config: Command = {
             name: 'dangerouslyenablesmtpserver',
             config: {
                 type:'boolean',
-                description: 'Abilita env EMAIL_SERVER. Usa con cautela' 
+                description: 'Enable env EMAIL_SERVER variable' 
             } 
         },
         {
             name: 'w',
             config: {
                 type:'boolean',
-                description:'Esegui solo webpack' 
+                description:'Run webpack only' 
+            } 
+        },
+        {
+            name: 'watch',
+            config: {
+                type:'boolean',
+                description:'Watch on build' 
             } 
         },
         {
             name: 'c',
             config: {
-                description:'Utilizza il file di serve specificato',
+                description:'Use the specified onit config file',
                 type:'string' 
             } 
         },
@@ -73,7 +80,7 @@ const config: Command = {
             config: {
                 alias: 'debug',
                 type:'boolean',
-                description: 'Avvia il processo node con il flag --inspact' 
+                description: 'Start node process with --inspact' 
             } 
         }
     ]
