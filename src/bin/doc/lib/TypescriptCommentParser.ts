@@ -1,8 +1,31 @@
-const { TSDocParser, DocExcerpt, TSDocConfiguration, TSDocTagSyntaxKind, TSDocTagDefinition } = require('@microsoft/tsdoc');
-const { forEachComment } = require('tsutils');
-const ts = require('typescript');
+import { TSDocParser, DocExcerpt, TSDocConfiguration, TSDocTagSyntaxKind, TSDocTagDefinition, DocNode } from '@microsoft/tsdoc';
+import { forEachComment } from 'tsutils';
+import ts from 'typescript';
 
-class TypescriptCommentParser {
+export type DocumentationBlock = {
+    title: string,
+    summary: string[],
+    chapter: string,
+    params: { name:string, description:string }[],
+    returns: string,
+    remarks: string,
+    privateRemarks: string,
+    see: string[],
+    throws: string[],
+    example: string[],
+    priority: number,
+    beta: boolean,
+    alpha: boolean,
+    deprecated: string,
+    virtual: boolean,
+    override: boolean,
+    remarksBlock: string,
+    __filename: string
+};
+
+export class TypescriptCommentParser {
+
+    private tsdocParser: TSDocParser;
     constructor () {
         const config = new TSDocConfiguration();
 
@@ -15,32 +38,11 @@ class TypescriptCommentParser {
             config.addTagDefinition(tag);
             config.setSupportForTag(tag, true);
         });
-        /*
-        const tag2 = new TSDocTagDefinition({
-            tagName: '@title',
-            syntaxKind: TSDocTagSyntaxKind.BlockTag
-        });
-        config.addTagDefinition(tag2);
-        config.setSupportForTag(tag2, true);
-
-        const tag3 = new TSDocTagDefinition({
-            tagName: '@summary',
-            syntaxKind: TSDocTagSyntaxKind.BlockTag
-        });
-        config.addTagDefinition(tag3);
-        config.setSupportForTag(tag3, true);
-
-        const tag3 = new TSDocTagDefinition({
-            tagName: '@summary',
-            syntaxKind: TSDocTagSyntaxKind.BlockTag
-        });
-        config.addTagDefinition(tag3);
-        config.setSupportForTag(tag3, true);
-*/
+        
         this.tsdocParser = new TSDocParser(config);
     }
 
-    renderDocNode (docNode) {
+    renderDocNode (docNode:DocNode) {
         let result = '';
         if (docNode) {
             if (docNode instanceof DocExcerpt) {
@@ -53,7 +55,7 @@ class TypescriptCommentParser {
         return result;
     }
 
-    renderDocNodes (docNodes) {
+    renderDocNodes (docNodes: DocNode[]) {
         let result = '';
         for (const docNode of docNodes) {
             result += this.renderDocNode(docNode);
@@ -61,16 +63,16 @@ class TypescriptCommentParser {
         return result;
     }
 
-    parseCommentText (commentText, filename) {
+    parseCommentText (commentText:string, filename:string): DocumentationBlock|null {
         const parserContext = this.tsdocParser.parseString(commentText);
         const docComment = parserContext.docComment;
 
-        const block = {
+        const block: DocumentationBlock = {
             title: '',
             summary: [],
             chapter: '',
             params: [],
-            return: '',
+            returns: '',
             remarks: '',
             privateRemarks: '',
             see: [],
@@ -82,6 +84,7 @@ class TypescriptCommentParser {
             deprecated: '',
             virtual: docComment.modifierTagSet.isVirtual(),
             override: docComment.modifierTagSet.isOverride(),
+            remarksBlock:'',
             __filename: filename
         };
 
@@ -93,14 +96,21 @@ class TypescriptCommentParser {
             block.privateRemarks = this.renderDocNode(docComment.privateRemarks.content).trim();
         }
 
+        // @ts-expect-error property
         for (const throwsBlock of docComment.getChildNodes().filter(n => (n.blockTag || {}).tagName === '@throws')) {
+            // @ts-expect-error property
             block.throws.push(this.renderDocNode(throwsBlock.content).trim());
         }
 
+        // @ts-expect-error property
         for (const priorityBlock of docComment.getChildNodes().filter(n => (n.blockTag || {}).tagName === '@priority')) {
+            // @ts-expect-error property
             block.priority = parseInt(this.renderDocNode(priorityBlock.content).trim());
         }
+
+        // @ts-expect-error property
         for (const exampleBlock of docComment.getChildNodes().filter(n => (n.blockTag || {}).tagName === '@example')) {
+            // @ts-expect-error property
             block.example.push(this.renderDocNode(exampleBlock.content).trim());
         }
 
@@ -135,10 +145,10 @@ class TypescriptCommentParser {
         }
 
         if (docComment.returnsBlock) {
-            block.return = this.renderDocNode(docComment.returnsBlock.content).trim();
+            block.returns = this.renderDocNode(docComment.returnsBlock.content).trim();
         }
 
-        block.summary = block.summary.join('\n');
+        block.summary = [block.summary.join('\n')];
 
         if (block.title && block.summary && block.chapter) {
             return block;
@@ -147,12 +157,12 @@ class TypescriptCommentParser {
         return null;
     }
 
-    parseFile (files) {
+    parseFile (files:string[]) {
         const program = ts.createProgram(files, {
             target: ts.ScriptTarget.ES2018
         });
 
-        const blocks = [];
+        const blocks: DocumentationBlock[] = [];
 
         for (const file of files) {
             const sourceFile = program.getSourceFile(file);
@@ -175,4 +185,3 @@ class TypescriptCommentParser {
         return blocks;
     }
 }
-exports.TypescriptCommentParser = TypescriptCommentParser;

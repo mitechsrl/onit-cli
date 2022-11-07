@@ -17,4 +17,5 @@ Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./errors"), exports);
 __exportStar(require("./command"), exports);
 __exportStar(require("./onitConfigFile"), exports);
+__exportStar(require("./onitDocumentationConfigFile"), exports);
 //# sourceMappingURL=index.js.map

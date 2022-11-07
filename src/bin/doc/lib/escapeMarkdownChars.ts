@@ -3,10 +3,9 @@
  * @param {*} str
  * @returns
  */
-function escapeMarkdownChars (str) {
+export function escapeMarkdownChars (str:string) {
     const regex = /([<>|_])/gm;
     const subst = '\\$1';
     return str.replace(regex, subst);
 }
 
-module.exports.escapeMarkdownChars = escapeMarkdownChars;

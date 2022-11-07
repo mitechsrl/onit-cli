@@ -1,5 +1,10 @@
+
+import path from 'path';
+import { OnitDocumentationConfigFileJson } from '../../../types';
+
+// This lib does not have typescript typings
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const globAll = require('glob-all');
-const path = require('path');
 
 /**
  * Find all files with glob.
@@ -10,7 +15,7 @@ const path = require('path');
  * parser is the name of theparser expected to be used to process the file
  * file is the absolute path of the file to be prrocessed
  */
-function findFiles (config, cwd = process.cwd()) {
+export function findFiles(config: OnitDocumentationConfigFileJson, cwd = process.cwd()): Promise<{ file:string, parser:string }[]> {
     const options = {
         ignore: [
             './node_modules/**/*',
@@ -35,20 +40,22 @@ function findFiles (config, cwd = process.cwd()) {
         .reduce((a, g) => {
             a.push(...(Array.isArray(g.glob) ? g.glob : [g.glob]));
             return a;
-        }, []);
+        }, [] as string[]);
 
     return new Promise((resolve, reject) => {
-        globAll(_globList, options, function (err, files) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        globAll(_globList, options, function (err:any, files: string[]) {
             if (err) { return reject(err); }
 
-            resolve(files.map(f => {
+            const result = files.map(f => {
                 return {
                     file: path.resolve(cwd, f),
-                    parser: (globList.find(l => f.toLowerCase().endsWith(l.extension.toLowerCase())) || {}).parser
+                    parser: (globList.find(l => f.toLowerCase().endsWith(l.extension.toLowerCase())) || {}).parser ?? 'unknown'
                 };
-            }));
+            });
+
+            resolve(result);
         });
     });
 }
 
-exports.findFiles = findFiles;

@@ -41,6 +41,11 @@
         ]
     },
     {
+        "cmd": "doc",
+        "file": "bin\\doc\\commandConfig.js",
+        "children": []
+    },
+    {
         "cmd": "serve",
         "file": "bin\\serve\\commandConfig.js",
         "children": []

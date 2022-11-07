@@ -1,33 +1,36 @@
-const path = require('path');
-const fse = require('fs-extra');
-const fs = require('fs');
-const crypto = require('crypto')
 
+import path from 'path';
+import fs from 'fs';
+import fse from 'fs-extra';
+import crypto from 'crypto';
+import { GenericObject, OnitDocumentationConfigFileChapter, OnitDocumentationConfigFileJson, StringError } from '../../../types';
+import { DocumentationBlock } from './TypescriptCommentParser';
 
-class DocBuilder {
+export class DocBuilder {
 
-    configFile = null;
-    outDir = null;
-    blocks = null;
-    scanTargetDir = null;
+    private configFile: OnitDocumentationConfigFileJson;
+    private outDir: string;
+    private blocks: DocumentationBlock[];
+    private scanTargetDir: string;
+
     // keep the callbacks for writing out data. THis allow us to precalculate everything and write them out 
     // only at the end of the process
-    writeCallbacks = [];
+    private writeCallbacks: (()=> void)[] = [];
 
-    constructor(configFile, scanTargetDir, blocks, outDir) {
+    constructor(configFile: OnitDocumentationConfigFileJson, scanTargetDir:string, blocks: DocumentationBlock[] , outDir:string) {
         this.configFile = configFile;
         this.blocks = blocks;
         this.outDir = outDir;
         this.scanTargetDir = scanTargetDir;
     }
 
-    generateBlockContentString(block, defaultTitle) {
+    generateBlockContentString(block: DocumentationBlock, defaultTitle:string) {
         let str = '';
 
         // title is by default h1. If the user add one ort more #, we're keeping that value for sizing.
         if (block.title) {
-            if (!block.title.startsWith("#")) {
-                str += "# ";
+            if (!block.title.startsWith('#')) {
+                str += '# ';
             }
             str += (block.title || defaultTitle) + '\n\n';
         }
@@ -50,12 +53,12 @@ class DocBuilder {
             str += '\n\n';
         }
 
-
-        const chapterPath = this.findChapterPath(this.configFile.chapters, block.chapter, []);
+        const chapterPath = this.findChapterPath(this.configFile.chapters ?? [], block.chapter, []);
+        if (!chapterPath) throw new StringError('Cannot find chapterPath');
         const chapterDepth = chapterPath.length;
 
         // resolve the internal links for better navigation
-        str = this.resolveInternalLink(str, chapterDepth)
+        str = this.resolveInternalLink(str, chapterDepth);
 
         // Resolve image links 
         str = this.resolveImageLink(str, block.__filename, chapterDepth);
@@ -64,7 +67,7 @@ class DocBuilder {
         str = this.resolveSourceIncludes(str, block.__filename);
 
         return str;
-    };
+    }
 
     /**
      * Teplace the [@src filePath transformFunction] with the content of filepath.
@@ -76,7 +79,7 @@ class DocBuilder {
      * @param {*} blockSourceFile block source file
      * @returns
      */
-    resolveSourceIncludes(str, blockSourceFile) {
+    resolveSourceIncludes(str:string, blockSourceFile: string) {
         // resolve reference links
         // [@src filename_relative_path transformFunction]
         const regex = /\[@src +([^ \]]+) *([^ \]]+)? *(.*)?\]/gm;
@@ -105,15 +108,16 @@ class DocBuilder {
 
             const fileContent = fs.readFileSync(file).toString();
             if (!transformFunction) {
-                transformFunction = 'includeFullFile'
+                transformFunction = 'includeFullFile';
             }
             
             const transformFunctionPath = path.join(__dirname, './includeTransforms/', './' + transformFunction);
             try {
+                // eslint-disable-next-line @typescript-eslint/no-var-requires
                 const fn = require(transformFunctionPath);
                 // this is needed to support class-style includeTransforms
-                if (typeof fn.ProcessorClass === 'function'){
-                    const processor = new fn.ProcessorClass();
+                if (typeof fn.default === 'function'){
+                    const processor = new fn.default();
                     replace = processor.parse(fileContent, file, params);
                 }else{
                     replace = fn(fileContent, params);
@@ -121,23 +125,22 @@ class DocBuilder {
             } catch (e) {
                 console.warn('Transform of ' + found + ' failed, error:' + e);
             }
-            
 
             str = str.replace(found, replace);
         }
         return str;
-    };
+    }
 
     /**
      * Create the string content of the file for the current chapterConfig
      * @param {*} chapterConfig 
      * @returns The file content
      */
-    buildChapterFileContent(chapterConfig) {
+    buildChapterFileContent(chapterConfig: OnitDocumentationConfigFileChapter) {
         const blocksByChapter = this.blocks.filter(b => b.chapter === chapterConfig.chapter);
         // add extracted blocks markdown
         if (blocksByChapter.length > 0) {
-            const defaultTitle = chapterConfig.title;
+            const defaultTitle = chapterConfig.title ?? '';
             // sort them
             blocksByChapter.sort((a, b) => a.priority - b.priority);
             // merge all the blocks for this chapter into a "mega arkdown text"
@@ -147,13 +150,14 @@ class DocBuilder {
         return '';
     }
 
-    reduceJekillHeader(acc, e) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    reduceJekillHeader(acc: string, e: any) {
         if (typeof e === 'string') acc = acc + '\n' + e;
         if (Array.isArray(e)) acc = acc + '\n' + e[0] + ': ' + e[1];
         return acc.trim();
-    };
+    }
 
-    createFinalFileContent(header, content = '') {
+    createFinalFileContent(header: GenericObject, content = '') {
         const jekillHeader = [
             '---',
             ['layout', 'page'],
@@ -170,15 +174,15 @@ class DocBuilder {
      * @param {*} parent 
      * @param {*} grandparent 
      */
-    recurseBuildChapterFiles(chapters, parent, grandparent) {
+    recurseBuildChapterFiles(chapters: OnitDocumentationConfigFileChapter[], parent?: OnitDocumentationConfigFileChapter, grandparent?: OnitDocumentationConfigFileChapter) {
         chapters.forEach(chapterConfig => {
 
             // calculate the destination directory
             const fileDir = path.join(
                 this.outDir,
                 this.chapterPathToMarkdownFilename([
-                    grandparent || {},
-                    parent || {},
+                    grandparent || {} as OnitDocumentationConfigFileChapter,
+                    parent || {} as OnitDocumentationConfigFileChapter,
                     chapterConfig
                 ])
             );
@@ -207,7 +211,7 @@ class DocBuilder {
                 const chapterFileContent = this.buildChapterFileContent(chapterConfig);
 
                 // write the file out
-                const headerData = chapterConfig.index || {};
+                const headerData: GenericObject = chapterConfig.index || {};
                 headerData.nav_order = chapterConfig.chapterIndexNumber;
                 const finalFileContent = this.createFinalFileContent(headerData, '\n\n\n' + chapterFileContent);
                 this.writeCallbacks.push(
@@ -242,8 +246,8 @@ class DocBuilder {
                     const chapterFileContent = '1. TOC\n{:toc}\n---\n' + generatedFileContent.replace(regex, subst);
 
                     // write the file out
-                    const fileFullPath = path.join(fileDir, chapterConfig.title.replace(/[^a-zA-Z0-9]/g, '-') + '.md');
-                    const headerData = chapterConfig.page || {};
+                    const fileFullPath = path.join(fileDir, chapterConfig.title?.replace(/[^a-zA-Z0-9]/g, '-') + '.md');
+                    const headerData:GenericObject = chapterConfig.page || {};
                     headerData.nav_order = chapterConfig.chapterIndexNumber;
 
                     const finalFileContent = this.createFinalFileContent(headerData, '\n\n\n' + chapterFileContent);
@@ -257,7 +261,7 @@ class DocBuilder {
             if (chapterConfig.children) {
                 this.recurseBuildChapterFiles(chapterConfig.children, chapterConfig, parent);
             }
-        })
+        });
     }
 
     /**
@@ -269,7 +273,7 @@ class DocBuilder {
      * @param {*} sourceString The string to be processsed for links 
      * @returns The string with processed links
      */
-    resolveImageLink(sourceString, blockSourceFile, chapterDepth) {
+    resolveImageLink(sourceString: string, blockSourceFile:string, chapterDepth:number) {
 
         // match for ![text](link)
         const regex = /!\[([^\]]+)\]\(([^)]+)\)/gm;
@@ -286,7 +290,7 @@ class DocBuilder {
             const srcFilename = path.join(path.dirname(blockSourceFile), m[2]);
             const ext = path.extname(srcFilename);
             const dstPath = path.join(this.outDir, './images/');
-            const hashDstFilename = crypto.createHash('md5').update(srcFilename).digest("hex") + ext;
+            const hashDstFilename = crypto.createHash('md5').update(srcFilename).digest('hex') + ext;
             const dstFilename = path.join(dstPath, hashDstFilename);
 
             // FIXME: questo url è hardcodato, non va bene. Occorre calcolarlo a partire da srcPath (con ../ etc)
@@ -304,57 +308,21 @@ class DocBuilder {
                     }
                     fs.copyFileSync(srcFilename, dstFilename);
                 } else {
-                    console.warn("Image " + srcFilename + ' not found in ' + blockSourceFile)
+                    console.warn('Image ' + srcFilename + ' not found in ' + blockSourceFile);
                 }
-            })
+            });
         }
         return sourceString;
     }
-
-
-    /**
-     * Replaces all the image inclusin links with final markdown code.
-     * This also take care of moving the images in the correct dstination folder
-     * 
-     * @param {*} obj Object to process (recursively)
-     * @param {*} blockSourceFile the source file path where this block comes from
-     * @param {*} chapterDepth The depth of the chapter in the config file
-     * @returns 
-     
-    recurseResolveImageLink(obj, blockSourceFile, chapterDepth) {
-
-        // final step. We got a string, just resolve and return it.
-        if (typeof obj === 'string') return this.resolveImageLink(obj, blockSourceFile, chapterDepth);
-
-        if (obj && Array.isArray(obj)) {
-            obj.forEach((b, index) => {
-                obj[index] = this.recurseResolveImageLink(b, blockSourceFile, chapterDepth);
-            })
-            return obj;
-        }
-
-        if (obj && typeof obj === 'object') {
-            Object.keys(obj).forEach(key => {
-                if (!key.startsWith("_")) {
-                    obj[key] = this.recurseResolveImageLink(obj[key], blockSourceFile, chapterDepth);
-                }
-            });
-            return obj;
-        }
-
-        return obj;
-    }*/
-
 
     /**
      * Convert array which represent a path in filename
      * @param {*} chapterPath 
      * @returns 
      */
-    chapterPathToMarkdownFilename(chapterPath) {
-        return chapterPath.map(p => p.chapter).filter(p => !!p).join(path.sep)
+    chapterPathToMarkdownFilename(chapterPath: OnitDocumentationConfigFileChapter[]) {
+        return chapterPath.map(p => p.chapter).filter(p => !!p).join(path.sep);
     }
-
 
     /**
      * 
@@ -363,16 +331,16 @@ class DocBuilder {
      * @param {*} path 
      * @returns 
      */
-    findChapterPath(chapters, chapter, path = [], matchFn = null) {
+    findChapterPath(chapters : OnitDocumentationConfigFileChapter[], chapter: string , path: OnitDocumentationConfigFileChapter[] = [], matchFn: ((c: OnitDocumentationConfigFileChapter) => boolean) | null = null): OnitDocumentationConfigFileChapter[]|null {
         if (matchFn === null)
             matchFn = c => c.chapter === chapter;
 
         const c = chapters.find(matchFn);
         if (c) return [...path, c];
 
-        for (const chapter of chapters) {
-            if (chapter.children) {
-                const r = this.findChapterPath(chapter.children, chapter, [...path, chapter], matchFn);
+        for (const _chapter of chapters) {
+            if (_chapter.children) {
+                const r = this.findChapterPath(_chapter.children, chapter, [...path, _chapter], matchFn);
                 if (r) return r;
             }
         }
@@ -385,14 +353,14 @@ class DocBuilder {
      * @param {*} chapterDepth 
      * @returns 
      */
-    resolveInternalLink(sourceString, chapterDepth) {
+    resolveInternalLink(sourceString: string, chapterDepth:number) {
         // resolve reference links
         // this matches one from
         // [@link LABEL#Info](for more info)
         // [@link LABEL](for more info)
         // [@link LABEL#Info] 
         // [@link LABEL] 
-        const regex = /\[@link +([a-zA-Z0-9_\-]+)(#[^\]]+)?\](\(([^)]+)\))?/gm;
+        const regex = /\[@link +([a-zA-Z0-9_-]+)(#[^\]]+)?\](\(([^)]+)\))?/gm;
         let m;
 
         while ((m = regex.exec(sourceString)) !== null) {
@@ -406,9 +374,9 @@ class DocBuilder {
             let text = m[4] || ''; // link text.
 
             // match both on chapter and title to make easier creating links
-            const matchFn = c => c.chapter === chapter || c.title === chapter;
+            const matchFn = (c:OnitDocumentationConfigFileChapter) => c.chapter === chapter || c.title === chapter;
 
-            const linkChapterPath = this.findChapterPath(this.configFile.chapters, null, [], matchFn);
+            const linkChapterPath = this.findChapterPath(this.configFile.chapters ?? [], chapter, [], matchFn);
             if (!linkChapterPath || linkChapterPath.length === 0) {
                 console.warn('Link generation for ' + found + ' failed. Nothing found for the specified label.');
                 continue;
@@ -429,7 +397,7 @@ class DocBuilder {
                 ].join(path.sep);
             }
 
-            if (!text) text = linkChapterPath[linkChapterPath.length - 1].title;
+            if (!text) text = linkChapterPath[linkChapterPath.length - 1].title ?? '';
 
             const replace = '[' + text + '](' + linkChapterFilename + ')';
             // console.log("Resolved link " + found + " -> " + replace)
@@ -447,14 +415,13 @@ class DocBuilder {
 
         // Do nothing special, just check and warn about unknown chapters
         this.blocks.forEach(block => {
-            const chapterPath = this.findChapterPath(this.configFile.chapters, block.chapter, []);
+            const chapterPath = this.findChapterPath(this.configFile.chapters ?? [], block.chapter, []);
             if (!chapterPath) {
-                console.warn("Unknown chapter " + block.chapter + ' in ' + block.__filename);
+                console.warn('Unknown chapter ' + block.chapter + ' in ' + block.__filename);
             }
-        })
+        });
 
-
-        this.recurseBuildChapterFiles(this.configFile.chapters, null, null);
+        this.recurseBuildChapterFiles(this.configFile.chapters??[]);
     }
 
     /**
@@ -474,6 +441,5 @@ class DocBuilder {
         }
     }
 }
-
 
 exports.DocBuilder = DocBuilder;
