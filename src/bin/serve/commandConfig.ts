@@ -69,8 +69,9 @@ const config: Command = {
             } 
         },
         {
-            name: 'debug',
+            name: 'd',
             config: {
+                alias: 'debug',
                 type:'boolean',
                 description: 'Avvia il processo node con il flag --inspact' 
             } 
