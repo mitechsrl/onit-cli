@@ -4,7 +4,7 @@ import fs from 'fs';
 import fse from 'fs-extra';
 import crypto from 'crypto';
 import { GenericObject, OnitDocumentationConfigFileChapter, OnitDocumentationConfigFileJson, StringError } from '../../../types';
-import { DocumentationBlock } from './TypescriptCommentParser';
+import { DocumentationBlock } from './types';
 
 export class DocBuilder {
 
@@ -119,8 +119,6 @@ export class DocBuilder {
                 if (typeof fn.default === 'function'){
                     const processor = new fn.default();
                     replace = processor.parse(fileContent, file, params);
-                }else{
-                    replace = fn(fileContent, params);
                 }
             } catch (e) {
                 console.warn('Transform of ' + found + ' failed, error:' + e);

@@ -3,15 +3,15 @@
  * This processor just use the generic class one
  */
 
-const { GenericClassFileParser } = require('./tsClass');
+import GenericClassFileParser, { TsClassMemberMethod } from './tsClass';
 
-class LB4ControllerParser extends GenericClassFileParser {
+export default class LB4ControllerParser extends GenericClassFileParser {
     /**
      * Add a custom piece of markdown after the title. THis mainly prints out the decorators.
      * @param {*} method
      * @returns
      */
-    renderMethodMarkdownAfterTitle (method) {
+    renderMethodMarkdownAfterTitle (method: TsClassMemberMethod): string[] {
         const result = [];
 
         if (method.decorators.length > 0) {
@@ -26,6 +26,3 @@ class LB4ControllerParser extends GenericClassFileParser {
         return result;
     }
 }
-
-// This file MUST export ProcessorClass since it is managed automatically by other scripts
-module.exports.ProcessorClass = LB4ControllerParser;

@@ -1,5 +1,6 @@
-const path = require('path');
-
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const path_1 = require("path");
 class IncludeFullFileParser {
     /**
      *
@@ -7,12 +8,10 @@ class IncludeFullFileParser {
      * @param type
      * @returns the full file as markdowncode block
      */
-    parse (src, filename, params) {
-        const fileType = path.extname(filename).replace(/[.]/, '').toLowerCase() || 'ts';
-
+    parse(src, filename, argv) {
+        const fileType = (0, path_1.extname)(filename).replace(/[.]/, '').toLowerCase() || 'ts';
         return '```' + fileType + '\n' + src + '\n' + '```';
-    };
+    }
 }
-
-// This file MUST export ProcessorClass since it is managed automatically by other scripts
-module.exports.ProcessorClass = IncludeFullFileParser;
+exports.default = IncludeFullFileParser;
+//# sourceMappingURL=includeFullFile.js.map

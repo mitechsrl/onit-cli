@@ -97,12 +97,9 @@ class DocBuilder {
                 // eslint-disable-next-line @typescript-eslint/no-var-requires
                 const fn = require(transformFunctionPath);
                 // this is needed to support class-style includeTransforms
-                if (typeof fn.ProcessorClass === 'function') {
-                    const processor = new fn.ProcessorClass();
+                if (typeof fn.default === 'function') {
+                    const processor = new fn.default();
                     replace = processor.parse(fileContent, file, params);
-                }
-                else {
-                    replace = fn(fileContent, params);
                 }
             }
             catch (e) {

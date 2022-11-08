@@ -1,17 +1,56 @@
 /**
  * Process a repository TS file and produces a markdown document
  */
-const { writeFileSync } = require('fs-extra');
-const ts = require('typescript');
-const { escapeMarkdownChars } = require('../lib/escapeMarkdownChars');
+import ts from 'typescript';
+import yargs from 'yargs';
+import { GenericObject } from '../../../../types';
+import { escapeMarkdownChars } from '../escapeMarkdownChars';
 
+export type TsClassCommon = {
+    name: string,
+    title?: string,
+    chapter?: string,
+    see?: string[],
+    throws?: string[],
+    deprecated?: string[],
+    decorators: {
+        name: string,
+        params: string[],
+    }[],
+    comment: string[],
+};
+
+export type TsClassMemberCommon = {
+    public: boolean,
+    private: boolean,
+    protected: boolean,
+    static: boolean,
+    async: boolean,
+} & TsClassCommon;
+
+export type TsClassMemberProperty ={
+   
+    type: string,
+} & TsClassMemberCommon;
+
+export type TsClassMemberMethod = {
+    params: { name:string, type:string, comment:string }[],
+    returnComment: string,
+    returnType: string,
+} & TsClassMemberCommon;
+
+export type TsClass = {
+    properties: TsClassMemberProperty[],
+    methods: TsClassMemberMethod[],
+    chapter: string,
+} & TsClassCommon;
 /**
  * Parse a generic typescript class
  */
-class GenericClassFileParser {
+export default class GenericClassFileParser {
 
     // internal cache
-    classes = [];
+    classes: TsClass[] = [];
 
     /**
      * Convert a property object to markdown
@@ -19,18 +58,18 @@ class GenericClassFileParser {
      * @param {*} property
      * @returns Array of markdown lines
      */
-    renderPropertyMarkdown (property) {
+    renderPropertyMarkdown (property: TsClassMemberProperty ) {
         // do not output private methods
         if (property.private) return [];
 
         // Create the output
         const content = [];
         const titleBadges = [];
-        if (property.private) titleBadges.push("<span class='badge badge-red'><b>Private</b></span>");
-        if (property.public) titleBadges.push("<span class='badge badge-green'><b>Public</b></span>");
-        if (property.protected) titleBadges.push("<span class='badge badge-yellow'><b>Protected</b></span>");
-        if (property.static) titleBadges.push("<span class='badge badge-gray'><b>Static</b></span>");
-        if (property.async) titleBadges.push("<span class='badge badge-gray'><b>Async</b></span>");
+        if (property.private) titleBadges.push('<span class=\'badge badge-red\'><b>Private</b></span>');
+        if (property.public) titleBadges.push('<span class=\'badge badge-green\'><b>Public</b></span>');
+        if (property.protected) titleBadges.push('<span class=\'badge badge-yellow\'><b>Protected</b></span>');
+        if (property.static) titleBadges.push('<span class=\'badge badge-gray\'><b>Static</b></span>');
+        if (property.async) titleBadges.push('<span class=\'badge badge-gray\'><b>Async</b></span>');
 
         content.push(`#### ${escapeMarkdownChars(property.name)} <span class='member-type'>${escapeMarkdownChars(property.type)}</span> ${titleBadges.join(' ')}`);
         content.push(property.comment.join('\n'));
@@ -43,8 +82,8 @@ class GenericClassFileParser {
      * @param {*} method 
      * @returns 
      */
-    renderMethodMarkdownAfterTitle(method){
-        return []
+    renderMethodMarkdownAfterTitle(method: TsClassMemberMethod): string[]{
+        return [];
     }
 
     /**
@@ -52,7 +91,7 @@ class GenericClassFileParser {
      * @param {*} method
      * @returns Array of markdown lines
      */
-    renderMethodMarkdown (method) {
+    renderMethodMarkdown (method: TsClassMemberMethod) {
         // do not output private methods
         if (method.private) return [];
 
@@ -60,17 +99,16 @@ class GenericClassFileParser {
         const content = [];
 
         const titleBadges = [];
-        if (method.private) titleBadges.push("<span class='badge badge-red'><b>Private</b></span>");
-        if (method.public) titleBadges.push("<span class='badge badge-green'><b>Public</b></span>");
-        if (method.protected) titleBadges.push("<span class='badge badge-yellow'><b>Protected</b></span>");
-        if (method.static) titleBadges.push("<span class='badge badge-gray'><b>Static</b></span>");
-        if (method.async) titleBadges.push("<span class='badge badge-gray'><b>Async</b></span>");
+        if (method.private) titleBadges.push('<span class=\'badge badge-red\'><b>Private</b></span>');
+        if (method.public) titleBadges.push('<span class=\'badge badge-green\'><b>Public</b></span>');
+        if (method.protected) titleBadges.push('<span class=\'badge badge-yellow\'><b>Protected</b></span>');
+        if (method.static) titleBadges.push('<span class=\'badge badge-gray\'><b>Static</b></span>');
+        if (method.async) titleBadges.push('<span class=\'badge badge-gray\'><b>Async</b></span>');
 
         content.push(`### ${method.name} ${titleBadges.join(' ')}`);
 
-        this.render
         // render method signature
-        const signatureParams = [];
+        const signatureParams:string[] = [];
         method.params.forEach(param => {
             signatureParams.push(`${param.name}: ${param.type}`);
         });
@@ -115,7 +153,7 @@ class GenericClassFileParser {
      * @returns Array of markdown lines
      */
     renderMarkdown () {
-        const content = [];
+        const content: string[]= [];
         this.classes.forEach(classDefinition => {
             content.push('## '+classDefinition.name +' class');
             if (classDefinition.properties.length) {
@@ -126,10 +164,9 @@ class GenericClassFileParser {
                 content.push('## Methods');
                 classDefinition.methods.forEach(p => content.push(...this.renderMethodMarkdown(p)));
             }
-        })
+        });
         return content;
     }
-
  
     /**
      * Process the passed-in src file andproduces a markdown output
@@ -139,7 +176,7 @@ class GenericClassFileParser {
      * @param {*} params 
      * @returns the built markdown string
      */
-    parse(src, filename, params){
+    parse(src: string, filename:string, argv: yargs.ArgumentsCamelCase<unknown>){
         // extract file info in internal cache
         this.extractInfo(src);
 
@@ -153,16 +190,18 @@ class GenericClassFileParser {
      * @param {*} n current AST node 
      * @return the populated descripor object
      */
-    processModifiers(obj, n){
-        (n.modifiers || []).forEach(modifier => {
-            switch (modifier.kind) {
-            case ts.SyntaxKind.AsyncKeyword: obj.async = true; break;
-            case ts.SyntaxKind.PublicKeyword: obj.public = true; break;
-            case ts.SyntaxKind.PrivateKeyword: obj.private = true; break;
-            case ts.SyntaxKind.ProtectedKeyword: obj.protected = true; break;
-            case ts.SyntaxKind.StaticKeyword: obj.static = true; break;
-            }
-        });
+    processModifiers<T extends TsClassMemberCommon>(obj: T, n:ts.Node){
+        if (ts.canHaveModifiers(n)){
+            ts.getModifiers(n)?.forEach(modifier => {
+                switch (modifier.kind) {
+                case ts.SyntaxKind.AsyncKeyword: obj.async = true; break;
+                case ts.SyntaxKind.PublicKeyword: obj.public = true; break;
+                case ts.SyntaxKind.PrivateKeyword: obj.private = true; break;
+                case ts.SyntaxKind.ProtectedKeyword: obj.protected = true; break;
+                case ts.SyntaxKind.StaticKeyword: obj.static = true; break;
+                }
+            });
+        }
 
         return obj;
     }
@@ -173,18 +212,22 @@ class GenericClassFileParser {
      * @param {*} n  current AST node 
      * @return the populated descripor object
      */
-    processDecorators(obj, src, n){
-        (n.decorators || []).forEach(decorator => {
-            const expression = decorator.expression.expression;
-            const name = expression.escapedText || src.substring(expression.pos, expression.end);
-            const params = decorator.expression.arguments.map(arg => {
-                return src.substring(arg.pos,arg.end)
-            })
-            obj.decorators.push({
-                name: name,
-                params: params,
-            })
-        });
+    processDecorators<T extends TsClassCommon>(obj: T, src:string, n:ts.Node){
+        if (ts.canHaveDecorators(n)){
+            ts.getDecorators(n)?.forEach(decorator => {
+                // @ts-expect-error expression does exist
+                const expression = decorator.expression.expression;
+                const name = expression.escapedText || src.substring(expression.pos, expression.end);
+                // @ts-expect-error arguments does exists
+                const params = decorator.expression.arguments.map(arg => {
+                    return src.substring(arg.pos,arg.end);
+                });
+                obj.decorators.push({
+                    name: name,
+                    params: params,
+                });
+            });
+        }
 
         return obj;
     }
@@ -195,13 +238,14 @@ class GenericClassFileParser {
      * @param {*} n Current ast node
      * @returns A object describing this property
      */
-    processMethodDeclaration (src, n) {
-        let method = {
+    processMethodDeclaration (src:string, n: ts.Node): TsClassMemberMethod {
+        let method: TsClassMemberMethod = {
             public: false,
             private: false,
             protected: false,
             static: false,
             async: false,
+            // @ts-expect-error name does exist
             name: n.name.escapedText,
             params: [],
             comment: [],
@@ -213,6 +257,7 @@ class GenericClassFileParser {
         method = this.processDecorators(method, src, n);
         method = this.processModifiers(method, n);
 
+        // @ts-expect-error this may exist
         (n.parameters || []).forEach(p => {
             const params = {
                 name: src.substring(p.name.pos, p.name.end).trim(),
@@ -222,15 +267,18 @@ class GenericClassFileParser {
             method.params.push(params);
         });
 
+        // @ts-expect-error n.type may exist
         if (n.type) {
+            // @ts-expect-error n.type may exist
             method.returnType = src.substring(n.type.pos, n.type.end).trim();
         }
 
         // call the basic jsdoc parser for generic info
         method = this.processJSDoc(method, src, n);
         // add custom parsing for method-specific data
+        // @ts-expect-error jsDoc may exist
         (n.jsDoc || []).forEach(comment => {            
-            (comment.tags || []).forEach(t => {
+            (comment.tags || []).forEach( (t:GenericObject) => {
                 const tagName = src.substring(t.tagName.pos, t.tagName.end).trim();
                 switch (tagName) {
                 case 'param': {
@@ -251,7 +299,6 @@ class GenericClassFileParser {
         return method;
     }
 
-
     /**
      * Process a property declaration node 
      * 
@@ -259,15 +306,18 @@ class GenericClassFileParser {
      * @param {*} n Current property AST node
      * @returns 
      */
-    processProperty (src, n) {
-        let property = {
+    processProperty (src: string, n: ts.Node) {
+        let property: TsClassMemberProperty = {
+            // @ts-expect-error name does exist
             name: n.name.escapedText,
+            // @ts-expect-error type does exist
             type: src.substring(n.type.pos, n.type.end).trim().replace(/['"’\r\n]/g, '').replace(/ +/g, ' '),
             comment: [],
             public: false,
             private: false,
             protected: false,
             static: false,
+            async:false,
             decorators:[]
         };
 
@@ -286,39 +336,39 @@ class GenericClassFileParser {
      * @param {*} n Current property AST node
      * @return the populated descripor object 
      */
-    processJSDoc(obj, src, n){
-
-        (n.jsDoc || []).forEach(comment => {
+    processJSDoc<T extends TsClassCommon>(obj: T, src:string, n:ts.Node){
+        // @ts-expect-error this property may exist
+        (n.jsDoc || []).forEach((comment: ts.NodeObject)=> {
             if (comment.comment && comment.comment.trim()){
                 obj.comment.push(comment.comment.trim());
             }
-            (comment.tags || []).forEach(tag => {
+            (comment.tags || []).forEach((tag: GenericObject) => {
                 if (tag.comment){
                     switch(tag.tagName.escapedText){
-                        case 'summary': 
-                            obj.comment.push(tag.comment);
-                            break;
-                        case 'title': 
-                            obj.title = tag.comment;
-                            break;
-                        case 'chapter': 
-                            obj.chapter = tag.comment;
-                            break;
-                        case 'see': 
-                            obj.see = obj.see || []
-                            obj.see.push(tag.comment);
-                            break;
-                        case 'throws': 
-                            obj.throws = obj.throws || []
-                            obj.throws.push(tag.comment);
-                            break;
-                        case 'deprecated': 
-                            obj.deprecated = obj.deprecated || []
-                            obj.deprecated.push(tag.comment);
-                            break;
+                    case 'summary': 
+                        obj.comment.push(tag.comment);
+                        break;
+                    case 'title': 
+                        obj.title = tag.comment;
+                        break;
+                    case 'chapter': 
+                        obj.chapter = tag.comment;
+                        break;
+                    case 'see': 
+                        obj.see = obj.see || [];
+                        obj.see.push(tag.comment);
+                        break;
+                    case 'throws': 
+                        obj.throws = obj.throws || [];
+                        obj.throws.push(tag.comment);
+                        break;
+                    case 'deprecated': 
+                        obj.deprecated = obj.deprecated || [];
+                        obj.deprecated.push(tag.comment);
+                        break;
                     }
                 }
-            })
+            });
         });
 
         return obj;
@@ -328,7 +378,7 @@ class GenericClassFileParser {
      * 
      * @param {*} src 
      */
-    extractInfo (src) {
+    extractInfo (src: string) {
         // parse the typescript file
         const node = ts.createSourceFile(
             'class.ts',
@@ -337,28 +387,31 @@ class GenericClassFileParser {
         );
 
         // process class declarations
-        node.forEachChild(child => {
-            if (child.kind === ts.SyntaxKind.ClassDeclaration) {
-                let classDefinition = {
+        node.forEachChild(classChild => {
+            if (classChild.kind === ts.SyntaxKind.ClassDeclaration) {
+                let classDefinition: TsClass = {
                     properties:[],
                     methods: [],
-                    name: child.name.escapedText,
+                    // @ts-expect-error name does exist
+                    name: classChild.name.escapedText,
                     decorators: [],
                     comment: [],
                     title:'',
                     chapter: ''
-                }
+                };
 
                 // process decorators if any
-                classDefinition = this.processDecorators(classDefinition, src, child);
+                classDefinition = this.processDecorators(classDefinition, src, classChild);
 
                 // process jsdoc
-                classDefinition = this.processJSDoc(classDefinition, src, child);
+                classDefinition = this.processJSDoc(classDefinition, src, classChild);
                 // remove @src tags. We don0t want them to appear in the documentation text
                 classDefinition.comment = classDefinition.comment.map(c => c.replace(/\[ *@src[^\]]+\]/gmi,'').trim());
 
                 // process properties and method declarations
-                child.members.forEach(n => {
+                // @ts-expect-error name does exist
+                classChild.members.forEach((n: ts.Node) => {
+                    // @ts-expect-error name does exist
                     if (n.name) {
                         if (n.kind === ts.SyntaxKind.PropertyDeclaration) {
                             classDefinition.properties.push(this.processProperty(src,n));
@@ -374,7 +427,3 @@ class GenericClassFileParser {
         });
     }
 }
-
-// This file MUST export ProcessorClass since it is managed automatically by other scripts
-module.exports.ProcessorClass = GenericClassFileParser
-module.exports.GenericClassFileParser = GenericClassFileParser

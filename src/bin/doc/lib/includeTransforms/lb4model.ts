@@ -1,13 +1,12 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const tsClass_1 = __importDefault(require("./tsClass"));
-class lb4ModelParser extends tsClass_1.default {
-    renderPropertyMarkdown(property) {
-        const content = [];
-        const titleBadges = [];
+
+import GenericClassFileParser, { TsClassMemberProperty } from './tsClass';
+
+export default class lb4ModelParser extends GenericClassFileParser{
+
+    renderPropertyMarkdown(property: TsClassMemberProperty): string[] {
+        const content: string[] = [];
+        const titleBadges: string[] = [];
+
         /*const memberProp = function (name: string) {
             const prop = member.modelProperty.find(p => p.name === name);
             member.modelProperty = member.modelProperty.filter(p => p.name !== name);
@@ -27,17 +26,15 @@ class lb4ModelParser extends tsClass_1.default {
             titleBadges.push('<span class=\'badge badge-yellow\'><b>Required</b></span>');
         }
 */
-        if (property.private)
-            titleBadges.push('<span class=\'badge badge-red\'><b>Private</b></span>');
-        if (property.public)
-            titleBadges.push('<span class=\'badge badge-green\'><b>Public</b></span>');
-        if (property.protected)
-            titleBadges.push('<span class=\'badge badge-yellow\'><b>Protected</b></span>');
-        if (property.static)
-            titleBadges.push('<span class=\'badge badge-gray\'><b>Static</b></span>');
+        if (property.private) titleBadges.push('<span class=\'badge badge-red\'><b>Private</b></span>');
+        if (property.public) titleBadges.push('<span class=\'badge badge-green\'><b>Public</b></span>');
+        if (property.protected) titleBadges.push('<span class=\'badge badge-yellow\'><b>Protected</b></span>');
+        if (property.static) titleBadges.push('<span class=\'badge badge-gray\'><b>Static</b></span>');
+
         content.push(`##### ${property.name} ${titleBadges.join(' ')}`);
         content.push('**Decorators**');
-        content.push('```ts\n' + property.decorators.map(d => d.name + '(' + d.params.join(',') + ')').join('\n') + '\n```\n\n');
+        content.push('```ts\n' + property.decorators.map(d => d.name+'('+d.params.join(',')+')').join('\n') + '\n```\n\n');
+
         /*const description = memberProp('description');
         if (description) {
             content.push(description.value + '\n');
@@ -51,12 +48,14 @@ class lb4ModelParser extends tsClass_1.default {
             content.push('```ts\n' + member.modelPropertyRaw + '\n```\n\n');
         }
         */
+
         return content;
     }
-    renderMarkdown() {
-        const content = [];
+    
+    renderMarkdown(): string[] {
+        const content: string[]= [];
         this.classes.forEach(classDefinition => {
-            content.push('## ' + classDefinition.name);
+            content.push('## '+classDefinition.name);
             if (classDefinition.properties.length) {
                 content.push('### Model properties and relations');
                 classDefinition.properties.forEach(p => content.push(...this.renderPropertyMarkdown(p)));
@@ -68,6 +67,5 @@ class lb4ModelParser extends tsClass_1.default {
         });
         return content;
     }
+    
 }
-exports.default = lb4ModelParser;
-//# sourceMappingURL=lb4model.js.map

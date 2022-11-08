@@ -12,7 +12,7 @@
                 "<node_internals>/**"
             ],
             "runtimeExecutable": "node",
-            "runtimeArgs":["./bin/cli.js","doc"],
+            "runtimeArgs":["./dist/index.js","doc"],
         },
        
     ]

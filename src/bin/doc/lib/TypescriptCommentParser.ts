@@ -1,27 +1,7 @@
 import { TSDocParser, DocExcerpt, TSDocConfiguration, TSDocTagSyntaxKind, TSDocTagDefinition, DocNode } from '@microsoft/tsdoc';
 import { forEachComment } from 'tsutils';
 import ts from 'typescript';
-
-export type DocumentationBlock = {
-    title: string,
-    summary: string[],
-    chapter: string,
-    params: { name:string, description:string }[],
-    returns: string,
-    remarks: string,
-    privateRemarks: string,
-    see: string[],
-    throws: string[],
-    example: string[],
-    priority: number,
-    beta: boolean,
-    alpha: boolean,
-    deprecated: string,
-    virtual: boolean,
-    override: boolean,
-    remarksBlock: string,
-    __filename: string
-};
+import { DocumentationBlock } from './types';
 
 export class TypescriptCommentParser {
 

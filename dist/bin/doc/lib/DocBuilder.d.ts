@@ -1,5 +1,5 @@
 import { GenericObject, OnitDocumentationConfigFileChapter, OnitDocumentationConfigFileJson } from '../../../types';
-import { DocumentationBlock } from './TypescriptCommentParser';
+import { DocumentationBlock } from './types';
 export declare class DocBuilder {
     private configFile;
     private outDir;

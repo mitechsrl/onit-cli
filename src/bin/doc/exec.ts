@@ -41,8 +41,8 @@ const exec: CommandExecFunction = async (argv: yargs.ArgumentsCamelCase<unknown>
     }
 
     // load the config file. 
-    const config = await onitFileLoader(process.cwd(), 'onitdocumentation.config') as OnitDocumentationConfigFile;
-   
+    //const config = await onitFileLoader(process.cwd(), 'onitdocumentation.config') as OnitDocumentationConfigFile;
+    const config = await onitFileLoader('C:\\progetti\\onit-base-workspace\\onit-next', 'onitdocumentation.config') as OnitDocumentationConfigFile;
     if (!config) throw new Error('File onitdocumentation.config.[js|json] not found');
     logger.warn('Using configuration file ' + config.sources.join(', '));
 

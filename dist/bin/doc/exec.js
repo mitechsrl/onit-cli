@@ -38,7 +38,8 @@ const exec = async (argv) => {
         outputPath = (0, path_1.resolve)(process.cwd(), './onit-doc/');
     }
     // load the config file. 
-    const config = await (0, onitFileLoader_1.onitFileLoader)(process.cwd(), 'onitdocumentation.config');
+    //const config = await onitFileLoader(process.cwd(), 'onitdocumentation.config') as OnitDocumentationConfigFile;
+    const config = await (0, onitFileLoader_1.onitFileLoader)('C:\\progetti\\onit-base-workspace\\onit-next', 'onitdocumentation.config');
     if (!config)
         throw new Error('File onitdocumentation.config.[js|json] not found');
     logger_1.logger.warn('Using configuration file ' + config.sources.join(', '));
