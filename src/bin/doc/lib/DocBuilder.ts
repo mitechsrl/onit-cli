@@ -54,7 +54,7 @@ export class DocBuilder {
         return result;
     }
     
-    generateBlockContentString(block: DocumentationBlock, defaultTitle:string) {
+    private generateBlockContentString(block: DocumentationBlock, defaultTitle:string) {
         let str = '';
 
         // title is by default h1. If the user add one ort more #, we're keeping that value for sizing.
@@ -111,7 +111,7 @@ export class DocBuilder {
      * @param {*} blockSourceFile block source file
      * @returns
      */
-    resolveSourceIncludes(str:string, blockSourceFile: string) {
+    private resolveSourceIncludes(str:string, blockSourceFile: string) {
         // resolve reference links
         // [@src filename_relative_path transformFunction]
         const regex = /\[@src +([^ \]]+) *([^ \]]+)? *(.*)?\]/gm;
@@ -166,7 +166,7 @@ export class DocBuilder {
      * @param {*} chapterConfig 
      * @returns The file content
      */
-    buildChapterFileContent(chapterConfig: OnitDocumentationConfigFileChapter) {
+    private buildChapterFileContent(chapterConfig: OnitDocumentationConfigFileChapter) {
         const blocksByChapter = this.blocks.filter(b => b.chapter === chapterConfig.chapter);
         // add extracted blocks markdown
         if (blocksByChapter.length > 0) {
@@ -181,13 +181,13 @@ export class DocBuilder {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    reduceJekillHeader(acc: string, e: any) {
+    private reduceJekillHeader(acc: string, e: any) {
         if (typeof e === 'string') acc = acc + '\n' + e;
         if (Array.isArray(e)) acc = acc + '\n' + e[0] + ': ' + e[1];
         return acc.trim();
     }
 
-    createFinalFileContent(header: GenericObject, content = '') {
+    private createFinalFileContent(header: GenericObject, content = '') {
         const jekillHeader = [
             '---',
             ['layout', 'page'],
@@ -204,7 +204,7 @@ export class DocBuilder {
      * @param {*} parent 
      * @param {*} grandparent 
      */
-    recurseBuildChapterFiles(chapters: OnitDocumentationConfigFileChapter[], parent?: OnitDocumentationConfigFileChapter, grandparent?: OnitDocumentationConfigFileChapter) {
+    private recurseBuildChapterFiles(chapters: OnitDocumentationConfigFileChapter[], parent?: OnitDocumentationConfigFileChapter, grandparent?: OnitDocumentationConfigFileChapter) {
         chapters.forEach(chapterConfig => {
 
             // calculate the destination directory
@@ -303,7 +303,7 @@ export class DocBuilder {
      * @param {*} sourceString The string to be processsed for links 
      * @returns The string with processed links
      */
-    resolveImageLink(sourceString: string, blockSourceFile:string, chapterDepth:number) {
+    private resolveImageLink(sourceString: string, blockSourceFile:string, chapterDepth:number) {
 
         // match for ![text](link)
         const regex = /!\[([^\]]+)\]\(([^)]+)\)/gm;
@@ -350,7 +350,7 @@ export class DocBuilder {
      * @param {*} chapterPath 
      * @returns 
      */
-    chapterPathToMarkdownFilename(chapterPath: OnitDocumentationConfigFileChapter[]) {
+    private chapterPathToMarkdownFilename(chapterPath: OnitDocumentationConfigFileChapter[]) {
         return chapterPath.map(p => p.chapter).filter(p => !!p).join(path.sep);
     }
 
@@ -361,7 +361,7 @@ export class DocBuilder {
      * @param {*} path 
      * @returns 
      */
-    findChapterPath(chapters : OnitDocumentationConfigFileChapter[], chapter: string , path: OnitDocumentationConfigFileChapter[] = [], matchFn: ((c: OnitDocumentationConfigFileChapter) => boolean) | null = null): OnitDocumentationConfigFileChapter[]|null {
+    private findChapterPath(chapters : OnitDocumentationConfigFileChapter[], chapter: string , path: OnitDocumentationConfigFileChapter[] = [], matchFn: ((c: OnitDocumentationConfigFileChapter) => boolean) | null = null): OnitDocumentationConfigFileChapter[]|null {
         if (matchFn === null)
             matchFn = c => c.chapter === chapter;
 
@@ -379,9 +379,13 @@ export class DocBuilder {
 
     /**
      * convert any piece of text to link accordingly to the chapter labels and titles
+     * This will make easier to navigate between chapters sinche every recognized text will be a link to his
+     * chapter without need to manually add a link to it.
+     * 
      * @param sourceString 
+     * @returns The parsed string
      */
-    generateAutomaticLinks(sourceString: string){
+    private generateAutomaticLinks(sourceString: string){
         this.automaticLinksLabels.forEach(l => {
             l.labels.forEach(label => {
                 const regexs = [
@@ -408,12 +412,13 @@ export class DocBuilder {
     }
 
     /**
+     * Resolve the @link tags to create a hyperlink to the destination page
      * 
-     * @param {*} sourceString 
+     * @param {*} sourceString The text to be parsed
      * @param {*} chapterDepth 
      * @returns 
      */
-    resolveInternalLink(sourceString: string, chapterDepth:number) {
+    private resolveInternalLink(sourceString: string, chapterDepth:number) {
         // resolve reference links
         // this matches one from
         // [@link LABEL#Info](for more info)
@@ -469,7 +474,7 @@ export class DocBuilder {
     /**
      * Prebuild file outputs in memory
      */
-    build() {
+    public build() {
         // empty write callbacks. This 
         this.writeCallbacks = [];
 
@@ -487,7 +492,7 @@ export class DocBuilder {
     /**
      * Write out data. This basically call all the writeCallbacks.
      */
-    write() {
+    public write() {
 
         // Ensure we have the target dir empty
         fse.removeSync(this.outDir);

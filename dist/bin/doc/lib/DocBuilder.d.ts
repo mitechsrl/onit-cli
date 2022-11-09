@@ -1,4 +1,4 @@
-import { GenericObject, OnitDocumentationConfigFileChapter, OnitDocumentationConfigFileJson } from '../../../types';
+import { OnitDocumentationConfigFileJson } from '../../../types';
 import { DocumentationBlock } from './types';
 export declare class DocBuilder {
     private configFile;
@@ -15,7 +15,7 @@ export declare class DocBuilder {
      * @returns
      */
     private generateAutomaticLinksLabels;
-    generateBlockContentString(block: DocumentationBlock, defaultTitle: string): string;
+    private generateBlockContentString;
     /**
      * Teplace the [@src filePath transformFunction] with the content of filepath.
      * The content can be processed usingransformfunction, whichcan extract any useful info from the filePath
@@ -26,22 +26,22 @@ export declare class DocBuilder {
      * @param {*} blockSourceFile block source file
      * @returns
      */
-    resolveSourceIncludes(str: string, blockSourceFile: string): string;
+    private resolveSourceIncludes;
     /**
      * Create the string content of the file for the current chapterConfig
      * @param {*} chapterConfig
      * @returns The file content
      */
-    buildChapterFileContent(chapterConfig: OnitDocumentationConfigFileChapter): string;
-    reduceJekillHeader(acc: string, e: any): string;
-    createFinalFileContent(header: GenericObject, content?: string): string;
+    private buildChapterFileContent;
+    private reduceJekillHeader;
+    private createFinalFileContent;
     /**
      *
      * @param {*} chapters
      * @param {*} parent
      * @param {*} grandparent
      */
-    recurseBuildChapterFiles(chapters: OnitDocumentationConfigFileChapter[], parent?: OnitDocumentationConfigFileChapter, grandparent?: OnitDocumentationConfigFileChapter): void;
+    private recurseBuildChapterFiles;
     /**
      * Process a string and resolve image links.
      * Links follow the stndard markdown config: https://www.markdownguide.org/basic-syntax/#images
@@ -51,13 +51,13 @@ export declare class DocBuilder {
      * @param {*} sourceString The string to be processsed for links
      * @returns The string with processed links
      */
-    resolveImageLink(sourceString: string, blockSourceFile: string, chapterDepth: number): string;
+    private resolveImageLink;
     /**
      * Convert array which represent a path in filename
      * @param {*} chapterPath
      * @returns
      */
-    chapterPathToMarkdownFilename(chapterPath: OnitDocumentationConfigFileChapter[]): string;
+    private chapterPathToMarkdownFilename;
     /**
      *
      * @param {*} chapters
@@ -65,19 +65,22 @@ export declare class DocBuilder {
      * @param {*} path
      * @returns
      */
-    findChapterPath(chapters: OnitDocumentationConfigFileChapter[], chapter: string, path?: OnitDocumentationConfigFileChapter[], matchFn?: ((c: OnitDocumentationConfigFileChapter) => boolean) | null): OnitDocumentationConfigFileChapter[] | null;
+    private findChapterPath;
     /**
      * convert any piece of text to link accordingly to the chapter labels and titles
+     * This will make easier to navigate between chapters sinche every recognized text will be a link to his
+     * chapter without need to manually add a link to it.
      * @param sourceString
      */
-    generateAutomaticLinks(sourceString: string): string;
+    private generateAutomaticLinks;
     /**
+     * Resolve the @link tags to create a hyperlink to the destination page
      *
-     * @param {*} sourceString
+     * @param {*} sourceString The text to be parsed
      * @param {*} chapterDepth
      * @returns
      */
-    resolveInternalLink(sourceString: string, chapterDepth: number): string;
+    private resolveInternalLink;
     /**
      * Prebuild file outputs in memory
      */

@@ -326,6 +326,8 @@ class DocBuilder {
     }
     /**
      * convert any piece of text to link accordingly to the chapter labels and titles
+     * This will make easier to navigate between chapters sinche every recognized text will be a link to his
+     * chapter without need to manually add a link to it.
      * @param sourceString
      */
     generateAutomaticLinks(sourceString) {
@@ -352,8 +354,9 @@ class DocBuilder {
         return sourceString;
     }
     /**
+     * Resolve the @link tags to create a hyperlink to the destination page
      *
-     * @param {*} sourceString
+     * @param {*} sourceString The text to be parsed
      * @param {*} chapterDepth
      * @returns
      */
