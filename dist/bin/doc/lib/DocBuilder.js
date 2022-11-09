@@ -9,8 +9,10 @@ const fs_1 = __importDefault(require("fs"));
 const fs_extra_1 = __importDefault(require("fs-extra"));
 const crypto_1 = __importDefault(require("crypto"));
 const types_1 = require("../../../types");
+const logger_1 = require("../../../lib/logger");
 class DocBuilder {
     constructor(configFile, scanTargetDir, blocks, outDir) {
+        var _a;
         this.automaticLinksLabels = [];
         // keep the callbacks for writing out data. THis allow us to precalculate everything and write them out 
         // only at the end of the process
@@ -19,6 +21,15 @@ class DocBuilder {
         this.blocks = blocks;
         this.outDir = outDir;
         this.scanTargetDir = scanTargetDir;
+        const _recurseSetIndex = (tree) => {
+            tree.forEach((t, i) => {
+                t.chapterIndexNumber = i;
+                if (t.children) {
+                    _recurseSetIndex(t.children);
+                }
+            });
+        };
+        _recurseSetIndex((_a = configFile.chapters) !== null && _a !== void 0 ? _a : []);
         if (configFile.chapters) {
             this.automaticLinksLabels = this.generateAutomaticLinksLabels(configFile.chapters);
         }
@@ -325,33 +336,89 @@ class DocBuilder {
         return null;
     }
     /**
+     * Split a string for code tags.
+     *
+     * example
+     *    "comment1\n```code```\ncomment2"
+     * will be splitted in
+     *   ["comment2", "```code```", "comment2"]
+     *
+     * This make easier to detect code blocks because they will start and end with ```.
+     * NOTE: this is a simple split, it can be broken by malformed tags.
+     *       Each time a ``` is detected it will be managed accordingly as open or close tag
+     * @param str
+     * @returns array of stirngs.
+     */
+    splitCodeTags(str) {
+        let isCode = false;
+        const pieces = [];
+        let currentPiece = '';
+        const chars = str.split('');
+        const isCodeTag = (index) => {
+            return chars[index] + chars[index + 1] + chars[index + 2] === '```';
+        };
+        for (let i = 0; i < chars.length; i++) {
+            if (isCodeTag(i)) {
+                if (!isCode) {
+                    pieces.push(currentPiece);
+                    currentPiece = '```';
+                    i += 2;
+                }
+                else {
+                    currentPiece += '```';
+                    pieces.push(currentPiece);
+                    currentPiece = '';
+                    i += 2;
+                }
+                isCode = !isCode;
+            }
+            else {
+                currentPiece += chars[i];
+            }
+        }
+        pieces.push(currentPiece);
+        return pieces.filter(p => !!p);
+    }
+    /**
      * convert any piece of text to link accordingly to the chapter labels and titles
      * This will make easier to navigate between chapters sinche every recognized text will be a link to his
      * chapter without need to manually add a link to it.
+     *
      * @param sourceString
+     * @returns The parsed string
      */
     generateAutomaticLinks(sourceString) {
-        this.automaticLinksLabels.forEach(l => {
-            l.labels.forEach(label => {
-                const regexs = [
-                    // entire line match exactly label
-                    { regex: new RegExp('^' + label + '$', 'g'), replace: `[@link ${l.chapter}](${label})` },
-                    { regex: new RegExp('^' + label + '\n', 'g'), replace: `[@link ${l.chapter}](${label})\n` },
-                    // line ends with label and label has space before (but not on titles)
-                    { regex: new RegExp('([^#]+ +)' + label + '$', 'g'), replace: `$1[@link ${l.chapter}](${label})` },
-                    { regex: new RegExp('([^#]+ +)' + label + '\n', 'g'), replace: `$1[@link ${l.chapter}](${label})\n` },
-                    // label is surronded by spaces (but not if is a title)
-                    { regex: new RegExp('([^#]+ +)' + label + '( +)', 'g'), replace: `$1[@link ${l.chapter}](${label})$2` },
-                    // line starts with label and has spaces after
-                    { regex: new RegExp('^' + label + '( +)', 'g'), replace: `[@link ${l.chapter}](${label})$1` },
-                    { regex: new RegExp('\n' + label + '( +)', 'g'), replace: `\n[@link ${l.chapter}](${label})$1` },
-                ];
-                regexs.forEach(r => {
-                    sourceString = sourceString.replace(r.regex, r.replace);
+        const codeBlockMatch = /```((?!```).)*```/s;
+        // split the string in subpieces.
+        // these pieces will be either standard comment (strings which does not stats and ends with ```)
+        // or code blocks (starting and ending with ```)
+        // Code blocks will be skipped from substitution. We don't want to change source code!
+        const pieces = this.splitCodeTags(sourceString).map(piece => {
+            if (piece.match(codeBlockMatch))
+                return piece;
+            this.automaticLinksLabels.forEach(l => {
+                l.labels.forEach(label => {
+                    const regexs = [
+                        // entire line match exactly label
+                        { regex: new RegExp('^' + label + '$', 'g'), replace: `[@link ${l.chapter}](${label})` },
+                        { regex: new RegExp('^' + label + '\n', 'g'), replace: `[@link ${l.chapter}](${label})\n` },
+                        // line ends with label and label has space before (but not on titles)
+                        { regex: new RegExp('([^#]+ +)' + label + '$', 'g'), replace: `$1[@link ${l.chapter}](${label})` },
+                        { regex: new RegExp('([^#]+ +)' + label + '\n', 'g'), replace: `$1[@link ${l.chapter}](${label})\n` },
+                        // label is surronded by spaces (but not if is a title)
+                        { regex: new RegExp('([^#]+ +)' + label + '( +)', 'g'), replace: `$1[@link ${l.chapter}](${label})$2` },
+                        // line starts with label and has spaces after
+                        { regex: new RegExp('^' + label + '( +)', 'g'), replace: `[@link ${l.chapter}](${label})$1` },
+                        { regex: new RegExp('\n' + label + '( +)', 'g'), replace: `\n[@link ${l.chapter}](${label})$1` },
+                    ];
+                    regexs.forEach(r => {
+                        piece = piece.replace(r.regex, r.replace);
+                    });
                 });
             });
+            return piece;
         });
-        return sourceString;
+        return pieces.join('');
     }
     /**
      * Resolve the @link tags to create a hyperlink to the destination page
@@ -421,9 +488,10 @@ class DocBuilder {
             var _a;
             const chapterPath = this.findChapterPath((_a = this.configFile.chapters) !== null && _a !== void 0 ? _a : [], block.chapter, []);
             if (!chapterPath) {
-                console.warn('Unknown chapter ' + block.chapter + ' in ' + block.__filename);
+                logger_1.logger.warn('Unknown chapter ' + block.chapter + ' in ' + block.__filename);
             }
         });
+        logger_1.logger.log('Building output files...');
         this.recurseBuildChapterFiles((_a = this.configFile.chapters) !== null && _a !== void 0 ? _a : []);
     }
     /**

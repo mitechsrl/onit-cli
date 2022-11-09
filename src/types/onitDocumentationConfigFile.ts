@@ -4,6 +4,7 @@ export type OnitDocumentationConfigFileChapter = {
     index?: { [k:string]:string|undefined },
     page?:{ [k:string]:string|undefined },
     children?: OnitDocumentationConfigFileChapter[],
+    // index for order based on position in definition file
     chapterIndexNumber: number
 };
 

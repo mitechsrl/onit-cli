@@ -67,10 +67,27 @@ export declare class DocBuilder {
      */
     private findChapterPath;
     /**
+     * Split a string for code tags.
+     *
+     * example
+     *    "comment1\n```code```\ncomment2"
+     * will be splitted in
+     *   ["comment2", "```code```", "comment2"]
+     *
+     * This make easier to detect code blocks because they will start and end with ```.
+     * NOTE: this is a simple split, it can be broken by malformed tags.
+     *       Each time a ``` is detected it will be managed accordingly as open or close tag
+     * @param str
+     * @returns array of stirngs.
+     */
+    private splitCodeTags;
+    /**
      * convert any piece of text to link accordingly to the chapter labels and titles
      * This will make easier to navigate between chapters sinche every recognized text will be a link to his
      * chapter without need to manually add a link to it.
+     *
      * @param sourceString
+     * @returns The parsed string
      */
     private generateAutomaticLinks;
     /**
