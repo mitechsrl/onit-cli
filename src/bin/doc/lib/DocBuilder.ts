@@ -147,7 +147,7 @@ export class DocBuilder {
 
             file = path.join(path.dirname(blockSourceFile), file);
             if (!fs.existsSync(file)) {
-                console.warn('@src file resolution error: file ' + file + ' not found in ' + blockSourceFile);
+                logger.warn('@src file resolution error: file ' + file + ' not found in ' + blockSourceFile);
                 continue;
             }
             let replace = '';
@@ -167,7 +167,7 @@ export class DocBuilder {
                     replace = processor.parse(fileContent, file, params);
                 }
             } catch (e) {
-                console.warn('Transform of ' + found + ' failed, error:' + e);
+                logger.warn('Transform of ' + found + ' failed, error:' + e);
             }
 
             str = str.replace(found, replace);
@@ -258,8 +258,11 @@ export class DocBuilder {
                 const headerData: GenericObject = chapterConfig.index || {};
                 headerData.nav_order = chapterConfig.chapterIndexNumber;
                 const finalFileContent = this.createFinalFileContent(headerData, '\n\n\n' + chapterFileContent);
+                
+                const fileFullPath = path.join(fileDir, 'index.md');
+                logger.log('Generating content of '+fileFullPath);
                 this.writeCallbacks.push(
-                    () => fs.writeFileSync(path.join(fileDir, 'index.md'), finalFileContent)
+                    () => fs.writeFileSync(fileFullPath, finalFileContent)
                 );
             }
 
@@ -295,6 +298,7 @@ export class DocBuilder {
                     headerData.nav_order = chapterConfig.chapterIndexNumber;
 
                     const finalFileContent = this.createFinalFileContent(headerData, '\n\n\n' + chapterFileContent);
+                    logger.log('Generating content of '+fileFullPath);
                     this.writeCallbacks.push(
                         () => fs.writeFileSync(fileFullPath, finalFileContent)
                     );
@@ -352,7 +356,7 @@ export class DocBuilder {
                     }
                     fs.copyFileSync(srcFilename, dstFilename);
                 } else {
-                    console.warn('Image ' + srcFilename + ' not found in ' + blockSourceFile);
+                    logger.warn('Image ' + srcFilename + ' not found in ' + blockSourceFile);
                 }
             });
         }
@@ -520,7 +524,7 @@ export class DocBuilder {
 
             const linkChapterPath = this.findChapterPath(this.configFile.chapters ?? [], chapter, [], matchFn);
             if (!linkChapterPath || linkChapterPath.length === 0) {
-                console.warn('Link generation for ' + found + ' failed. Nothing found for the specified label.');
+                logger.warn('Link generation for ' + found + ' failed. Nothing found for the specified label.');
                 continue;
             }
 
@@ -542,7 +546,6 @@ export class DocBuilder {
             if (!text) text = linkChapterPath[linkChapterPath.length - 1].title ?? '';
 
             const replace = '[' + text + '](' + linkChapterFilename + ')';
-            // console.log("Resolved link " + found + " -> " + replace)
             sourceString = sourceString.replace(found, replace);
         }
         return sourceString;
@@ -575,7 +578,6 @@ export class DocBuilder {
         // Ensure we have the target dir empty
         fse.removeSync(this.outDir);
 
-        // console.log('Create out directory: ' + outDir);
         fs.mkdirSync(this.outDir, { recursive: true });
 
         // effectively run the fs-related stuff

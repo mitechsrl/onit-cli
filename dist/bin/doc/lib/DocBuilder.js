@@ -224,7 +224,9 @@ class DocBuilder {
                 const headerData = chapterConfig.index || {};
                 headerData.nav_order = chapterConfig.chapterIndexNumber;
                 const finalFileContent = this.createFinalFileContent(headerData, '\n\n\n' + chapterFileContent);
-                this.writeCallbacks.push(() => fs_1.default.writeFileSync(path_1.default.join(fileDir, 'index.md'), finalFileContent));
+                const fileFullPath = path_1.default.join(fileDir, 'index.md');
+                logger_1.logger.log('Generating content of ' + fileFullPath);
+                this.writeCallbacks.push(() => fs_1.default.writeFileSync(fileFullPath, finalFileContent));
             }
             // do not add page content for indexes
             if (!chapterConfig.index) {
@@ -253,6 +255,7 @@ class DocBuilder {
                     const headerData = chapterConfig.page || {};
                     headerData.nav_order = chapterConfig.chapterIndexNumber;
                     const finalFileContent = this.createFinalFileContent(headerData, '\n\n\n' + chapterFileContent);
+                    logger_1.logger.log('Generating content of ' + fileFullPath);
                     this.writeCallbacks.push(() => fs_1.default.writeFileSync(fileFullPath, finalFileContent));
                 }
             }

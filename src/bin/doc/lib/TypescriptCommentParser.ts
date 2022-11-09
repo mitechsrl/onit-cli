@@ -130,7 +130,7 @@ export class TypescriptCommentParser {
 
         block.summary = [block.summary.join('\n')];
 
-        if (block.title && block.summary && block.chapter) {
+        if (block.summary && block.chapter) {
             return block;
         }
 
