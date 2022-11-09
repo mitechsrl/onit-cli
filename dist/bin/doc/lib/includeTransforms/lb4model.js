@@ -4,6 +4,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const tsClass_1 = __importDefault(require("./tsClass"));
+/**
+ * Parse a loopback4 model class.
+ * The processor is the same as the GenericClassFileParser but the render is slightly different due the
+ * presence of property decorators which defines model properties. These decorators must be printed out aswell.
+ */
 class lb4ModelParser extends tsClass_1.default {
     renderPropertyMarkdown(property) {
         const content = [];
@@ -36,7 +41,6 @@ class lb4ModelParser extends tsClass_1.default {
         if (property.static)
             titleBadges.push('<span class=\'badge badge-gray\'><b>Static</b></span>');
         content.push(`##### ${property.name} ${titleBadges.join(' ')}`);
-        content.push('**Decorators**');
         content.push('```ts\n' + property.decorators.map(d => d.name + '(' + d.params.join(',') + ')').join('\n') + '\n```\n\n');
         /*const description = memberProp('description');
         if (description) {
@@ -61,10 +65,10 @@ class lb4ModelParser extends tsClass_1.default {
                 content.push('### Model properties and relations');
                 classDefinition.properties.forEach(p => content.push(...this.renderPropertyMarkdown(p)));
             }
-            /*if (classDefinition.methods.length) {
+            if (classDefinition.methods.length) {
                 content.push('## Methods');
                 classDefinition.methods.forEach(p => content.push(...this.renderMethodMarkdown(p)));
-            }*/
+            }
         });
         return content;
     }

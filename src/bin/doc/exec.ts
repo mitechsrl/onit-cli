@@ -32,21 +32,19 @@ import { generateDoc } from './lib/generateDoc';
 
 const exec: CommandExecFunction = async (argv: yargs.ArgumentsCamelCase<unknown>) => {
 
-    // check for manual serve file specifed
-    let outputPath = argv.o as string;
-    if (outputPath) {
-        outputPath = resolve(process.cwd(), outputPath);
-    } else {
-        outputPath = resolve(process.cwd(), './onit-doc/');
-    }
-
     // load the config file. 
-    //const config = await onitFileLoader(process.cwd(), 'onitdocumentation.config') as OnitDocumentationConfigFile;
-    const config = await onitFileLoader('C:\\progetti\\onit-base-workspace\\onit-next', 'onitdocumentation.config') as OnitDocumentationConfigFile;
+    const projectPath = (argv.p ?? process.cwd()) as string;
+    const config = await onitFileLoader(projectPath, 'onitdocumentation.config') as OnitDocumentationConfigFile;
     if (!config) throw new Error('File onitdocumentation.config.[js|json] not found');
-    logger.warn('Using configuration file ' + config.sources.join(', '));
 
-    await generateDoc(config.json, outputPath);
+    // check for manual serve file specifed
+    const outputPath = resolve(projectPath, (argv.o ?? './onit-doc/') as string);
+
+    logger.warn('Configuration file: ' + config.sources.join(', '));
+    logger.warn('Scan directory: ' + projectPath);
+    logger.warn('Output directory: ' + outputPath);
+    
+    await generateDoc(config.json, projectPath, outputPath);
    
 };
 

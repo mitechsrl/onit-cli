@@ -10,6 +10,13 @@ const config = {
                 type: 'string',
                 description: 'Output path.  Default ./onit-docs'
             }
+        },
+        {
+            name: 'p',
+            config: {
+                type: 'string',
+                description: 'Project path to process. If omitted, defaults to current working directory'
+            }
         }]
 };
 exports.default = config;

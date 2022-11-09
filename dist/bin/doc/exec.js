@@ -29,21 +29,18 @@ const logger_1 = require("../../lib/logger");
 const onitFileLoader_1 = require("../../lib/onitFileLoader");
 const generateDoc_1 = require("./lib/generateDoc");
 const exec = async (argv) => {
-    // check for manual serve file specifed
-    let outputPath = argv.o;
-    if (outputPath) {
-        outputPath = (0, path_1.resolve)(process.cwd(), outputPath);
-    }
-    else {
-        outputPath = (0, path_1.resolve)(process.cwd(), './onit-doc/');
-    }
+    var _a, _b;
     // load the config file. 
-    //const config = await onitFileLoader(process.cwd(), 'onitdocumentation.config') as OnitDocumentationConfigFile;
-    const config = await (0, onitFileLoader_1.onitFileLoader)('C:\\progetti\\onit-base-workspace\\onit-next', 'onitdocumentation.config');
+    const projectPath = ((_a = argv.p) !== null && _a !== void 0 ? _a : process.cwd());
+    const config = await (0, onitFileLoader_1.onitFileLoader)(projectPath, 'onitdocumentation.config');
     if (!config)
         throw new Error('File onitdocumentation.config.[js|json] not found');
-    logger_1.logger.warn('Using configuration file ' + config.sources.join(', '));
-    await (0, generateDoc_1.generateDoc)(config.json, outputPath);
+    // check for manual serve file specifed
+    const outputPath = (0, path_1.resolve)(projectPath, ((_b = argv.o) !== null && _b !== void 0 ? _b : './onit-doc/'));
+    logger_1.logger.warn('Configuration file: ' + config.sources.join(', '));
+    logger_1.logger.warn('Scan directory: ' + projectPath);
+    logger_1.logger.warn('Output directory: ' + outputPath);
+    await (0, generateDoc_1.generateDoc)(config.json, projectPath, outputPath);
 };
 exports.default = exec;
 //# sourceMappingURL=exec.js.map

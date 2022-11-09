@@ -5,14 +5,15 @@ import { MarkdownCommentParser } from './MarkdownCommentParser';
 import { TypescriptCommentParser } from './TypescriptCommentParser';
 
 /**
- *
- * @param {*} configFile
- * @param {*} outDir
+ * Scan  and generate the doc files at the specified path 
+ * 
+ * @param config Documentation config file
+ * @param scanTargetDir Dierectory to be scanned for comments
+ * @param outDir The final markdown oututt directory
+ *  
  */
-export async function generateDoc (config: OnitDocumentationConfigFileJson, outDir: string) {
-    // const scanTargetDir = process.cwd();
-    const scanTargetDir = 'C:\\progetti\\onit-base-workspace\\onit-next';
-
+export async function generateDoc (config: OnitDocumentationConfigFileJson, scanTargetDir: string, outDir: string) {
+   
     const parsers: GenericObject = {
         typescript: new TypescriptCommentParser(),
         markdown: new MarkdownCommentParser()
@@ -35,11 +36,9 @@ export async function generateDoc (config: OnitDocumentationConfigFileJson, outD
         blocks.push(...parsers[parser].parseFile(groupByParser[parser]));
     }
 
-    // console.log('Copying images...');
-    // copyImages(config, blocks, scanTargetDir, outDir);
-
     const docBuilder = new DocBuilder(config, scanTargetDir, blocks, outDir);
     docBuilder.build();
     docBuilder.write();
+
 }
 

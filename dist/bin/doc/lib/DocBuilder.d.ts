@@ -5,8 +5,16 @@ export declare class DocBuilder {
     private outDir;
     private blocks;
     private scanTargetDir;
+    private automaticLinksLabels;
     private writeCallbacks;
     constructor(configFile: OnitDocumentationConfigFileJson, scanTargetDir: string, blocks: DocumentationBlock[], outDir: string);
+    /**
+     * Build an internal array of "string pieces" to be matched in the comments to be converted automatically to links.
+     *
+     * @param chapters
+     * @returns
+     */
+    private generateAutomaticLinksLabels;
     generateBlockContentString(block: DocumentationBlock, defaultTitle: string): string;
     /**
      * Teplace the [@src filePath transformFunction] with the content of filepath.
@@ -58,6 +66,11 @@ export declare class DocBuilder {
      * @returns
      */
     findChapterPath(chapters: OnitDocumentationConfigFileChapter[], chapter: string, path?: OnitDocumentationConfigFileChapter[], matchFn?: ((c: OnitDocumentationConfigFileChapter) => boolean) | null): OnitDocumentationConfigFileChapter[] | null;
+    /**
+     * convert any piece of text to link accordingly to the chapter labels and titles
+     * @param sourceString
+     */
+    generateAutomaticLinks(sourceString: string): string;
     /**
      *
      * @param {*} sourceString

@@ -1,6 +1,11 @@
 
 import GenericClassFileParser, { TsClassMemberProperty } from './tsClass';
 
+/**
+ * Parse a loopback4 model class.
+ * The processor is the same as the GenericClassFileParser but the render is slightly different due the 
+ * presence of property decorators which defines model properties. These decorators must be printed out aswell.
+ */
 export default class lb4ModelParser extends GenericClassFileParser{
 
     renderPropertyMarkdown(property: TsClassMemberProperty): string[] {
@@ -32,7 +37,6 @@ export default class lb4ModelParser extends GenericClassFileParser{
         if (property.static) titleBadges.push('<span class=\'badge badge-gray\'><b>Static</b></span>');
 
         content.push(`##### ${property.name} ${titleBadges.join(' ')}`);
-        content.push('**Decorators**');
         content.push('```ts\n' + property.decorators.map(d => d.name+'('+d.params.join(',')+')').join('\n') + '\n```\n\n');
 
         /*const description = memberProp('description');
@@ -60,10 +64,10 @@ export default class lb4ModelParser extends GenericClassFileParser{
                 content.push('### Model properties and relations');
                 classDefinition.properties.forEach(p => content.push(...this.renderPropertyMarkdown(p)));
             }
-            /*if (classDefinition.methods.length) {
+            if (classDefinition.methods.length) {
                 content.push('## Methods');
                 classDefinition.methods.forEach(p => content.push(...this.renderMethodMarkdown(p)));
-            }*/
+            }
         });
         return content;
     }

@@ -12,7 +12,7 @@
                 "<node_internals>/**"
             ],
             "runtimeExecutable": "node",
-            "runtimeArgs":["./dist/index.js","doc"],
+            "runtimeArgs":["./dist/index.js","doc","-p","C:\\progetti\\onit-base-workspace\\onit-next"],
         },
        
     ]

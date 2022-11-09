@@ -6,13 +6,14 @@ const findFiles_1 = require("./findFiles");
 const MarkdownCommentParser_1 = require("./MarkdownCommentParser");
 const TypescriptCommentParser_1 = require("./TypescriptCommentParser");
 /**
+ * Scan  and generate the doc files at the specified path
  *
- * @param {*} configFile
- * @param {*} outDir
+ * @param config Documentation config file
+ * @param scanTargetDir Dierectory to be scanned for comments
+ * @param outDir The final markdown oututt directory
+ *
  */
-async function generateDoc(config, outDir) {
-    // const scanTargetDir = process.cwd();
-    const scanTargetDir = 'C:\\progetti\\onit-base-workspace\\onit-next';
+async function generateDoc(config, scanTargetDir, outDir) {
     const parsers = {
         typescript: new TypescriptCommentParser_1.TypescriptCommentParser(),
         markdown: new MarkdownCommentParser_1.MarkdownCommentParser()
@@ -31,8 +32,6 @@ async function generateDoc(config, outDir) {
     for (const parser of Object.keys(groupByParser)) {
         blocks.push(...parsers[parser].parseFile(groupByParser[parser]));
     }
-    // console.log('Copying images...');
-    // copyImages(config, blocks, scanTargetDir, outDir);
     const docBuilder = new DocBuilder_1.DocBuilder(config, scanTargetDir, blocks, outDir);
     docBuilder.build();
     docBuilder.write();

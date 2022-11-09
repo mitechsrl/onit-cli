@@ -12,6 +12,7 @@ export class DocBuilder {
     private outDir: string;
     private blocks: DocumentationBlock[];
     private scanTargetDir: string;
+    private automaticLinksLabels: { labels: string[], chapter: string }[] = [];
 
     // keep the callbacks for writing out data. THis allow us to precalculate everything and write them out 
     // only at the end of the process
@@ -22,8 +23,37 @@ export class DocBuilder {
         this.blocks = blocks;
         this.outDir = outDir;
         this.scanTargetDir = scanTargetDir;
+
+        if (configFile.chapters){
+            this.automaticLinksLabels = this.generateAutomaticLinksLabels(configFile.chapters);
+        }
     }
 
+    /**
+     * Build an internal array of "string pieces" to be matched in the comments to be converted automatically to links.
+     * 
+     * @param chapters 
+     * @returns 
+     */
+    private generateAutomaticLinksLabels(chapters: OnitDocumentationConfigFileChapter[]){
+        const result: { labels: string[], chapter: string }[] = [];
+
+        chapters.forEach(chapter => {
+            if (!chapter.chapter) return;
+            if (!chapter.title) return;
+            
+            result.push({
+                chapter: chapter.chapter,
+                labels: [chapter.chapter, chapter.title]
+            });
+            if (chapter.children){
+                const subLabels = this.generateAutomaticLinksLabels(chapter.children);
+                result.push(...subLabels);
+            }
+        });
+        return result;
+    }
+    
     generateBlockContentString(block: DocumentationBlock, defaultTitle:string) {
         let str = '';
 
@@ -56,6 +86,8 @@ export class DocBuilder {
         const chapterPath = this.findChapterPath(this.configFile.chapters ?? [], block.chapter, []);
         if (!chapterPath) throw new StringError('Cannot find chapterPath');
         const chapterDepth = chapterPath.length;
+
+        str = this.generateAutomaticLinks(str);
 
         // resolve the internal links for better navigation
         str = this.resolveInternalLink(str, chapterDepth);
@@ -343,6 +375,36 @@ export class DocBuilder {
             }
         }
         return null;
+    }
+
+    /**
+     * convert any piece of text to link accordingly to the chapter labels and titles
+     * @param sourceString 
+     */
+    generateAutomaticLinks(sourceString: string){
+        this.automaticLinksLabels.forEach(l => {
+            l.labels.forEach(label => {
+                const regexs = [
+                    // entire line match exactly label
+                    { regex: new RegExp('^'+label+'$', 'g'), replace: `[@link ${l.chapter}](${label})` },
+                    { regex: new RegExp('^'+label+'\n', 'g'), replace: `[@link ${l.chapter}](${label})\n` },
+                    // line ends with label and label has space before (but not on titles)
+                    { regex: new RegExp('([^#]+ +)'+label+'$', 'g'), replace: `$1[@link ${l.chapter}](${label})` },
+                    { regex: new RegExp('([^#]+ +)'+label+'\n', 'g'), replace: `$1[@link ${l.chapter}](${label})\n` },
+                    // label is surronded by spaces (but not if is a title)
+                    { regex: new RegExp('([^#]+ +)'+label+'( +)', 'g'), replace: `$1[@link ${l.chapter}](${label})$2` },
+                    // line starts with label and has spaces after
+                    { regex: new RegExp('^'+label+'( +)', 'g'), replace: `[@link ${l.chapter}](${label})$1` },
+                    { regex: new RegExp('\n'+label+'( +)', 'g'), replace: `\n[@link ${l.chapter}](${label})$1` },
+                ];
+
+                regexs.forEach(r => {
+                    sourceString = sourceString.replace(r.regex, r.replace);
+                });
+                
+            });
+        });
+        return sourceString;
     }
 
     /**
