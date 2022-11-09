@@ -58,6 +58,7 @@ export declare class DocBuilder {
      * @returns
      */
     private chapterPathToMarkdownFilename;
+    private chapterCache;
     /**
      *
      * @param {*} chapters

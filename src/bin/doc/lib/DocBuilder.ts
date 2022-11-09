@@ -100,6 +100,10 @@ export class DocBuilder {
         if (!chapterPath) throw new StringError('Cannot find chapterPath');
         const chapterDepth = chapterPath.length;
 
+        // resolve @src source include tags
+        str = this.resolveSourceIncludes(str, block.__filename);
+                
+        // 
         str = this.generateAutomaticLinks(str);
 
         // resolve the internal links for better navigation
@@ -107,9 +111,6 @@ export class DocBuilder {
 
         // Resolve image links 
         str = this.resolveImageLink(str, block.__filename, chapterDepth);
-
-        // resolve @src source include tags
-        str = this.resolveSourceIncludes(str, block.__filename);
 
         return str;
     }
@@ -367,6 +368,7 @@ export class DocBuilder {
         return chapterPath.map(p => p.chapter).filter(p => !!p).join(path.sep);
     }
 
+    private chapterCache: GenericObject = {};
     /**
      * 
      * @param {*} chapters 
@@ -375,8 +377,12 @@ export class DocBuilder {
      * @returns 
      */
     private findChapterPath(chapters : OnitDocumentationConfigFileChapter[], chapter: string , path: OnitDocumentationConfigFileChapter[] = [], matchFn: ((c: OnitDocumentationConfigFileChapter) => boolean) | null = null): OnitDocumentationConfigFileChapter[]|null {
+        
         if (matchFn === null)
             matchFn = c => c.chapter === chapter;
+
+        const cacheKey = chapter+matchFn.toString();
+        if (this.chapterCache[cacheKey]) return this.chapterCache[cacheKey];
 
         const c = chapters.find(matchFn);
         if (c) return [...path, c];
@@ -384,6 +390,7 @@ export class DocBuilder {
         for (const _chapter of chapters) {
             if (_chapter.children) {
                 const r = this.findChapterPath(_chapter.children, chapter, [...path, _chapter], matchFn);
+                this.chapterCache[cacheKey] = r;
                 if (r) return r;
             }
         }
@@ -443,7 +450,8 @@ export class DocBuilder {
      * @returns The parsed string
      */
     private generateAutomaticLinks(sourceString: string){
-        const codeBlockMatch = /```((?!```).)*```/s;
+        
+        const codeBlockMatch = /^```.+```$/gms;
 
         // split the string in subpieces.
         // these pieces will be either standard comment (strings which does not stats and ends with ```)

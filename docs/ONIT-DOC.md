@@ -158,7 +158,7 @@ Example config
 
 ```js
 const config = {
-    baseUrl: '/onit-docs', // optional, if set it must start with '/'
+
     ignore: [
         './node_modules/**/*',
         './build/**/*',

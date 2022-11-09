@@ -17,10 +17,12 @@ class DocBuilder {
         // keep the callbacks for writing out data. THis allow us to precalculate everything and write them out 
         // only at the end of the process
         this.writeCallbacks = [];
+        this.chapterCache = {};
         this.configFile = configFile;
         this.blocks = blocks;
         this.outDir = outDir;
         this.scanTargetDir = scanTargetDir;
+        // set indexes based on position in config file so we can sort the chapters later
         const _recurseSetIndex = (tree) => {
             tree.forEach((t, i) => {
                 t.chapterIndexNumber = i;
@@ -86,13 +88,14 @@ class DocBuilder {
         if (!chapterPath)
             throw new types_1.StringError('Cannot find chapterPath');
         const chapterDepth = chapterPath.length;
+        // resolve @src source include tags
+        str = this.resolveSourceIncludes(str, block.__filename);
+        // 
         str = this.generateAutomaticLinks(str);
         // resolve the internal links for better navigation
         str = this.resolveInternalLink(str, chapterDepth);
         // Resolve image links 
         str = this.resolveImageLink(str, block.__filename, chapterDepth);
-        // resolve @src source include tags
-        str = this.resolveSourceIncludes(str, block.__filename);
         return str;
     }
     /**
@@ -323,12 +326,16 @@ class DocBuilder {
     findChapterPath(chapters, chapter, path = [], matchFn = null) {
         if (matchFn === null)
             matchFn = c => c.chapter === chapter;
+        const cacheKey = chapter + matchFn.toString();
+        if (this.chapterCache[cacheKey])
+            return this.chapterCache[cacheKey];
         const c = chapters.find(matchFn);
         if (c)
             return [...path, c];
         for (const _chapter of chapters) {
             if (_chapter.children) {
                 const r = this.findChapterPath(_chapter.children, chapter, [...path, _chapter], matchFn);
+                this.chapterCache[cacheKey] = r;
                 if (r)
                     return r;
             }
@@ -388,7 +395,7 @@ class DocBuilder {
      * @returns The parsed string
      */
     generateAutomaticLinks(sourceString) {
-        const codeBlockMatch = /```((?!```).)*```/s;
+        const codeBlockMatch = /^```.+```$/gms;
         // split the string in subpieces.
         // these pieces will be either standard comment (strings which does not stats and ends with ```)
         // or code blocks (starting and ending with ```)
