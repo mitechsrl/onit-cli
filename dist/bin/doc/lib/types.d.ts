@@ -21,3 +21,6 @@ export declare type DocumentationBlock = {
     remarksBlock: string;
     __filename: string;
 };
+export declare abstract class CommentParser {
+    abstract parseFiles(files: string[]): DocumentationBlock[];
+}

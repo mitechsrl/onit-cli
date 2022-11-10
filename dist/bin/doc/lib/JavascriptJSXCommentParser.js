@@ -27,11 +27,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MarkdownCommentParser = void 0;
+exports.JavascriptJSXCommentParser = void 0;
 const TypescriptCommentParser_1 = require("./TypescriptCommentParser");
 const fs_1 = __importDefault(require("fs"));
 const types_1 = require("./types");
-class MarkdownCommentParser extends types_1.CommentParser {
+const comment_parser_1 = require("comment-parser");
+class JavascriptJSXCommentParser extends types_1.CommentParser {
     constructor() {
         super();
         // uses internally some methods of TypescriptCommentParser.
@@ -42,17 +43,20 @@ class MarkdownCommentParser extends types_1.CommentParser {
     parseFiles(files) {
         const blocks = [];
         for (const file of files) {
-            // this just fakes a comment text block and passes it to typescript parser
-            // For markdown, the entire file is faked as comment text block
-            const fileContent = `/**\n${fs_1.default.readFileSync(file).toString()}\n*/`;
-            // parse the comment text block.
-            const block = this.typescriptCommentParser.parseCommentText(fileContent, file);
-            if (block) {
-                blocks.push(block);
-            }
+            const fileContent = fs_1.default.readFileSync(file).toString();
+            // extract all comment blocks from file
+            const commentBlocks = (0, comment_parser_1.parse)(fileContent);
+            commentBlocks.forEach(extractedBlock => {
+                // stringify will construct them back as string comments which then are parsed with the default 
+                // parser for typescript files (which expect a single comment block text as input)
+                const block = this.typescriptCommentParser.parseCommentText((0, comment_parser_1.stringify)(extractedBlock), file);
+                if (block) {
+                    blocks.push(block);
+                }
+            });
         }
         return blocks;
     }
 }
-exports.MarkdownCommentParser = MarkdownCommentParser;
-//# sourceMappingURL=MarkdownCommentParser.js.map
+exports.JavascriptJSXCommentParser = JavascriptJSXCommentParser;
+//# sourceMappingURL=JavascriptJSXCommentParser.js.map

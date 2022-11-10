@@ -44,8 +44,6 @@ export function findFiles(config: OnitDocumentationConfigFileJson, cwd = process
     const options = {
         ignore: [
             './node_modules/**/*',
-            './dist/**/*',
-            './dist-fe/**/*',
             ...(config.ignore || [])
         ],
         cwd: cwd
@@ -55,7 +53,7 @@ export function findFiles(config: OnitDocumentationConfigFileJson, cwd = process
     const globList = [
         // { extension: '.js', glob: ['./**/*.js', './**/*.JS'], parser: path.join(__dirname, './parsers/javascript.js') },
         { extension: '.ts', glob: ['./**/*.ts', './**/*.TS'], parser: 'typescript' },
-        // { extension: '.jsx', glob: ['./**/*.jsx', './**/*.JSX'], parser: path.join(__dirname, './parsers/javascript.js') },
+        { extension: '.jsx', glob: ['./**/*.jsx', './**/*.JSX'], parser: 'jsx-javascript' },
         { extension: '.md', glob: ['./**/*.md', './**/*.MD'], parser: 'markdown' },
         ...(config.globList || []) // add globs from config file
     ];
@@ -71,7 +69,6 @@ export function findFiles(config: OnitDocumentationConfigFileJson, cwd = process
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         globAll(_globList, options, function (err:any, files: string[]) {
             if (err) { return reject(err); }
-
             const result = files.map(f => {
                 return {
                     file: path.resolve(cwd, f),

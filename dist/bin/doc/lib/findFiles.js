@@ -45,8 +45,6 @@ function findFiles(config, cwd = process.cwd()) {
     const options = {
         ignore: [
             './node_modules/**/*',
-            './dist/**/*',
-            './dist-fe/**/*',
             ...(config.ignore || [])
         ],
         cwd: cwd
@@ -55,7 +53,7 @@ function findFiles(config, cwd = process.cwd()) {
     const globList = [
         // { extension: '.js', glob: ['./**/*.js', './**/*.JS'], parser: path.join(__dirname, './parsers/javascript.js') },
         { extension: '.ts', glob: ['./**/*.ts', './**/*.TS'], parser: 'typescript' },
-        // { extension: '.jsx', glob: ['./**/*.jsx', './**/*.JSX'], parser: path.join(__dirname, './parsers/javascript.js') },
+        { extension: '.jsx', glob: ['./**/*.jsx', './**/*.JSX'], parser: 'jsx-javascript' },
         { extension: '.md', glob: ['./**/*.md', './**/*.MD'], parser: 'markdown' },
         ...(config.globList || []) // add globs from config file
     ];

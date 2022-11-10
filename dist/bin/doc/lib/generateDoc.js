@@ -27,6 +27,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.generateDoc = void 0;
 const DocBuilder_1 = require("./DocBuilder");
 const findFiles_1 = require("./findFiles");
+const JavascriptJSXCommentParser_1 = require("./JavascriptJSXCommentParser");
 const MarkdownCommentParser_1 = require("./MarkdownCommentParser");
 const TypescriptCommentParser_1 = require("./TypescriptCommentParser");
 /**
@@ -40,7 +41,8 @@ const TypescriptCommentParser_1 = require("./TypescriptCommentParser");
 async function generateDoc(config, scanTargetDir, outDir) {
     const parsers = {
         typescript: new TypescriptCommentParser_1.TypescriptCommentParser(),
-        markdown: new MarkdownCommentParser_1.MarkdownCommentParser()
+        markdown: new MarkdownCommentParser_1.MarkdownCommentParser(),
+        'jsx-javascript': new JavascriptJSXCommentParser_1.JavascriptJSXCommentParser()
     };
     const blocks = [];
     // Scan for files
@@ -54,7 +56,7 @@ async function generateDoc(config, scanTargetDir, outDir) {
     }, {});
     // Run the parser
     for (const parser of Object.keys(groupByParser)) {
-        blocks.push(...parsers[parser].parseFile(groupByParser[parser]));
+        blocks.push(...parsers[parser].parseFiles(groupByParser[parser]));
     }
     const docBuilder = new DocBuilder_1.DocBuilder(config, scanTargetDir, blocks, outDir);
     docBuilder.build();

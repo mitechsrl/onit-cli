@@ -24,4 +24,8 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.CommentParser = void 0;
+class CommentParser {
+}
+exports.CommentParser = CommentParser;
 //# sourceMappingURL=types.js.map

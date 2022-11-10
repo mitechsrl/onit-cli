@@ -1,5 +1,5 @@
 import yargs from 'yargs';
-export declare type CommandExecFunction = (argv: yargs.ArgumentsCamelCase<{}>) => void;
+export declare type CommandExecFunction = (argv: yargs.ArgumentsCamelCase<unknown>) => void;
 export declare type Command = {
     description: string;
     longHelp?: string;
@@ -9,4 +9,5 @@ export declare type Command = {
     }[];
     exec: string;
     strictCommands?: boolean;
+    strictOptions?: boolean;
 };

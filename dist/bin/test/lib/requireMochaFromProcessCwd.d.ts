@@ -1,4 +1,4 @@
-/// <reference types="mocha" />
+import Mocha from 'mocha';
 /**
  * Search and require an instance of mocha in the target workspace
  * @returns;

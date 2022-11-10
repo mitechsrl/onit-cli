@@ -1,10 +1,10 @@
 import { DocNode } from '@microsoft/tsdoc';
-import { DocumentationBlock } from './types';
-export declare class TypescriptCommentParser {
+import { CommentParser, DocumentationBlock } from './types';
+export declare class TypescriptCommentParser extends CommentParser {
     private tsdocParser;
     constructor();
     renderDocNode(docNode: DocNode): string;
     renderDocNodes(docNodes: DocNode[]): string;
     parseCommentText(commentText: string, filename: string): DocumentationBlock | null;
-    parseFile(files: string[]): DocumentationBlock[];
+    parseFiles(files: string[]): DocumentationBlock[];
 }

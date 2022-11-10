@@ -25,6 +25,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 import { join } from 'path';
 import { logger } from '../../../lib/logger';
+import Mocha from 'mocha';
 
 /**
  * Search and require an instance of mocha in the target workspace

@@ -30,10 +30,13 @@ function recourseRegisterCommand(parentYargs, commandConfig) {
         commandConfig.children.forEach(child => {
             recourseRegisterCommand(_yargs, child);
         });
-        // se strict, lancia errore per sottocomandi non conosciuti
+        // Error on unrecognized subcommands
         // Se non strict, chiama l'ultimo padre riconosciuto e passagli i restanti parametri
         // https://yargs.js.org/docs/#api-reference-strictcommandsenabledtrue
         _yargs.strictCommands(command.strictCommands !== false);
+        // error on unrecognized options
+        // https://yargs.js.org/docs/#api-reference-strictoptionsenabledtrue
+        _yargs.strictOptions(command.strictOptions !== false);
     }, (argv) => {
         // Command method runner        
         let promise = Promise.resolve();

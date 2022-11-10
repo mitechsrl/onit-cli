@@ -25,9 +25,10 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 import { TypescriptCommentParser } from './TypescriptCommentParser';
 import fs from 'fs';
-import { CommentParser } from './types';
+import { CommentParser, DocumentationBlock } from './types';
+import { parse, stringify } from 'comment-parser';
 
-export class MarkdownCommentParser extends CommentParser {
+export class JavascriptJSXCommentParser extends CommentParser {
 
     private typescriptCommentParser: TypescriptCommentParser;
     
@@ -41,17 +42,21 @@ export class MarkdownCommentParser extends CommentParser {
 
     parseFiles(files: string[]) {
 
-        const blocks = [];
+        const blocks: DocumentationBlock[] = [];
         for (const file of files) {
-            // this just fakes a comment text block and passes it to typescript parser
-            // For markdown, the entire file is faked as comment text block
-            const fileContent = `/**\n${fs.readFileSync(file).toString()}\n*/`;
+            const fileContent = fs.readFileSync(file).toString();
 
-            // parse the comment text block.
-            const block = this.typescriptCommentParser.parseCommentText(fileContent, file);
-            if (block) {
-                blocks.push(block);
-            }
+            // extract all comment blocks from file
+            const commentBlocks = parse(fileContent);
+            
+            commentBlocks.forEach(extractedBlock => {
+                // stringify will construct them back as string comments which then are parsed with the default 
+                // parser for typescript files (which expect a single comment block text as input)
+                const block = this.typescriptCommentParser.parseCommentText(stringify(extractedBlock), file);
+                if (block) {
+                    blocks.push(block);
+                }
+            });
         }
         return blocks;
     }

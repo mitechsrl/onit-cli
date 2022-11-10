@@ -23,7 +23,6 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import glob from 'glob';
 import fs from 'fs';
 import { resolve } from 'path';
 import { promisify } from 'util';
@@ -38,7 +37,7 @@ const globAll = require('glob-all');
 export async function checkDirectory(dir: string) {
 
     // search for json files
-    const options: glob.IOptions = {
+    const options: GenericObject = {
         cwd: dir,
         ignore: [
             './**/node_modules/**/*',

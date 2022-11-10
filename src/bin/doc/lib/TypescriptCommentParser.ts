@@ -26,12 +26,13 @@ OTHER DEALINGS IN THE SOFTWARE.
 import { TSDocParser, DocExcerpt, TSDocConfiguration, TSDocTagSyntaxKind, TSDocTagDefinition, DocNode } from '@microsoft/tsdoc';
 import { forEachComment } from 'tsutils';
 import ts from 'typescript';
-import { DocumentationBlock } from './types';
+import { CommentParser, DocumentationBlock } from './types';
 
-export class TypescriptCommentParser {
+export class TypescriptCommentParser extends CommentParser {
 
     private tsdocParser: TSDocParser;
     constructor () {
+        super();
         const config = new TSDocConfiguration();
 
         const customTags = ['@chapter', '@title', '@summary', '@priority'];
@@ -83,7 +84,7 @@ export class TypescriptCommentParser {
             see: [],
             throws: [],
             example: [],
-            priority: 0,
+            priority: 1000,
             beta: docComment.modifierTagSet.isBeta(),
             alpha: docComment.modifierTagSet.isAlpha(),
             deprecated: '',
@@ -161,8 +162,8 @@ export class TypescriptCommentParser {
 
         return null;
     }
-
-    parseFile (files:string[]) {
+    
+    parseFiles (files:string[]) {
         const program = ts.createProgram(files, {
             target: ts.ScriptTarget.ES2018
         });

@@ -31,8 +31,10 @@ exports.TypescriptCommentParser = void 0;
 const tsdoc_1 = require("@microsoft/tsdoc");
 const tsutils_1 = require("tsutils");
 const typescript_1 = __importDefault(require("typescript"));
-class TypescriptCommentParser {
+const types_1 = require("./types");
+class TypescriptCommentParser extends types_1.CommentParser {
     constructor() {
+        super();
         const config = new tsdoc_1.TSDocConfiguration();
         const customTags = ['@chapter', '@title', '@summary', '@priority'];
         customTags.forEach(tagString => {
@@ -78,7 +80,7 @@ class TypescriptCommentParser {
             see: [],
             throws: [],
             example: [],
-            priority: 0,
+            priority: 1000,
             beta: docComment.modifierTagSet.isBeta(),
             alpha: docComment.modifierTagSet.isAlpha(),
             deprecated: '',
@@ -145,7 +147,7 @@ class TypescriptCommentParser {
         }
         return null;
     }
-    parseFile(files) {
+    parseFiles(files) {
         const program = typescript_1.default.createProgram(files, {
             target: typescript_1.default.ScriptTarget.ES2018
         });

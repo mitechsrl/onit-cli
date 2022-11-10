@@ -20,13 +20,6 @@ const config: Command = {
             } 
         },
         {
-            name: 'watch',
-            config: {
-                type:'boolean',
-                description:'Abbinato a -t, esegue solo il watch&build senza lanciare node' 
-            } 
-        },
-        {
             name: 'minimize',
             config: {
                 type:'boolean',
@@ -44,7 +37,7 @@ const config: Command = {
             name: 'exit',
             config: {
                 type:'boolean',
-                description:'Abbinato a -t esce subito dopo aver terminato tsc' 
+                description:'Used with -t or -w, exit after the fuirs successfull build' 
             } 
         },
         {
@@ -58,14 +51,14 @@ const config: Command = {
             name: 'w',
             config: {
                 type:'boolean',
-                description:'Run webpack only' 
+                description:'Run webpack only. The app will not be launched' 
             } 
         },
         {
             name: 'watch',
             config: {
                 type:'boolean',
-                description:'Watch on build' 
+                description:'Used with -t or -w, just watch and rebuild without launching the app' 
             } 
         },
         {

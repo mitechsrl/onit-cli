@@ -1,6 +1,6 @@
 import yargs from 'yargs';
 
-export type CommandExecFunction = (argv: yargs.ArgumentsCamelCase<{}>) => void;
+export type CommandExecFunction = (argv: yargs.ArgumentsCamelCase<unknown>) => void;
 
 export type Command = {
     // short description
@@ -19,5 +19,10 @@ export type Command = {
 
     // allow unknown positional parameters
     // If true, "mitech pm2 demo" will be managed by "mitech pm2" since everything after "pm2" is unknown 
+    // defaults to true
     strictCommands?: boolean
+
+    // https://yargs.js.org/docs/#api-reference-strictoptionsenabledtrue
+    // defaults to true    
+    strictOptions?: boolean
 };

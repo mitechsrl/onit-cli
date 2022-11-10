@@ -1,5 +1,6 @@
-export declare class MarkdownCommentParser {
+import { CommentParser } from './types';
+export declare class MarkdownCommentParser extends CommentParser {
     private typescriptCommentParser;
     constructor();
-    parseFile(files: string[]): import("./types").DocumentationBlock[];
+    parseFiles(files: string[]): import("./types").DocumentationBlock[];
 }

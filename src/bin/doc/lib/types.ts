@@ -43,3 +43,7 @@ export type DocumentationBlock = {
     remarksBlock: string,
     __filename: string
 };
+
+export abstract class CommentParser{
+    abstract parseFiles(files: string[]): DocumentationBlock[]; 
+}
