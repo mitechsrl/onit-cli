@@ -26,6 +26,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 import { GenericObject, OnitDocumentationConfigFileJson } from '../../../types';
 import { DocBuilder } from './DocBuilder';
 import { findFiles } from './findFiles';
+import { JavascriptCommentParser } from './JavascriptCommentParser';
 import { JavascriptJSXCommentParser } from './JavascriptJSXCommentParser';
 import { MarkdownCommentParser } from './MarkdownCommentParser';
 import { TypescriptCommentParser } from './TypescriptCommentParser';
@@ -43,7 +44,8 @@ export async function generateDoc (config: OnitDocumentationConfigFileJson, scan
     const parsers: GenericObject = {
         typescript: new TypescriptCommentParser(),
         markdown: new MarkdownCommentParser(),
-        'jsx-javascript': new JavascriptJSXCommentParser()
+        'jsx-javascript': new JavascriptJSXCommentParser(),
+        javascript: new JavascriptCommentParser()
     };
     const blocks = [];
 

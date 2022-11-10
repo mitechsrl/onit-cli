@@ -23,41 +23,6 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { TypescriptCommentParser } from './TypescriptCommentParser';
-import fs from 'fs';
-import { CommentParser, DocumentationBlock } from './types';
-import { parse, stringify } from 'comment-parser';
+import { JavascriptCommentParser } from './JavascriptCommentParser';
 
-export class JavascriptJSXCommentParser extends CommentParser {
-
-    private typescriptCommentParser: TypescriptCommentParser;
-    
-    constructor() {
-        super();
-        // uses internally some methods of TypescriptCommentParser.
-        // Mainly the method that parse a comment text block
-        // NOTE: Comment text blocks are strings that start with '/**' and ends with '*/'
-        this.typescriptCommentParser = new TypescriptCommentParser();
-    }
-
-    parseFiles(files: string[]) {
-
-        const blocks: DocumentationBlock[] = [];
-        for (const file of files) {
-            const fileContent = fs.readFileSync(file).toString();
-
-            // extract all comment blocks from file
-            const commentBlocks = parse(fileContent);
-            
-            commentBlocks.forEach(extractedBlock => {
-                // stringify will construct them back as string comments which then are parsed with the default 
-                // parser for typescript files (which expect a single comment block text as input)
-                const block = this.typescriptCommentParser.parseCommentText(stringify(extractedBlock), file);
-                if (block) {
-                    blocks.push(block);
-                }
-            });
-        }
-        return blocks;
-    }
-}
+export class JavascriptJSXCommentParser extends JavascriptCommentParser {}

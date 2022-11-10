@@ -51,7 +51,7 @@ function findFiles(config, cwd = process.cwd()) {
     };
     // setup which files must be parsed and the relative parser. See https://en.wikipedia.org/wiki/Glob_(programming) for glob patterns
     const globList = [
-        // { extension: '.js', glob: ['./**/*.js', './**/*.JS'], parser: path.join(__dirname, './parsers/javascript.js') },
+        { extension: '.js', glob: ['./**/*.js', './**/*.JS'], parser: 'javascript' },
         { extension: '.ts', glob: ['./**/*.ts', './**/*.TS'], parser: 'typescript' },
         { extension: '.jsx', glob: ['./**/*.jsx', './**/*.JSX'], parser: 'jsx-javascript' },
         { extension: '.md', glob: ['./**/*.md', './**/*.MD'], parser: 'markdown' },

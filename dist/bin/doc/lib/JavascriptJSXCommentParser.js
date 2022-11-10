@@ -23,40 +23,10 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.JavascriptJSXCommentParser = void 0;
-const TypescriptCommentParser_1 = require("./TypescriptCommentParser");
-const fs_1 = __importDefault(require("fs"));
-const types_1 = require("./types");
-const comment_parser_1 = require("comment-parser");
-class JavascriptJSXCommentParser extends types_1.CommentParser {
-    constructor() {
-        super();
-        // uses internally some methods of TypescriptCommentParser.
-        // Mainly the method that parse a comment text block
-        // NOTE: Comment text blocks are strings that start with '/**' and ends with '*/'
-        this.typescriptCommentParser = new TypescriptCommentParser_1.TypescriptCommentParser();
-    }
-    parseFiles(files) {
-        const blocks = [];
-        for (const file of files) {
-            const fileContent = fs_1.default.readFileSync(file).toString();
-            // extract all comment blocks from file
-            const commentBlocks = (0, comment_parser_1.parse)(fileContent);
-            commentBlocks.forEach(extractedBlock => {
-                // stringify will construct them back as string comments which then are parsed with the default 
-                // parser for typescript files (which expect a single comment block text as input)
-                const block = this.typescriptCommentParser.parseCommentText((0, comment_parser_1.stringify)(extractedBlock), file);
-                if (block) {
-                    blocks.push(block);
-                }
-            });
-        }
-        return blocks;
-    }
+const JavascriptCommentParser_1 = require("./JavascriptCommentParser");
+class JavascriptJSXCommentParser extends JavascriptCommentParser_1.JavascriptCommentParser {
 }
 exports.JavascriptJSXCommentParser = JavascriptJSXCommentParser;
 //# sourceMappingURL=JavascriptJSXCommentParser.js.map
