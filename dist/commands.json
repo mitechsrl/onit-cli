@@ -46,6 +46,22 @@
         "children": []
     },
     {
+        "cmd": "labels",
+        "file": "bin\\labels\\commandConfig.js",
+        "children": [
+            {
+                "cmd": "dup",
+                "file": "bin\\labels\\dup\\commandConfig.js",
+                "children": []
+            },
+            {
+                "cmd": "extract",
+                "file": "bin\\labels\\extract\\commandConfig.js",
+                "children": []
+            }
+        ]
+    },
+    {
         "cmd": "serve",
         "file": "bin\\serve\\commandConfig.js",
         "children": []

@@ -1,4 +1,28 @@
 "use strict";
+/*
+Copyright (c) 2021 Mitech S.R.L.
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+*/
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -127,7 +151,7 @@ class DocBuilder {
             }
             file = path_1.default.join(path_1.default.dirname(blockSourceFile), file);
             if (!fs_1.default.existsSync(file)) {
-                console.warn('@src file resolution error: file ' + file + ' not found in ' + blockSourceFile);
+                logger_1.logger.warn('@src file resolution error: file ' + file + ' not found in ' + blockSourceFile);
                 continue;
             }
             let replace = '';
@@ -146,7 +170,7 @@ class DocBuilder {
                 }
             }
             catch (e) {
-                console.warn('Transform of ' + found + ' failed, error:' + e);
+                logger_1.logger.warn('Transform of ' + found + ' failed, error:' + e);
             }
             str = str.replace(found, replace);
         }
@@ -305,7 +329,7 @@ class DocBuilder {
                     fs_1.default.copyFileSync(srcFilename, dstFilename);
                 }
                 else {
-                    console.warn('Image ' + srcFilename + ' not found in ' + blockSourceFile);
+                    logger_1.logger.warn('Image ' + srcFilename + ' not found in ' + blockSourceFile);
                 }
             });
         }
@@ -460,7 +484,7 @@ class DocBuilder {
             const matchFn = (c) => c.chapter === chapter || c.title === chapter;
             const linkChapterPath = this.findChapterPath((_a = this.configFile.chapters) !== null && _a !== void 0 ? _a : [], chapter, [], matchFn);
             if (!linkChapterPath || linkChapterPath.length === 0) {
-                console.warn('Link generation for ' + found + ' failed. Nothing found for the specified label.');
+                logger_1.logger.warn('Link generation for ' + found + ' failed. Nothing found for the specified label.');
                 continue;
             }
             let linkChapterFilename = null;
@@ -481,7 +505,6 @@ class DocBuilder {
             if (!text)
                 text = (_b = linkChapterPath[linkChapterPath.length - 1].title) !== null && _b !== void 0 ? _b : '';
             const replace = '[' + text + '](' + linkChapterFilename + ')';
-            // console.log("Resolved link " + found + " -> " + replace)
             sourceString = sourceString.replace(found, replace);
         }
         return sourceString;
@@ -510,7 +533,6 @@ class DocBuilder {
     write() {
         // Ensure we have the target dir empty
         fs_extra_1.default.removeSync(this.outDir);
-        // console.log('Create out directory: ' + outDir);
         fs_1.default.mkdirSync(this.outDir, { recursive: true });
         // effectively run the fs-related stuff
         for (const cb of this.writeCallbacks) {

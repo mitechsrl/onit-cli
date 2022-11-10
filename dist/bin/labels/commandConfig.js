@@ -1,3 +1,4 @@
+"use strict";
 /*
 Copyright (c) 2021 Mitech S.R.L.
 
@@ -22,18 +23,11 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
-
-const logger = require('../../../lib/logger');
-const checker = require('./_src/duplicate');
-
-module.exports.info = 'Utility verifica duplicazione e correzione labels.';
-module.exports.help = [
-    'Questa utility verifica i files json delle labels alla ricerca di duplicati.',
-    'Esegue rimozione in-place verificando che non esistano duplicati sia intra-json, che cross-json'
-];
-
-module.exports.cmd = async function (basepath, params) {
-    logger.info('Verifica directory corrente');
-
-    checker.checkDirectory(process.cwd());
+Object.defineProperty(exports, "__esModule", { value: true });
+const config = {
+    description: 'Labels management utility',
+    exec: './exec',
+    params: []
 };
+exports.default = config;
+//# sourceMappingURL=commandConfig.js.map
