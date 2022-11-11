@@ -86,6 +86,9 @@ Defines the sorting priority of this comment block when more comment blocks matc
 Defines the comment block main text. This tag is optional in case you just start with the main documentation after opening a comment block. 
 If you use other tags before the main text, you needs to instruct jsdoc where this block will start.
 
+**@prop** 
+The same as @param, but more targeted to document react component props.
+
 #### Images
 You can use standard markdown syntax to define images:
 

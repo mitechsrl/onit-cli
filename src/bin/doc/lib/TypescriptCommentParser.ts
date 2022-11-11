@@ -35,7 +35,7 @@ export class TypescriptCommentParser extends CommentParser {
         super();
         const config = new TSDocConfiguration();
 
-        const customTags = ['@chapter', '@title', '@summary', '@priority'];
+        const customTags = ['@chapter', '@title', '@summary', '@priority','@prop'];
         customTags.forEach(tagString => {
             const tag = new TSDocTagDefinition({
                 tagName: tagString,
@@ -91,6 +91,7 @@ export class TypescriptCommentParser extends CommentParser {
             virtual: docComment.modifierTagSet.isVirtual(),
             override: docComment.modifierTagSet.isOverride(),
             remarksBlock:'',
+            props: [],
             __filename: filename
         };
 
@@ -136,6 +137,15 @@ export class TypescriptCommentParser extends CommentParser {
                 break;
             case '@chapter': block.chapter = this.renderDocNode(customBlock.content).trim();
                 break;
+            case '@prop': {
+                const content = this.renderDocNode(customBlock.content).trim().replace(/\n/gm,' \n').split(' ');
+                const p = {
+                    name: (content[0] ?? '').trim(),
+                    description: content.slice(1).join(' ').trim()
+                };
+                if(p.name) block.props.push(p);
+                break;
+            }
             }
         }
 

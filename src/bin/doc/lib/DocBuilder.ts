@@ -23,7 +23,6 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
 
-
 import path from 'path';
 import fs from 'fs';
 import fse from 'fs-extra';
@@ -107,13 +106,23 @@ export class DocBuilder {
 
         if (block.params.length > 0) {
             str += '#### Params\n';
+            block.params.forEach(param => {
+                str += '**' + param.name + '**\n';
+                str += param.description;
+                str += '\n\n';
+            });
         }
 
-        block.params.forEach(param => {
-            str += '**' + param.name + '**\n';
-            str += param.description;
-            str += '\n\n';
-        });
+        // Add props. Available only when the parsed file was a react component
+        if (block.props.length > 0) {
+            str += '#### Props\n';
+            
+            block.props.forEach(prop => {
+                str += '**' + prop.name + '**\n';
+                str += prop.description;
+                str += '\n\n';
+            });
+        }
 
         if (block.returns) {
             str += '#### Returns\n';

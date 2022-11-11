@@ -89,6 +89,9 @@ Definisce l'ordinamento con cui inserire blocchi di codice referenti allo stesso
 Definisce l'inizio del blocco di testo contente la documentazione da estrapolare.
 Il tag è opzionale se il testo del summary è la prima entità all'interno del blocco commento. Nel caso come prima entità vengano inseriti diversi altri tags, allora per **iniziare** il blocco del summary è necessario l'uso del tag
 
+**@prop** 
+Come @param, ma targetizzato alla documentazione di props react.
+
 #### Immagini
 Utiluzzare il classito tag markdown per la gestione delle immagini:
 

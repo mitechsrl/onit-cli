@@ -36,7 +36,7 @@ class TypescriptCommentParser extends types_1.CommentParser {
     constructor() {
         super();
         const config = new tsdoc_1.TSDocConfiguration();
-        const customTags = ['@chapter', '@title', '@summary', '@priority'];
+        const customTags = ['@chapter', '@title', '@summary', '@priority', '@prop'];
         customTags.forEach(tagString => {
             const tag = new tsdoc_1.TSDocTagDefinition({
                 tagName: tagString,
@@ -67,6 +67,7 @@ class TypescriptCommentParser extends types_1.CommentParser {
         return result;
     }
     parseCommentText(commentText, filename) {
+        var _a;
         const parserContext = this.tsdocParser.parseString(commentText);
         const docComment = parserContext.docComment;
         const block = {
@@ -87,6 +88,7 @@ class TypescriptCommentParser extends types_1.CommentParser {
             virtual: docComment.modifierTagSet.isVirtual(),
             override: docComment.modifierTagSet.isOverride(),
             remarksBlock: '',
+            props: [],
             __filename: filename
         };
         if (docComment.remarksBlock) {
@@ -127,6 +129,16 @@ class TypescriptCommentParser extends types_1.CommentParser {
                 case '@chapter':
                     block.chapter = this.renderDocNode(customBlock.content).trim();
                     break;
+                case '@prop': {
+                    const content = this.renderDocNode(customBlock.content).trim().replace(/\n/gm, ' \n').split(' ');
+                    const p = {
+                        name: ((_a = content[0]) !== null && _a !== void 0 ? _a : '').trim(),
+                        description: content.slice(1).join(' ').trim()
+                    };
+                    if (p.name)
+                        block.props.push(p);
+                    break;
+                }
             }
         }
         if (docComment.summarySection) {

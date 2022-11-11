@@ -6,6 +6,10 @@ export declare type DocumentationBlock = {
         name: string;
         description: string;
     }[];
+    props: {
+        name: string;
+        description: string;
+    }[];
     returns: string;
     remarks: string;
     privateRemarks: string;
