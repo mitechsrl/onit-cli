@@ -66,6 +66,6 @@ export async function extraStepRunner(step: OnitConfigFileBuildExtraStep, vars: 
         process.chdir(originalCwd);
     }
 
-    logger.log('Step <' + step.name + '> completed!');
+    logger.log(':white_check_mark: Step <' + step.name + '> completed!');
     return 0;
 }
