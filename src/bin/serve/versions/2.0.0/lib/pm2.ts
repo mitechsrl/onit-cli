@@ -54,14 +54,17 @@ async function checkPm2Availability(){
         return false;
     }
 }
+
+/**
+ * Stop pm2 instances.
+ * The process is detached so this cli can stop immediately without waiting for pm2 stop.
+ */
 export async function pm2stop() {
-    // launch this detached so the cli can exit quickly while pm2 is still stopping apps
     const subprocess = _spawn(pm2exec, ['stop', 'all'], {
         detached: true,
         stdio: 'ignore'
     });
     subprocess.unref();
-
 }
 
 /**
@@ -72,11 +75,6 @@ export async function pm2stop() {
  */
 export async function pm2start(onitConfigFile: OnitConfigFile): Promise<number> {
 
-    if (!await checkPm2Availability()){
-        logger.warn('PM2 is not installed. Apps launch as defined in <pm2-dev-ecosystem> will be skipped');
-        return 0;
-    }
-    
     // preparo ecosystem file temporaneo
     const pm2Ecosystem: GenericObject = (onitConfigFile.json.serve || {})['pm2-dev-ecosystem'] ?? { apps: [] };
 
@@ -96,7 +94,12 @@ export async function pm2start(onitConfigFile: OnitConfigFile): Promise<number> 
 
     // c'è qualche app da lanciare?
     if (pm2Ecosystem.apps.length === 0) {
-        logger.log('No pm2 apps to be launched. Skipping step.');
+        logger.log('No PM2 apps to be launched. Skipping step.');
+        return 0;
+    }
+
+    if (!await checkPm2Availability()){
+        logger.warn('PM2 is not installed. Apps launch as defined in <pm2-dev-ecosystem> will be skipped');
         return 0;
     }
 
