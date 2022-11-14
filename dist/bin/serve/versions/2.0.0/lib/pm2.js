@@ -32,9 +32,31 @@ const fs_1 = __importDefault(require("fs"));
 const lodash_1 = __importDefault(require("lodash"));
 const spawn_1 = require("../../../../../lib/spawn");
 const child_process_1 = require("child_process");
+const logger_1 = require("../../../../../lib/logger");
 // windows fa il windows percui lui vuole 'pm2.cmd' anzichè 'pm2' come comando di avvio
 const isWindows = (process.env.OS || '').toUpperCase().includes('WIN');
 const pm2exec = isWindows ? 'pm2.cmd' : 'pm2';
+/**
+ * Check for pm2 availability. Launche will be skipped if not available
+ * @returns true or false
+ */
+async function checkPm2Availability() {
+    let pm2Path = '';
+    // quickest way: check for pm2 file command available
+    // FIXME: add linux case
+    if (isWindows)
+        pm2Path = 'C:\\Program Files\\nodejs\\' + pm2exec;
+    if (pm2Path && fs_1.default.existsSync(pm2Path))
+        return true;
+    // slower method: run pm2 -v command and watch output
+    try {
+        const result = await (0, spawn_1.spawn)(pm2exec, ['-v'], false);
+        return result.output.trim().length > 0;
+    }
+    catch (e) {
+        return false;
+    }
+}
 async function pm2stop() {
     // launch this detached so the cli can exit quickly while pm2 is still stopping apps
     const subprocess = (0, child_process_1.spawn)(pm2exec, ['stop', 'all'], {
@@ -44,8 +66,18 @@ async function pm2stop() {
     subprocess.unref();
 }
 exports.pm2stop = pm2stop;
+/**
+ * Launch apps from pm2-dev-ecosystem config.
+ *
+ * @param onitConfigFile
+ * @returns The number of app launched
+ */
 async function pm2start(onitConfigFile) {
     var _a;
+    if (!await checkPm2Availability()) {
+        logger_1.logger.warn('PM2 is not installed. Apps launch as defined in <pm2-dev-ecosystem> will be skipped');
+        return 0;
+    }
     // preparo ecosystem file temporaneo
     const pm2Ecosystem = (_a = (onitConfigFile.json.serve || {})['pm2-dev-ecosystem']) !== null && _a !== void 0 ? _a : { apps: [] };
     // filter out apps based on enableOn

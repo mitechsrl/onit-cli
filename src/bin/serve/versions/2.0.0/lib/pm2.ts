@@ -28,11 +28,32 @@ import _ from 'lodash';
 import { spawn } from '../../../../../lib/spawn';
 import { GenericObject, OnitConfigFile } from '../../../../../types';
 import { spawn as _spawn } from 'child_process';
+import { logger } from '../../../../../lib/logger';
 
 // windows fa il windows percui lui vuole 'pm2.cmd' anzichè 'pm2' come comando di avvio
 const isWindows = (process.env.OS || '').toUpperCase().includes('WIN');
 const pm2exec = isWindows ? 'pm2.cmd' : 'pm2';
 
+/**
+ * Check for pm2 availability. Launche will be skipped if not available
+ * @returns true or false
+ */
+async function checkPm2Availability(){
+    let pm2Path = '';
+
+    // quickest way: check for pm2 file command available
+    // FIXME: add linux case
+    if (isWindows) pm2Path = 'C:\\Program Files\\nodejs\\'+pm2exec;
+    if (pm2Path && fs.existsSync(pm2Path)) return true;
+
+    // slower method: run pm2 -v command and watch output
+    try{
+        const result = await spawn(pm2exec,['-v'], false);
+        return result.output.trim().length>0;
+    }catch(e){
+        return false;
+    }
+}
 export async function pm2stop() {
     // launch this detached so the cli can exit quickly while pm2 is still stopping apps
     const subprocess = _spawn(pm2exec, ['stop', 'all'], {
@@ -43,7 +64,19 @@ export async function pm2stop() {
 
 }
 
-export async function pm2start(onitConfigFile: OnitConfigFile) {
+/**
+ * Launch apps from pm2-dev-ecosystem config.
+ * 
+ * @param onitConfigFile 
+ * @returns The number of app launched
+ */
+export async function pm2start(onitConfigFile: OnitConfigFile): Promise<number> {
+
+    if (!await checkPm2Availability()){
+        logger.warn('PM2 is not installed. Apps launch as defined in <pm2-dev-ecosystem> will be skipped');
+        return 0;
+    }
+    
     // preparo ecosystem file temporaneo
     const pm2Ecosystem: GenericObject = (onitConfigFile.json.serve || {})['pm2-dev-ecosystem'] ?? { apps: [] };
 
@@ -63,7 +96,7 @@ export async function pm2start(onitConfigFile: OnitConfigFile) {
 
     // c'è qualche app da lanciare?
     if (pm2Ecosystem.apps.length === 0) {
-        console.log('No pm2 apps to be launched. Skipping step.');
+        logger.log('No pm2 apps to be launched. Skipping step.');
         return 0;
     }
 

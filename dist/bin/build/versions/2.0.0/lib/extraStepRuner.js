@@ -60,7 +60,7 @@ async function extraStepRunner(step, vars) {
     if (originalCwd) {
         process.chdir(originalCwd);
     }
-    logger_1.logger.log('Step <' + step.name + '> completed!');
+    logger_1.logger.log(':white_check_mark: Step <' + step.name + '> completed!');
     return 0;
 }
 exports.extraStepRunner = extraStepRunner;
