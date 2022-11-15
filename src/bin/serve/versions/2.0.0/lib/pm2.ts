@@ -26,13 +26,13 @@ OTHER DEALINGS IN THE SOFTWARE.
 import fs from 'fs';
 import _ from 'lodash';
 import { spawn } from '../../../../../lib/spawn';
-import { GenericObject, OnitConfigFile } from '../../../../../types';
+import { GenericObject, OnitConfigFile, StringError } from '../../../../../types';
 import { spawn as _spawn } from 'child_process';
 import { logger } from '../../../../../lib/logger';
+import os from 'os';
 
-// windows fa il windows percui lui vuole 'pm2.cmd' anzichè 'pm2' come comando di avvio
-const isWindows = (process.env.OS || '').toUpperCase().includes('WIN');
-const pm2exec = isWindows ? 'pm2.cmd' : 'pm2';
+// windows being windows... it wants the .cmd extension!
+const pm2exec = os.platform() === 'win32' ? 'pm2.cmd' : 'pm2';
 
 /**
  * Check for pm2 availability. Launche will be skipped if not available
@@ -42,8 +42,13 @@ async function checkPm2Availability(){
     let pm2Path = '';
 
     // quickest way: check for pm2 file command available
-    // FIXME: add linux case
-    if (isWindows) pm2Path = 'C:\\Program Files\\nodejs\\'+pm2exec;
+    switch(os.platform()){
+        case 'win32': pm2Path = 'C:\\Program Files\\nodejs\\'+pm2exec;
+        break;
+        case 'linux': pm2Path = '/usr/bin/pm2';
+        break;
+    }
+
     if (pm2Path && fs.existsSync(pm2Path)) return true;
 
     // slower method: run pm2 -v command and watch output

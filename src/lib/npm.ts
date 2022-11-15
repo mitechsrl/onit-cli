@@ -16,6 +16,7 @@ import inquirer from 'inquirer';
 import { GenericObject, StringError } from '../types';
 import { logger } from './logger';
 import { getPersistent, setPersistent } from './persistent';
+import os from 'os';
 
 export type NpmRegistry = {
     scope?: string,
@@ -29,10 +30,11 @@ export type NpmRegistry = {
     [k: string]: any
 };
 
-// windows fa il windows percui lui vuole 'npm.cmd' anzichè 'npm' come comando di avvio
-const isWindows = (process.env.OS || '').toUpperCase().includes('WIN');
-export const npmExecutable = isWindows ? 'npm.cmd' : 'npm';
-export const npxExecutable = isWindows ? 'npx.cmd' : 'npm';
+
+
+// windows being windows... it wants the .cmd extension!
+export const npmExecutable = os.platform()=== 'win32' ? 'npm.cmd' : 'npm';
+export const npxExecutable = os.platform()=== 'win32' ? 'npx.cmd' : 'npx';
 
 /**
  * ottiene url del registry per lo scope scelto

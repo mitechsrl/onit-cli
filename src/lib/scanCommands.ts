@@ -32,7 +32,7 @@ export async function scanCommands(dir: string, name: string): Promise<ScanComma
         if (fileName === 'commandConfig.js') {
             scanResult.push({
                 cmd: name,
-                file: path.join(dir, fileName).replace(replace,''),
+                file: path.posix.join(dir, fileName).replace(replace,''),
                 children: []
             });
         }
@@ -42,7 +42,7 @@ export async function scanCommands(dir: string, name: string): Promise<ScanComma
 
     for (const fileName of files) {
         if (!fileName.startsWith('_')) {
-            const f = path.join(dir, fileName);
+            const f = path.posix.join(dir, fileName);
             const stat = await fs.promises.stat(f);
             if (stat.isDirectory()) {
                 const _f = await scanCommands(f, fileName);

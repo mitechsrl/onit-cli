@@ -23,6 +23,9 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.startTest = void 0;
 const logger_1 = require("../../../lib/logger");
@@ -34,8 +37,9 @@ const checkFiles_1 = require("./checkFiles");
 const spawnNodeProcess_1 = require("../../serve/versions/2.0.0/lib/spawnNodeProcess");
 const resolveTestFilesDirectories_1 = require("./resolveTestFilesDirectories");
 const runMocha_1 = require("./runMocha");
-const isWindows = (process.env.OS || '').toUpperCase().includes('WIN');
-const onitCliExecutable = isWindows ? 'onit.cmd' : 'onit';
+const os_1 = __importDefault(require("os"));
+// windows being windows... it wants the .cmd extension!
+const onitCliExecutable = os_1.default.platform() === 'win32' ? 'onit.cmd' : 'onit';
 /**
  * Test starter method
  *

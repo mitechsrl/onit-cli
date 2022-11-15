@@ -1,74 +1,74 @@
 [
     {
         "cmd": "build",
-        "file": "bin\\build\\commandConfig.js",
+        "file": "bin/build/commandConfig.js",
         "children": []
     },
     {
         "cmd": "create",
-        "file": "bin\\create\\commandConfig.js",
+        "file": "bin/create/commandConfig.js",
         "children": [
             {
                 "cmd": "app",
-                "file": "bin\\create\\app\\commandConfig.js",
+                "file": "bin/create/app/commandConfig.js",
                 "children": []
             },
             {
                 "cmd": "controller",
-                "file": "bin\\create\\controller\\commandConfig.js",
+                "file": "bin/create/controller/commandConfig.js",
                 "children": []
             },
             {
                 "cmd": "model",
-                "file": "bin\\create\\model\\commandConfig.js",
+                "file": "bin/create/model/commandConfig.js",
                 "children": []
             },
             {
                 "cmd": "relation",
-                "file": "bin\\create\\relation\\commandConfig.js",
+                "file": "bin/create/relation/commandConfig.js",
                 "children": []
             },
             {
                 "cmd": "repository",
-                "file": "bin\\create\\repository\\commandConfig.js",
+                "file": "bin/create/repository/commandConfig.js",
                 "children": []
             },
             {
                 "cmd": "service",
-                "file": "bin\\create\\service\\commandConfig.js",
+                "file": "bin/create/service/commandConfig.js",
                 "children": []
             }
         ]
     },
     {
         "cmd": "doc",
-        "file": "bin\\doc\\commandConfig.js",
+        "file": "bin/doc/commandConfig.js",
         "children": []
     },
     {
         "cmd": "labels",
-        "file": "bin\\labels\\commandConfig.js",
+        "file": "bin/labels/commandConfig.js",
         "children": [
             {
                 "cmd": "dup",
-                "file": "bin\\labels\\dup\\commandConfig.js",
+                "file": "bin/labels/dup/commandConfig.js",
                 "children": []
             },
             {
                 "cmd": "extract",
-                "file": "bin\\labels\\extract\\commandConfig.js",
+                "file": "bin/labels/extract/commandConfig.js",
                 "children": []
             }
         ]
     },
     {
         "cmd": "serve",
-        "file": "bin\\serve\\commandConfig.js",
+        "file": "bin/serve/commandConfig.js",
         "children": []
     },
     {
         "cmd": "test",
-        "file": "bin\\test\\commandConfig.js",
+        "file": "bin/test/commandConfig.js",
         "children": []
     }
 ]
