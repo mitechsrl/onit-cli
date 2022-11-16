@@ -34,9 +34,10 @@ import { checkFiles } from './checkFiles';
 import { buildEnvironment } from '../../serve/versions/2.0.0/lib/spawnNodeProcess';
 import { resolveTestFilesDirectories } from './resolveTestFilesDirectories';
 import { runMocha } from './runMocha';
+import os from 'os';
 
-const isWindows = (process.env.OS || '').toUpperCase().includes('WIN');
-const onitCliExecutable = isWindows ? 'onit.cmd' : 'onit';
+// windows being windows... it wants the .cmd extension!
+const onitCliExecutable = os.platform()=== 'win32' ? 'onit.cmd' : 'onit';
 
 /**
  * Test starter method

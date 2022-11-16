@@ -33,9 +33,9 @@ const lodash_1 = __importDefault(require("lodash"));
 const spawn_1 = require("../../../../../lib/spawn");
 const child_process_1 = require("child_process");
 const logger_1 = require("../../../../../lib/logger");
-// windows fa il windows percui lui vuole 'pm2.cmd' anzichè 'pm2' come comando di avvio
-const isWindows = (process.env.OS || '').toUpperCase().includes('WIN');
-const pm2exec = isWindows ? 'pm2.cmd' : 'pm2';
+const os_1 = __importDefault(require("os"));
+// windows being windows... it wants the .cmd extension!
+const pm2exec = os_1.default.platform() === 'win32' ? 'pm2.cmd' : 'pm2';
 /**
  * Check for pm2 availability. Launche will be skipped if not available
  * @returns true or false
@@ -43,9 +43,14 @@ const pm2exec = isWindows ? 'pm2.cmd' : 'pm2';
 async function checkPm2Availability() {
     let pm2Path = '';
     // quickest way: check for pm2 file command available
-    // FIXME: add linux case
-    if (isWindows)
-        pm2Path = 'C:\\Program Files\\nodejs\\' + pm2exec;
+    switch (os_1.default.platform()) {
+        case 'win32':
+            pm2Path = 'C:\\Program Files\\nodejs\\' + pm2exec;
+            break;
+        case 'linux':
+            pm2Path = '/usr/bin/pm2';
+            break;
+    }
     if (pm2Path && fs_1.default.existsSync(pm2Path))
         return true;
     // slower method: run pm2 -v command and watch output

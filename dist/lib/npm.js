@@ -21,10 +21,10 @@ const inquirer_1 = __importDefault(require("inquirer"));
 const types_1 = require("../types");
 const logger_1 = require("./logger");
 const persistent_1 = require("./persistent");
-// windows fa il windows percui lui vuole 'npm.cmd' anzichè 'npm' come comando di avvio
-const isWindows = (process.env.OS || '').toUpperCase().includes('WIN');
-exports.npmExecutable = isWindows ? 'npm.cmd' : 'npm';
-exports.npxExecutable = isWindows ? 'npx.cmd' : 'npm';
+const os_1 = __importDefault(require("os"));
+// windows being windows... it wants the .cmd extension!
+exports.npmExecutable = os_1.default.platform() === 'win32' ? 'npm.cmd' : 'npm';
+exports.npxExecutable = os_1.default.platform() === 'win32' ? 'npx.cmd' : 'npx';
 /**
  * ottiene url del registry per lo scope scelto
  */

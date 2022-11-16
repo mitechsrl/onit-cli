@@ -27,7 +27,7 @@ async function scanCommands(dir, name) {
         if (fileName === 'commandConfig.js') {
             scanResult.push({
                 cmd: name,
-                file: path_1.default.join(dir, fileName).replace(replace, ''),
+                file: path_1.default.posix.join(dir, fileName).replace(replace, ''),
                 children: []
             });
         }
@@ -35,7 +35,7 @@ async function scanCommands(dir, name) {
     const found = scanResult.length > 0;
     for (const fileName of files) {
         if (!fileName.startsWith('_')) {
-            const f = path_1.default.join(dir, fileName);
+            const f = path_1.default.posix.join(dir, fileName);
             const stat = await fs_1.default.promises.stat(f);
             if (stat.isDirectory()) {
                 const _f = await scanCommands(f, fileName);
