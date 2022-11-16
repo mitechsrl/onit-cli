@@ -26,7 +26,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 import fs from 'fs';
 import _ from 'lodash';
 import { spawn } from '../../../../../lib/spawn';
-import { GenericObject, OnitConfigFile, StringError } from '../../../../../types';
+import { GenericObject, OnitConfigFile } from '../../../../../types';
 import { spawn as _spawn } from 'child_process';
 import { logger } from '../../../../../lib/logger';
 import os from 'os';
@@ -39,22 +39,20 @@ const pm2exec = os.platform() === 'win32' ? 'pm2.cmd' : 'pm2';
  * @returns true or false
  */
 async function checkPm2Availability(){
-    let pm2Path = '';
 
-    // quickest way: check for pm2 file command available
-    switch(os.platform()){
-        case 'win32': pm2Path = 'C:\\Program Files\\nodejs\\'+pm2exec;
-        break;
-        case 'linux': pm2Path = '/usr/bin/pm2';
-        break;
+    // Quicker method: check for executable file
+    if (os.platform() === 'win32'){
+        // works on win32
+        return fs.existsSync('C:\\Program Files\\nodejs\\'+pm2exec);
+    }else if (fs.existsSync('/usr/bin/pm2')){
+        // works on any linux/unix based distro
+        return true;
     }
-
-    if (pm2Path && fs.existsSync(pm2Path)) return true;
-
-    // slower method: run pm2 -v command and watch output
+    
+    // fallback slower method: run pm2 -v command and watch output
     try{
         const result = await spawn(pm2exec,['-v'], false);
-        return result.output.trim().length>0;
+        return (result.exitCode === 0) && (result.output.trim().length>0);
     }catch(e){
         return false;
     }

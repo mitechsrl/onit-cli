@@ -41,22 +41,19 @@ const pm2exec = os_1.default.platform() === 'win32' ? 'pm2.cmd' : 'pm2';
  * @returns true or false
  */
 async function checkPm2Availability() {
-    let pm2Path = '';
-    // quickest way: check for pm2 file command available
-    switch (os_1.default.platform()) {
-        case 'win32':
-            pm2Path = 'C:\\Program Files\\nodejs\\' + pm2exec;
-            break;
-        case 'linux':
-            pm2Path = '/usr/bin/pm2';
-            break;
+    // Quicker method: check for executable file
+    if (os_1.default.platform() === 'win32') {
+        // works on win32
+        return fs_1.default.existsSync('C:\\Program Files\\nodejs\\' + pm2exec);
     }
-    if (pm2Path && fs_1.default.existsSync(pm2Path))
+    else if (fs_1.default.existsSync('/usr/bin/pm2')) {
+        // works on any linux/unix based distro
         return true;
-    // slower method: run pm2 -v command and watch output
+    }
+    // fallback slower method: run pm2 -v command and watch output
     try {
         const result = await (0, spawn_1.spawn)(pm2exec, ['-v'], false);
-        return result.output.trim().length > 0;
+        return (result.exitCode === 0) && (result.output.trim().length > 0);
     }
     catch (e) {
         return false;
