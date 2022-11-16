@@ -61,11 +61,13 @@ Questo oggetto viene iniettato automaticamente nel **process.env** dell'istanza 
 
 **-n** Lancia solo il serve dell'app node
 
-**-debug** Avvia l'app node con il flag "--inspect", avviando quindi l'app in modalità debug. Vedi sezione debug.
+**--debug** Avvia l'app node con il flag "--inspect", avviando quindi l'app in modalità debug. Vedi sezione debug.
 
-**-reload** Abbinato a -debug, avvia il processo node con watch&reload.
+**--reload** Abbinato a --debug, avvia il processo node con watch&reload.
 
-**-dangerouslyenablesmtpserver** Abilita la variabile di ambiente SMTP_SERVER, in caso contrario non viene inserita nell'environment. Questo è un flag per assicurarsi che nessuna mail venga mai inviata in sviluppo.
+**--dangerouslyenablesmtpserver** Abilita la variabile di ambiente SMTP_SERVER, in caso contrario non viene inserita nell'environment. Questo è un flag per assicurarsi che nessuna mail venga mai inviata in sviluppo.
+
+**--exit** esce dopo la build iniziale
 
 ### Debug
 
