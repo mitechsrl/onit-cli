@@ -3,7 +3,7 @@
  */
 import ts from 'typescript';
 import yargs from 'yargs';
-export declare type TsClassCommon = {
+export type TsClassCommon = {
     name: string;
     title?: string;
     chapter?: string;
@@ -16,17 +16,17 @@ export declare type TsClassCommon = {
     }[];
     comment: string[];
 };
-export declare type TsClassMemberCommon = {
+export type TsClassMemberCommon = {
     public: boolean;
     private: boolean;
     protected: boolean;
     static: boolean;
     async: boolean;
 } & TsClassCommon;
-export declare type TsClassMemberProperty = {
+export type TsClassMemberProperty = {
     type: string;
 } & TsClassMemberCommon;
-export declare type TsClassMemberMethod = {
+export type TsClassMemberMethod = {
     params: {
         name: string;
         type: string;
@@ -35,7 +35,7 @@ export declare type TsClassMemberMethod = {
     returnComment: string;
     returnType: string;
 } & TsClassMemberCommon;
-export declare type TsClass = {
+export type TsClass = {
     properties: TsClassMemberProperty[];
     methods: TsClassMemberMethod[];
     chapter: string;

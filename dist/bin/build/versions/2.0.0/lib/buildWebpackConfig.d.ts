@@ -13,4 +13,4 @@ export declare function webpackMergeFn(dst: any, src: any): any[] | undefined;
  * @param {*} onitConfigFile
  * @returns
  */
-export declare function buildWebpackConfig(context: string, onitConfigFile: OnitConfigFile): Promise<any>;
+export declare function buildWebpackConfig(context: string, onitConfigFile: OnitConfigFile): Promise<{}>;

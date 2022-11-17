@@ -1,4 +1,4 @@
-export declare type GenericObject = {
+export type GenericObject = {
     [k: string]: any;
 };
 export * from './errors';

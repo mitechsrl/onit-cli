@@ -4,12 +4,22 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+// Hack for retrocompatibility: we used a custom parameter processor supporting alias with 
+// one single dash. Now yargs force to have two dashes. This small script translate some of them
+// to two dashes.
+// Doing it before anything else to be available globally. 
+['-exit', '-watch', '-debug'].forEach(c => {
+    process.argv.forEach((p, index) => {
+        if (p === c)
+            process.argv[index] = '-' + process.argv[index];
+    });
+});
 const path_1 = __importDefault(require("path"));
-const index_js_1 = require("./types/index.js");
-const errorHandler_js_1 = require("./lib/errorHandler.js");
-const main_js_1 = require("./bin/main.js");
+const index_1 = require("./types/index");
+const errorHandler_1 = require("./lib/errorHandler");
+const main_1 = require("./bin/main");
 const fs_1 = __importDefault(require("fs"));
-const outputRedirection_js_1 = require("./lib/outputRedirection.js");
+const outputRedirection_1 = require("./lib/outputRedirection");
 // generic check for log to file.
 const redirectOutput = process.argv.find(p => p === '--log-to-file');
 function recourseRegisterCommand(parentYargs, commandConfig) {
@@ -41,27 +51,27 @@ function recourseRegisterCommand(parentYargs, commandConfig) {
         // Command method runner        
         let promise = Promise.resolve();
         if (redirectOutput) {
-            promise = (0, outputRedirection_js_1.setupOutputRedirecion)();
+            promise = (0, outputRedirection_1.setupOutputRedirecion)();
         }
         promise.then(() => {
             // Non c'è exec specificato
             if (!command.exec)
-                throw new index_js_1.StringError('File exec non specificato');
+                throw new index_1.StringError('File exec non specificato');
             // command execution callback
             const configFilePath = path_1.default.join(__dirname, commandConfig.file);
             const execFilePath = path_1.default.join(path_1.default.dirname(configFilePath), command.exec + '.js');
             if (!fs_1.default.existsSync(execFilePath)) {
-                throw new index_js_1.StringError('Questo comando è rotto. Verifica che commandConfig punta a un file di exec valido');
+                throw new index_1.StringError('Questo comando è rotto. Verifica che commandConfig punta a un file di exec valido');
             }
             // eslint-disable-next-line @typescript-eslint/no-var-requires
             return require(execFilePath).default;
         })
             .then((execFn) => execFn(argv))
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            .catch((e) => (0, errorHandler_js_1.errorHandler)(e, argv))
+            .catch((e) => (0, errorHandler_1.errorHandler)(e, argv))
             .then(() => {
             if (redirectOutput)
-                return (0, outputRedirection_js_1.closeOutputRedirction)();
+                return (0, outputRedirection_1.closeOutputRedirction)();
         });
     });
 }
@@ -79,9 +89,9 @@ fs_1.default.promises.readFile(path_1.default.join(__dirname, './commands.json')
     const commands = JSON.parse(content.toString());
     // step 2: monta i comandi
     commands.forEach(commandConfig => {
-        recourseRegisterCommand(main_js_1.cli, commandConfig);
+        recourseRegisterCommand(main_1.cli, commandConfig);
     });
-    return main_js_1.cli.parse();
+    return main_1.cli.parse();
 })
-    .catch(errorHandler_js_1.errorHandler);
+    .catch(errorHandler_1.errorHandler);
 //# sourceMappingURL=index.js.map

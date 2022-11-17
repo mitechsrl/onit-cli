@@ -1,13 +1,23 @@
 #!/usr/bin/env node
 
-import { ScanCommandResult } from './lib/scanCommands.js';
+// Hack for retrocompatibility: we used a custom parameter processor supporting alias with 
+// one single dash. Now yargs force to have two dashes. This small script translate some of them
+// to two dashes.
+// Doing it before anything else to be available globally. 
+['-exit','-watch','-debug'].forEach(c => {
+    process.argv.forEach((p,index)=> {
+        if (p === c ) process.argv[index] = '-'+process.argv[index];
+    });
+});
+
+import { ScanCommandResult } from './lib/scanCommands';
 import path from 'path';
-import { Command, StringError } from './types/index.js';
-import { errorHandler } from './lib/errorHandler.js';
-import { cli } from './bin/main.js';
+import { Command, StringError } from './types/index';
+import { errorHandler } from './lib/errorHandler';
+import { cli } from './bin/main';
 import yargs from 'yargs';
 import fs from 'fs';
-import { closeOutputRedirction, setupOutputRedirecion } from './lib/outputRedirection.js';
+import { closeOutputRedirction, setupOutputRedirecion } from './lib/outputRedirection';
 
 // generic check for log to file.
 const redirectOutput = process.argv.find(p => p === '--log-to-file');

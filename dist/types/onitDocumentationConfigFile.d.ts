@@ -1,4 +1,4 @@
-export declare type OnitDocumentationConfigFileChapter = {
+export type OnitDocumentationConfigFileChapter = {
     chapter?: string;
     title?: string;
     index?: {
@@ -10,7 +10,7 @@ export declare type OnitDocumentationConfigFileChapter = {
     children?: OnitDocumentationConfigFileChapter[];
     chapterIndexNumber: number;
 };
-export declare type OnitDocumentationConfigFileJson = {
+export type OnitDocumentationConfigFileJson = {
     baseUrl?: string;
     ignore?: string[];
     globList?: {
@@ -20,7 +20,7 @@ export declare type OnitDocumentationConfigFileJson = {
     }[];
     chapters?: OnitDocumentationConfigFileChapter[];
 };
-export declare type OnitDocumentationConfigFile = {
+export type OnitDocumentationConfigFile = {
     sources: string[];
     json: OnitDocumentationConfigFileJson;
 };
