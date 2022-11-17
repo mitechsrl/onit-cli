@@ -56,12 +56,12 @@ function recourseRegisterCommand(parentYargs, commandConfig) {
         promise.then(() => {
             // Non c'è exec specificato
             if (!command.exec)
-                throw new index_1.StringError('File exec non specificato');
+                throw new index_1.StringError('No exec file defined. This is a onit-cli error, please report it.');
             // command execution callback
             const configFilePath = path_1.default.join(__dirname, commandConfig.file);
             const execFilePath = path_1.default.join(path_1.default.dirname(configFilePath), command.exec + '.js');
             if (!fs_1.default.existsSync(execFilePath)) {
-                throw new index_1.StringError('Questo comando è rotto. Verifica che commandConfig punta a un file di exec valido');
+                throw new index_1.StringError('This command appear to be broken. No exec file found. This is a onit-cli error, please report it.');
             }
             // eslint-disable-next-line @typescript-eslint/no-var-requires
             return require(execFilePath).default;
