@@ -4,6 +4,7 @@ declare const BelongsToRelationGenerator: any;
  * Redefinition of BelongsToRelationGenerator for our internal needs
  */
 export declare class CustomBelongsToRelationGenerator extends BelongsToRelationGenerator {
+    constructor();
     _initializeProperties(options: GenericObject): void;
     /**
      * custom template path

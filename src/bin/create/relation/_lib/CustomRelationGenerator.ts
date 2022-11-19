@@ -28,6 +28,7 @@ import { CustomBelongsToRelationGenerator } from './CustomBelongsToRelationGener
 import { CustomHasManyRelationGenerator } from './CustomHasManyRelationGenerator';
 import { CustomHasManyThroughRelationGenerator } from './CustomHasManyThroughRelationGenerator';
 import { CustomHasOneRelationGenerator } from './CustomHasOneRelationGenerator';
+import yeoman from 'yeoman-environment';
 
 // @loopback-cli is not a library, there's not typings
 // We are just leveraging on some implementation to reuse them
@@ -37,6 +38,10 @@ const RelationGenerator = require('@loopback/cli/generators/relation/index');
 const relationUtils = require('@loopback/cli/generators/relation/utils.generator');
 
 export class CustomRelationGenerator extends RelationGenerator {
+    constructor(){
+        super({ env: yeoman.createEnv() });
+    }
+    
     async scaffold () {
         if (this.shouldExit()) return false;
 

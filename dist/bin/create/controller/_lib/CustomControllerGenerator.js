@@ -31,6 +31,7 @@ exports.CustomControllerGenerator = void 0;
 const fs_1 = require("fs");
 const ejs_1 = __importDefault(require("ejs"));
 const path_1 = require("path");
+const yeoman_environment_1 = __importDefault(require("yeoman-environment"));
 // @loopback-cli is not a library, there's not typings
 // We are just leveraging on some implementation to reuse them
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -43,6 +44,9 @@ const relationUtils = require('@loopback/cli/generators/relation/utils.generator
  * Subclass loopback-cli generator and apply custom logic
  */
 class CustomControllerGenerator extends ControllerGenerator {
+    constructor() {
+        super({ env: yeoman_environment_1.default.createEnv() });
+    }
     /**
      * override the default copy template since we are using a custom one.
      * @param {*} _source the template file path. unused here, will be recalculated

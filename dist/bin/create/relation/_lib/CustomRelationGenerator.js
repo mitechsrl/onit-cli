@@ -23,12 +23,16 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CustomRelationGenerator = void 0;
 const CustomBelongsToRelationGenerator_1 = require("./CustomBelongsToRelationGenerator");
 const CustomHasManyRelationGenerator_1 = require("./CustomHasManyRelationGenerator");
 const CustomHasManyThroughRelationGenerator_1 = require("./CustomHasManyThroughRelationGenerator");
 const CustomHasOneRelationGenerator_1 = require("./CustomHasOneRelationGenerator");
+const yeoman_environment_1 = __importDefault(require("yeoman-environment"));
 // @loopback-cli is not a library, there's not typings
 // We are just leveraging on some implementation to reuse them
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -36,6 +40,9 @@ const RelationGenerator = require('@loopback/cli/generators/relation/index');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const relationUtils = require('@loopback/cli/generators/relation/utils.generator');
 class CustomRelationGenerator extends RelationGenerator {
+    constructor() {
+        super({ env: yeoman_environment_1.default.createEnv() });
+    }
     async scaffold() {
         if (this.shouldExit())
             return false;

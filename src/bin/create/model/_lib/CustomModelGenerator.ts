@@ -29,6 +29,7 @@ import ejs from 'ejs';
 import path from 'path';
 import { GenericObject } from '../../../../types';
 import { promptMixinSelection } from '../../_lib/mixinUtils';
+import yeoman from 'yeoman-environment';
 
 // @loopback-cli is not a library, there's not typings
 // We are just leveraging on some implementation to reuse them
@@ -44,9 +45,8 @@ const ModelGenerator = require('@loopback/cli/generators/model/index');
  */
 export class CustomModelGenerator extends ModelGenerator {
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    constructor(...args: any[]){
-        super(...args);
+    constructor(){
+        super({ env: yeoman.createEnv() });
     }
     
     // override the default copy template since we are using a custom one.

@@ -33,6 +33,7 @@ const lodash_1 = __importDefault(require("lodash"));
 const ejs_1 = __importDefault(require("ejs"));
 const path_1 = __importDefault(require("path"));
 const mixinUtils_1 = require("../../_lib/mixinUtils");
+const yeoman_environment_1 = __importDefault(require("yeoman-environment"));
 // @loopback-cli is not a library, there's not typings
 // We are just leveraging on some implementation to reuse them
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -45,9 +46,8 @@ const ModelGenerator = require('@loopback/cli/generators/model/index');
  * Subclass loopback-cli model generator and apply custom logic
  */
 class CustomModelGenerator extends ModelGenerator {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    constructor(...args) {
-        super(...args);
+    constructor() {
+        super({ env: yeoman_environment_1.default.createEnv() });
     }
     // override the default copy template since we are using a custom one.
     copyTemplatedFiles(_unused, filename, artifactInfo) {

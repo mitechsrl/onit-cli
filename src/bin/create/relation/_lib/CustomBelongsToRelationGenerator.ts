@@ -27,6 +27,7 @@ import { readFileSync, writeFileSync } from 'fs';
 import ejs from 'ejs';
 import { join } from 'path';
 import { GenericObject } from '../../../../types';
+import yeoman from 'yeoman-environment';
 
 // @loopback-cli is not a library, there's not typings
 // We are just leveraging on some implementation to reuse them
@@ -39,6 +40,10 @@ const relationUtils = require('@loopback/cli/generators/relation/utils.generator
  * Redefinition of BelongsToRelationGenerator for our internal needs
  */
 export class CustomBelongsToRelationGenerator extends BelongsToRelationGenerator {
+    constructor(){
+        super({ env: yeoman.createEnv() });
+    }
+    
     _initializeProperties (options: GenericObject) {
         // Our repos have a 'Base' class which is the one to be changed. Temporary set the correct name.
         super._initializeProperties(options);

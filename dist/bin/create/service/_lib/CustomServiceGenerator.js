@@ -32,6 +32,7 @@ const fs_1 = require("fs");
 const lodash_1 = __importDefault(require("lodash"));
 const ejs_1 = __importDefault(require("ejs"));
 const path_1 = require("path");
+const yeoman_environment_1 = __importDefault(require("yeoman-environment"));
 // @loopback-cli is not a library, there's not typings
 // We are just leveraging on some implementation to reuse them
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -44,6 +45,9 @@ const relationUtils = require('@loopback/cli/generators/relation/utils.generator
  * Subclass loopback-cli model generator and apply custom logic
  */
 class CustomServiceGenerator extends ServiceGenerator {
+    constructor() {
+        super({ env: yeoman_environment_1.default.createEnv() });
+    }
     // override the default copy template since we are using a custom one.
     copyTemplatedFiles(_unused, filename, data) {
         // render the model file and writer it out

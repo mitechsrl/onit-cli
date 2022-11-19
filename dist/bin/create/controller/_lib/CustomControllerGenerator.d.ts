@@ -4,6 +4,7 @@ declare const ControllerGenerator: any;
  * Subclass loopback-cli generator and apply custom logic
  */
 export declare class CustomControllerGenerator extends ControllerGenerator {
+    constructor();
     /**
      * override the default copy template since we are using a custom one.
      * @param {*} _source the template file path. unused here, will be recalculated

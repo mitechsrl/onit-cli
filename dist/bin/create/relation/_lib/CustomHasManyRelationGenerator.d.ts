@@ -1,6 +1,7 @@
 import { GenericObject } from '../../../../types';
 declare const HasManyRelationGenerator: any;
 export declare class CustomHasManyRelationGenerator extends HasManyRelationGenerator {
+    constructor();
     /**
      * Our repos have a 'Base' class which is the one to be changed.
      * Temporary set the correct name

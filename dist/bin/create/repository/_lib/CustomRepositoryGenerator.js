@@ -33,6 +33,7 @@ const lodash_1 = __importDefault(require("lodash"));
 const ejs_1 = __importDefault(require("ejs"));
 const path_1 = require("path");
 const mixinUtils_1 = require("../../_lib/mixinUtils");
+const yeoman_environment_1 = __importDefault(require("yeoman-environment"));
 // @loopback-cli is not a library, there's not typings
 // We are just leveraging on some implementation to reuse them
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -45,6 +46,9 @@ const relationUtils = require('@loopback/cli/generators/relation/utils.generator
  * Subclass loopback-cli model generator and apply custom logic
  */
 class CustomRepositoryGenerator extends RepositoryGenerator {
+    constructor() {
+        super({ env: yeoman_environment_1.default.createEnv() });
+    }
     presetValues(data) {
         this.hasPresetValues = true;
         Object.assign(this.artifactInfo, data);

@@ -28,6 +28,7 @@ import _ from 'lodash';
 import ejs from 'ejs';
 import { join, resolve } from 'path';
 import { GenericObject } from '../../../../types';
+import yeoman from 'yeoman-environment';
 
 // @loopback-cli is not a library, there's not typings
 // We are just leveraging on some implementation to reuse them
@@ -42,6 +43,10 @@ const relationUtils = require('@loopback/cli/generators/relation/utils.generator
  * Subclass loopback-cli model generator and apply custom logic
  */
 export class CustomServiceGenerator extends ServiceGenerator {
+    constructor(){
+        super({ env: yeoman.createEnv() });
+    }
+    
     // override the default copy template since we are using a custom one.
     copyTemplatedFiles (_unused:unknown, filename:string, data: GenericObject) {
         // render the model file and writer it out

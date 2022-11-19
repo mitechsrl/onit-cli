@@ -4,6 +4,7 @@ declare const RepositoryGenerator: any;
  * Subclass loopback-cli model generator and apply custom logic
  */
 export declare class CustomRepositoryGenerator extends RepositoryGenerator {
+    constructor();
     presetValues(data: GenericObject): void;
     /**
      * override the default copy template since we are using a custom one.

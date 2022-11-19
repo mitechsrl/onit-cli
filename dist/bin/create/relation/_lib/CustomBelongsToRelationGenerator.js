@@ -31,6 +31,7 @@ exports.CustomBelongsToRelationGenerator = void 0;
 const fs_1 = require("fs");
 const ejs_1 = __importDefault(require("ejs"));
 const path_1 = require("path");
+const yeoman_environment_1 = __importDefault(require("yeoman-environment"));
 // @loopback-cli is not a library, there's not typings
 // We are just leveraging on some implementation to reuse them
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -41,6 +42,9 @@ const relationUtils = require('@loopback/cli/generators/relation/utils.generator
  * Redefinition of BelongsToRelationGenerator for our internal needs
  */
 class CustomBelongsToRelationGenerator extends BelongsToRelationGenerator {
+    constructor() {
+        super({ env: yeoman_environment_1.default.createEnv() });
+    }
     _initializeProperties(options) {
         // Our repos have a 'Base' class which is the one to be changed. Temporary set the correct name.
         super._initializeProperties(options);
