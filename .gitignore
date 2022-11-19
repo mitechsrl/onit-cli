@@ -9,3 +9,5 @@ node_modules/
 
 # typescript 
 .tsbuildinfo
+
+dist/test
