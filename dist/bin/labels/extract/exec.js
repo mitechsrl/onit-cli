@@ -25,7 +25,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 */
 Object.defineProperty(exports, "__esModule", { value: true });
 const types_1 = require("../../../types");
-const extract_1 = require("./lib/extract");
+const extract_1 = require("./_lib/extract");
 const path_1 = require("path");
 const exec = async (argv) => {
     if (!argv.f) {

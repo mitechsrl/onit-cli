@@ -27,7 +27,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const path_1 = require("path");
 const logger_1 = require("../../lib/logger");
 const onitFileLoader_1 = require("../../lib/onitFileLoader");
-const generateDoc_1 = require("./lib/generateDoc");
+const generateDoc_1 = require("./_lib/generateDoc");
 const exec = async (argv) => {
     var _a, _b;
     // load the config file. 

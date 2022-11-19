@@ -25,7 +25,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.repoGenerator = void 0;
-const CustomRepositoryGenerator_1 = require("./lib/CustomRepositoryGenerator");
+const CustomRepositoryGenerator_1 = require("./_lib/CustomRepositoryGenerator");
 // @loopback-cli is not a library, there's not typings
 // We are just leveraging on some implementation to reuse them
 // eslint-disable-next-line @typescript-eslint/no-var-requires

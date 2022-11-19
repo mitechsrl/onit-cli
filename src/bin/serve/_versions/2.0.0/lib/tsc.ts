@@ -30,7 +30,7 @@ import { spawnNodeProcess, SpawnNodeProcessResult } from './spawnNodeProcess';
 import { spawnSubprocess, SpawnSubprocessResult } from './spawnSubprocess';
 import readline from 'readline';
 import _ from 'lodash';
-import { copyExtraFiles } from '../../../../build/versions/2.0.0/lib/copyExtraFiles';
+import { copyExtraFiles } from '../../../../build/_versions/2.0.0/lib/copyExtraFiles';
 import TscWatchClient from 'tsc-watch/client';
 
 /*

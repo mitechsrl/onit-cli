@@ -25,7 +25,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 */
 Object.defineProperty(exports, "__esModule", { value: true });
 const logger_1 = require("../../../lib/logger");
-const checkDirectory_1 = require("./lib/checkDirectory");
+const checkDirectory_1 = require("./_lib/checkDirectory");
 const exec = async (argv) => {
     var _a;
     if (!argv.d) {

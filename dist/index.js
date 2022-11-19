@@ -6,7 +6,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 // Hack for retrocompatibility: for versions <3.0.0, i was parsing the parameters manually by reading directly 
 // process.argv. I wasn't aware that by standard, long alias were supposed to have double dashes (like --exit)
-// instead of one (like -exit) so a lot of tools re calling onit-cli using single dashes.
+// instead of one (like -exit) so a lot of tools are calling onit-cli using single dashes.
 // Now the parameters are parsed with yargs and it force to have two dashes. This small script translate some 
 // of them to two dashes.
 // Doing it before anything else to be available globally. 

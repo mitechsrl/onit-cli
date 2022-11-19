@@ -55,7 +55,7 @@ const exec = async (argv) => {
         // version found: Load that builder and use it.
         logger_1.logger.info('Using serve version ' + version);
         // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const serve = require(path_1.default.join(__dirname, './versions/' + version + '/index.js'));
+        const serve = require(path_1.default.join(__dirname, './_versions/' + version + '/index.js'));
         // autoset the hardcoded params
         /*
         if (Array.isArray(onitConfigFile.json.serve.params)) {

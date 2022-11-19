@@ -29,7 +29,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const inquirer_1 = __importDefault(require("inquirer"));
 const exec_1 = require("../repository/exec");
-const CustomModelGenerator_1 = require("./lib/CustomModelGenerator");
+const CustomModelGenerator_1 = require("./_lib/CustomModelGenerator");
 // @loopback-cli is not a library, there's not typings
 // We are just leveraging on some implementation to reuse them
 // eslint-disable-next-line @typescript-eslint/no-var-requires

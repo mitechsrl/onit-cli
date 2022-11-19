@@ -24,7 +24,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
 Object.defineProperty(exports, "__esModule", { value: true });
-const CustomServiceGenerator_1 = require("./lib/CustomServiceGenerator");
+const CustomServiceGenerator_1 = require("./_lib/CustomServiceGenerator");
 // @loopback-cli is not a library, there's not typings
 // We are just leveraging on some implementation to reuse them
 // eslint-disable-next-line @typescript-eslint/no-var-requires

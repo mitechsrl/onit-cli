@@ -27,8 +27,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const logger_1 = require("../../lib/logger");
 const onitFileLoader_1 = require("../../lib/onitFileLoader");
 const types_1 = require("../../types");
-const selectTest_1 = require("./lib/selectTest");
-const test_1 = require("./lib/test");
+const selectTest_1 = require("./_lib/selectTest");
+const test_1 = require("./_lib/test");
 const exec = async (argv) => {
     // check for manual serve file specifed
     const manualConfigFile = argv.c;

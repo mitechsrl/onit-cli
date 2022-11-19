@@ -27,9 +27,9 @@ import _ from 'lodash';
 import yargs from 'yargs';
 import { GenericObject, OnitConfigFile } from '../../../../../types';
 import { webpackConfigFactory } from '../configFiles/webpack.config';
-import { buildWebpackConfig, webpackMergeFn } from '../../../../build/versions/2.0.0/lib/buildWebpackConfig';
+import { buildWebpackConfig, webpackMergeFn } from '../../../../build/_versions/2.0.0/lib/buildWebpackConfig';
 import { webpackWatcher } from './webpackWatcher';
-import { searchEntryPoints } from '../../../../build/versions/2.0.0/lib/searchEntryPoints';
+import { searchEntryPoints } from '../../../../build/_versions/2.0.0/lib/searchEntryPoints';
 
 /**
  * Launch a webpack build & watch. Resolve when the user trigger SIGINT (since this is a cli, 

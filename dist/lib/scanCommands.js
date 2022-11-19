@@ -31,16 +31,17 @@ exports.scanCommands = void 0;
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 /**
- * Scan the passed in directory searching for commandConfig.js files.
+ * Recursively scan the passed in directory searching for commandConfig.js files.
  *
- * @param dir
- * @param name
+ * @param dir The directory to be scanned
+ * @param name The command name. This is an arbitrary string but it should match the directory name
  * @returns A deep json with command paths and some infos
  */
 async function scanCommands(dir, name) {
     const replace = path_1.default.join(__dirname, '../');
     const files = await fs_1.default.promises.readdir(dir);
     const scanResult = [];
+    // check for files in current scanned directory
     for (const fileName of files) {
         if (fileName === 'commandConfig.js') {
             scanResult.push({
@@ -51,6 +52,7 @@ async function scanCommands(dir, name) {
         }
     }
     const found = scanResult.length > 0;
+    // recirsively scan subdirectories. Do not scan the ones starting with "_"
     for (const fileName of files) {
         if (!fileName.startsWith('_')) {
             const f = path_1.default.posix.join(dir, fileName);

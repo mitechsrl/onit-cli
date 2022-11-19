@@ -28,16 +28,17 @@ exports.spawn = void 0;
 const child_process_1 = require("child_process");
 const logger_1 = require("./logger");
 /**
- * Process spawn helper
- * @param {string} cmd Command to run
- * @param {string[]} params array of parameters
- * @param {boolean} print print command output to console. Default to true.
- * @param {SpawnOptionsWithoutStdio} options SpawnOptionsWithoutStdio object. See node child_process docs
- * @returns
+ * Process spawn helper. Proxy method to child_process.spawn to promisifize it and apply some custom logic
+ *
+ * @param cmd Command to be run
+ * @param params Array of strings for parameters
+ * @param print print command output to console. Default to true.
+ * @param options SpawnOptionsWithoutStdio object. See node child_process docs
+ * @returns SpawnResult object {exitCode:number, output:stirng}
  */
 async function spawn(cmd, params, print, options) {
     return new Promise((resolve, reject) => {
-        const proc = (0, child_process_1.spawn)(cmd, params, options);
+        const proc = (0, child_process_1.spawn)(cmd, params !== null && params !== void 0 ? params : [], options);
         let _data = Buffer.from('');
         proc.stdout.on('data', (data) => {
             _data = Buffer.concat([_data, data]);
