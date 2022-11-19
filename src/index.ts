@@ -20,6 +20,7 @@ import { cli } from './bin/main';
 import yargs from 'yargs';
 import fs from 'fs';
 import { closeOutputRedirction, setupOutputRedirecion } from './lib/outputRedirection';
+import { npmVersionCheck } from './lib/npm';
 
 // generic check for log to file.
 const redirectOutput = process.argv.find(p => p === '--log-to-file');
@@ -103,6 +104,9 @@ fs.promises.readFile(path.join(__dirname,'./commands.json'))
             recourseRegisterCommand(cli, commandConfig);
         });
 
+        // launch async check for new version
+        npmVersionCheck();
+        
         return cli.parse();
     })
     .catch(errorHandler);

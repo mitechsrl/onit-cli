@@ -22,6 +22,7 @@ const errorHandler_1 = require("./lib/errorHandler");
 const main_1 = require("./bin/main");
 const fs_1 = __importDefault(require("fs"));
 const outputRedirection_1 = require("./lib/outputRedirection");
+const npm_1 = require("./lib/npm");
 // generic check for log to file.
 const redirectOutput = process.argv.find(p => p === '--log-to-file');
 function recourseRegisterCommand(parentYargs, commandConfig) {
@@ -93,6 +94,8 @@ fs_1.default.promises.readFile(path_1.default.join(__dirname, './commands.json')
     commands.forEach(commandConfig => {
         recourseRegisterCommand(main_1.cli, commandConfig);
     });
+    // launch async check for new version
+    (0, npm_1.npmVersionCheck)();
     return main_1.cli.parse();
 })
     .catch(errorHandler_1.errorHandler);

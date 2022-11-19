@@ -1,9 +1,4 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.npxExecutable = exports.npmExecutable = void 0;
 /*
 Copyright (c) 2021 Mitech S.R.L.
 
@@ -28,8 +23,49 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.npmVersionCheck = exports.npxExecutable = exports.npmExecutable = void 0;
 const os_1 = __importDefault(require("os"));
+const spawn_1 = require("./spawn");
+const persistent_1 = require("./persistent");
+const logger_1 = require("./logger");
+const packageJson_1 = require("./packageJson");
+const gt_1 = __importDefault(require("semver/functions/gt"));
 // windows being windows... it wants the .cmd extension!
 exports.npmExecutable = os_1.default.platform() === 'win32' ? 'npm.cmd' : 'npm';
 exports.npxExecutable = os_1.default.platform() === 'win32' ? 'npx.cmd' : 'npx';
+// after some time (3 minutes), just check for newer versions and show a info in the console
+// This is just for a reminder, doesn't do anything else.
+function npmVersionCheck() {
+    const updateStatus = (0, persistent_1.getPersistent)('update');
+    if (updateStatus === null || updateStatus === void 0 ? void 0 : updateStatus.update) {
+        logger_1.logger.warn('[ONIT-CLI UPDATE] A new version of onit-cli is available. Current: ' + packageJson_1.packageJson.version + ', newer: ' + updateStatus.newversion + '. Install with <npm install -g ' + packageJson_1.packageJson.name + '>');
+    }
+    // check for npm registry updates. Do it once each hour to prevent too many calls
+    if ((!(updateStatus === null || updateStatus === void 0 ? void 0 : updateStatus.lastCheck)) || (((new Date().getTime() - new Date(updateStatus.lastCheck).getTime()) / 1000) > 3600)) {
+        const t = setTimeout(() => {
+            const npmParams = ['view', packageJson_1.packageJson.name, '--registry=https://registry.npmjs.org/', 'version'];
+            (0, spawn_1.spawn)(exports.npmExecutable, npmParams, false, { shell: true, cwd: __dirname })
+                .then(status => {
+                status.output = status.output.trim();
+                updateStatus.update = (0, gt_1.default)(status.output, packageJson_1.packageJson.version);
+                if (updateStatus.update) {
+                    updateStatus.newversion = status.output;
+                }
+                else {
+                    updateStatus.newversion = packageJson_1.packageJson.version;
+                }
+                updateStatus.lastCheck = new Date().toISOString();
+                (0, persistent_1.setPersistent)('update', updateStatus);
+            })
+                .catch(e => { });
+        }, 60 * 1000);
+        t.unref();
+    }
+}
+exports.npmVersionCheck = npmVersionCheck;
+;
 //# sourceMappingURL=npm.js.map
