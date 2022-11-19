@@ -30,12 +30,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const inquirer_1 = __importDefault(require("inquirer"));
 const exec_1 = require("../repository/exec");
 const CustomModelGenerator_1 = require("./_lib/CustomModelGenerator");
+const yeoman_environment_1 = __importDefault(require("yeoman-environment"));
 // @loopback-cli is not a library, there's not typings
 // We are just leveraging on some implementation to reuse them
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const ModelGenerator = require('@loopback/cli/generators/model/index');
 const exec = async (argv) => {
-    const modelGenerator = new CustomModelGenerator_1.CustomModelGenerator();
+    const modelGenerator = new CustomModelGenerator_1.CustomModelGenerator({ env: yeoman_environment_1.default.createEnv() });
     // NOTE: the orignal class methods were run with yeoman.
     // Yeoman runs sequentially the class mehods. Imitating it with this code.
     for (const method of Object.getOwnPropertyNames(ModelGenerator.prototype)) {

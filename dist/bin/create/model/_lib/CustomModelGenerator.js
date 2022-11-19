@@ -45,6 +45,10 @@ const ModelGenerator = require('@loopback/cli/generators/model/index');
  * Subclass loopback-cli model generator and apply custom logic
  */
 class CustomModelGenerator extends ModelGenerator {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    constructor(...args) {
+        super(...args);
+    }
     // override the default copy template since we are using a custom one.
     copyTemplatedFiles(_unused, filename, artifactInfo) {
         // render the model file and writer it out

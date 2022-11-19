@@ -28,6 +28,7 @@ import yargs from 'yargs';
 import { CommandExecFunction } from '../../../types';
 import { repoGenerator } from '../repository/exec';
 import { CustomModelGenerator } from './_lib/CustomModelGenerator';
+import yeoman from 'yeoman-environment';
 
 // @loopback-cli is not a library, there's not typings
 // We are just leveraging on some implementation to reuse them
@@ -35,7 +36,7 @@ import { CustomModelGenerator } from './_lib/CustomModelGenerator';
 const ModelGenerator = require('@loopback/cli/generators/model/index');
 
 const exec: CommandExecFunction = async (argv: yargs.ArgumentsCamelCase<unknown>) => {
-    const modelGenerator = new CustomModelGenerator();
+    const modelGenerator = new CustomModelGenerator({ env: yeoman.createEnv() });
 
     // NOTE: the orignal class methods were run with yeoman.
     // Yeoman runs sequentially the class mehods. Imitating it with this code.
