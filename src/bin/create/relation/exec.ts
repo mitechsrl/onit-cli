@@ -25,7 +25,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 import yargs from 'yargs';
 import { CommandExecFunction } from '../../../types';
-import { CustomRelationGenerator } from './lib/CustomRelationGenerator';
+import { CustomRelationGenerator } from './_lib/CustomRelationGenerator';
 
 // @loopback-cli is not a library, there's not typings
 // We are just leveraging on some implementation to reuse them

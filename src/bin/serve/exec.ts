@@ -61,7 +61,7 @@ const exec: CommandExecFunction = async (argv: yargs.ArgumentsCamelCase<unknown>
         // version found: Load that builder and use it.
         logger.info('Using serve version ' + version);
         // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const serve = require(path.join(__dirname, './versions/' + version + '/index.js'));
+        const serve = require(path.join(__dirname, './_versions/' + version + '/index.js'));
 
         // autoset the hardcoded params
         /*

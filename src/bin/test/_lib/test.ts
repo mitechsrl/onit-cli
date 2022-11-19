@@ -31,7 +31,7 @@ import { onitProcessLauncher } from './onitProcessLauncher';
 import { spawn } from '../../../lib/spawn';
 import { npmExecutable } from '../../../lib/npm';
 import { checkFiles } from './checkFiles';
-import { buildEnvironment } from '../../serve/versions/2.0.0/lib/spawnNodeProcess';
+import { buildEnvironment } from '../../serve/_versions/2.0.0/lib/spawnNodeProcess';
 import { resolveTestFilesDirectories } from './resolveTestFilesDirectories';
 import { runMocha } from './runMocha';
 import os from 'os';

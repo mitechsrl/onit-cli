@@ -28,7 +28,7 @@ import _ from 'lodash';
 import ejs from 'ejs';
 import path from 'path';
 import { GenericObject } from '../../../../types';
-import { promptMixinSelection } from '../../lib/mixinUtils';
+import { promptMixinSelection } from '../../_lib/mixinUtils';
 
 // @loopback-cli is not a library, there's not typings
 // We are just leveraging on some implementation to reuse them

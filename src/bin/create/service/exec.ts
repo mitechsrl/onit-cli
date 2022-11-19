@@ -25,7 +25,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 import yargs from 'yargs';
 import { CommandExecFunction, GenericObject } from '../../../types';
-import { CustomServiceGenerator } from './lib/CustomServiceGenerator';
+import { CustomServiceGenerator } from './_lib/CustomServiceGenerator';
 
 // @loopback-cli is not a library, there's not typings
 // We are just leveraging on some implementation to reuse them

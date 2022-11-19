@@ -25,7 +25,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 import yargs from 'yargs';
 import { CommandExecFunction, GenericObject } from '../../../types';
-import { CustomRepositoryGenerator } from './lib/CustomRepositoryGenerator';
+import { CustomRepositoryGenerator } from './_lib/CustomRepositoryGenerator';
 
 // @loopback-cli is not a library, there's not typings
 // We are just leveraging on some implementation to reuse them

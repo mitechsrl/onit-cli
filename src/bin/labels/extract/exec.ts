@@ -25,7 +25,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 import yargs from 'yargs';
 import { CommandExecFunction, StringError } from '../../../types';
-import { scanLabals } from './lib/extract';
+import { scanLabals } from './_lib/extract';
 import { resolve } from 'path';
 
 const exec: CommandExecFunction = async (argv: yargs.ArgumentsCamelCase<unknown>) => {

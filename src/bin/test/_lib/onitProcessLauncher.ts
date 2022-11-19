@@ -1,5 +1,5 @@
 import { OnitConfigFile, OnitConfigFileTestTarget, StringError } from '../../../types';
-import { getMainExecutableFilePath } from '../../serve/versions/2.0.0/lib/spawnNodeProcess';
+import { getMainExecutableFilePath } from '../../serve/_versions/2.0.0/lib/spawnNodeProcess';
 import { join } from 'path';
 
 /*

@@ -28,7 +28,7 @@ import { resolve } from 'path';
 import { logger } from '../../lib/logger';
 import { onitFileLoader } from '../../lib/onitFileLoader';
 import { CommandExecFunction, OnitDocumentationConfigFile } from '../../types';
-import { generateDoc } from './lib/generateDoc';
+import { generateDoc } from './_lib/generateDoc';
 
 const exec: CommandExecFunction = async (argv: yargs.ArgumentsCamelCase<unknown>) => {
 

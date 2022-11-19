@@ -25,7 +25,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 import yargs from 'yargs';
 import { CommandExecFunction } from '../../../types';
-import { CustomControllerGenerator } from './lib/CustomControllerGenerator';
+import { CustomControllerGenerator } from './_lib/CustomControllerGenerator';
 
 // @loopback-cli is not a library, there's not typings
 // We are just leveraging on some implementation to reuse them

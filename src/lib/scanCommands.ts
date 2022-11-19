@@ -33,10 +33,10 @@ export type ScanCommandResult = {
 };
 
 /**
- * Scan the passed in directory searching for commandConfig.js files.
+ * Recursively scan the passed in directory searching for commandConfig.js files.
  *
- * @param dir 
- * @param name 
+ * @param dir The directory to be scanned
+ * @param name The command name. This is an arbitrary string but it should match the directory name
  * @returns A deep json with command paths and some infos
  */
 export async function scanCommands(dir: string, name: string): Promise<ScanCommandResult[]> {
@@ -46,6 +46,7 @@ export async function scanCommands(dir: string, name: string): Promise<ScanComma
 
     const scanResult: ScanCommandResult[] = [];
 
+    // check for files in current scanned directory
     for (const fileName of files) {
         if (fileName === 'commandConfig.js') {
             scanResult.push({
@@ -58,6 +59,7 @@ export async function scanCommands(dir: string, name: string): Promise<ScanComma
 
     const found = scanResult.length > 0;
 
+    // recirsively scan subdirectories. Do not scan the ones starting with "_"
     for (const fileName of files) {
         if (!fileName.startsWith('_')) {
             const f = path.posix.join(dir, fileName);

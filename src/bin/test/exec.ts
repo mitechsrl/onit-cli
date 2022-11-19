@@ -27,8 +27,8 @@ import yargs from 'yargs';
 import { logger } from '../../lib/logger';
 import { onitFileLoader } from '../../lib/onitFileLoader';
 import { CommandExecFunction, StringError } from '../../types';
-import { selectTest } from './lib/selectTest';
-import { startTest } from './lib/test';
+import { selectTest } from './_lib/selectTest';
+import { startTest } from './_lib/test';
 
 const exec: CommandExecFunction = async (argv: yargs.ArgumentsCamelCase<unknown>) => {
 

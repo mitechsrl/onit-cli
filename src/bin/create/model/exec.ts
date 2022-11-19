@@ -27,7 +27,7 @@ import inquirer from 'inquirer';
 import yargs from 'yargs';
 import { CommandExecFunction } from '../../../types';
 import { repoGenerator } from '../repository/exec';
-import { CustomModelGenerator } from './lib/CustomModelGenerator';
+import { CustomModelGenerator } from './_lib/CustomModelGenerator';
 
 // @loopback-cli is not a library, there's not typings
 // We are just leveraging on some implementation to reuse them

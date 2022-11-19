@@ -26,7 +26,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 import yargs from 'yargs';
 import { logger } from '../../../lib/logger';
 import { CommandExecFunction } from '../../../types';
-import { checkDirectory } from './lib/checkDirectory';
+import { checkDirectory } from './_lib/checkDirectory';
 
 const exec: CommandExecFunction = async (argv: yargs.ArgumentsCamelCase<unknown>) => {
     if (!argv.d){

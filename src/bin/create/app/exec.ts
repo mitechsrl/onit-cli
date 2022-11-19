@@ -31,12 +31,12 @@ import { CommandExecFunction, GenericObject } from '../../../types';
 import { existsSync } from 'fs';
 import { logger } from '../../../lib/logger';
 import { spawn } from '../../../lib/spawn';
-import { commitRepo, unlinkGitRepo } from './lib/git';
-import { replaceValues } from './lib/replaceValues';
-import { fixPackageJson } from './lib/fixPackageJson';
-import { removeUnwantedFiles } from './lib/removeUnwantedFiles';
-import { fixOnitConfig } from './lib/fixOnitConfig';
-import { replaceInFile } from './lib/replaceInFile';
+import { commitRepo, unlinkGitRepo } from './_lib/git';
+import { replaceValues } from './_lib/replaceValues';
+import { fixPackageJson } from './_lib/fixPackageJson';
+import { removeUnwantedFiles } from './_lib/removeUnwantedFiles';
+import { fixOnitConfig } from './_lib/fixOnitConfig';
+import { replaceInFile } from './_lib/replaceInFile';
 
 const exec: CommandExecFunction = async (argv: yargs.ArgumentsCamelCase<unknown>) => {
     const nameMatch = /^(@[a-zA-Z0-9-_]+\/){0,1}([a-zA-Z0-9-_]+)$/g;
