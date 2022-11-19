@@ -4,17 +4,6 @@ exports.onitProcessLauncher = void 0;
 const types_1 = require("../../../types");
 const spawnNodeProcess_1 = require("../../serve/_versions/2.0.0/lib/spawnNodeProcess");
 const path_1 = require("path");
-/*
-const logger = require('../../../lib/logger');
-const { runMocha } = require('./lib/runMocha');
-const { resolveTestFilesDirectories } = require('./lib/resolveTestFilesDirectories');
-const { checkFiles } = require('./lib/checkFiles');
-const { requireMochaFromProcessCwd } = require('./lib/requireMochaFromProcessCwd');
-const { buildEnvironment, getMainExecutableFilePath } = require('../../../shared/2.0.0/lib/spawnNodeProcess.js');
-const path = require('path');
-const { printError } = require('../../../lib/printError');
-const spawnPromise = require('../../../lib/spawn');
-const { npmExecutable, onitExecutable } = require('../../../lib/commandNames');*/
 /**
  *
  * @param {*} onitConfigFile

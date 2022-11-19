@@ -33,13 +33,6 @@ import _ from 'lodash';
 import { copyExtraFiles } from '../../../../build/_versions/2.0.0/lib/copyExtraFiles';
 import TscWatchClient from 'tsc-watch/client';
 
-/*
-const TscWatchClient = require('tsc-watch/client');
-
-const logger = require('../../../../../lib/logger');
-const copyExtraFiles = require('../../../../../shared/2.0.0/lib/copyExtraFiles');
-
-*/
 const subProcesses: SpawnSubprocessResult[]= [];
 
 export async function tscWatchAndRun(onitConfigFile: OnitConfigFile, argv: yargs.ArgumentsCamelCase<unknown>): Promise<void>{

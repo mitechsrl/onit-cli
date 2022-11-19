@@ -28,12 +28,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.start = void 0;
-/*
-const pm2Dev = require('./lib/pm2');
-const webpack = require('./lib/webpack');
-const tsc = require('./lib/tscWatch.js');
-const links = require('../../../../shared/1.0.0/lib/link');
-*/
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 const semver_1 = __importDefault(require("semver"));

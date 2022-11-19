@@ -2,17 +2,6 @@ import { OnitConfigFile, OnitConfigFileTestTarget, StringError } from '../../../
 import { getMainExecutableFilePath } from '../../serve/_versions/2.0.0/lib/spawnNodeProcess';
 import { join } from 'path';
 
-/*
-const logger = require('../../../lib/logger');
-const { runMocha } = require('./lib/runMocha');
-const { resolveTestFilesDirectories } = require('./lib/resolveTestFilesDirectories');
-const { checkFiles } = require('./lib/checkFiles');
-const { requireMochaFromProcessCwd } = require('./lib/requireMochaFromProcessCwd');
-const { buildEnvironment, getMainExecutableFilePath } = require('../../../shared/2.0.0/lib/spawnNodeProcess.js');
-const path = require('path');
-const { printError } = require('../../../lib/printError');
-const spawnPromise = require('../../../lib/spawn');
-const { npmExecutable, onitExecutable } = require('../../../lib/commandNames');*/
 /**
  *
  * @param {*} onitConfigFile

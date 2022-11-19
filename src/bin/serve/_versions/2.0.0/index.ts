@@ -25,12 +25,6 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 import yargs from 'yargs';
 import { GenericObject, OnitConfigFile } from '../../../../types';
-/*
-const pm2Dev = require('./lib/pm2');
-const webpack = require('./lib/webpack');
-const tsc = require('./lib/tscWatch.js');
-const links = require('../../../../shared/1.0.0/lib/link');
-*/
 import path from 'path';
 import fs from 'fs';
 import semver from 'semver';

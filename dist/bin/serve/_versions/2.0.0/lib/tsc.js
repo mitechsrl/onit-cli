@@ -35,13 +35,6 @@ const readline_1 = __importDefault(require("readline"));
 const lodash_1 = __importDefault(require("lodash"));
 const copyExtraFiles_1 = require("../../../../build/_versions/2.0.0/lib/copyExtraFiles");
 const client_1 = __importDefault(require("tsc-watch/client"));
-/*
-const TscWatchClient = require('tsc-watch/client');
-
-const logger = require('../../../../../lib/logger');
-const copyExtraFiles = require('../../../../../shared/2.0.0/lib/copyExtraFiles');
-
-*/
 const subProcesses = [];
 async function tscWatchAndRun(onitConfigFile, argv) {
     const exitAfterTsc = argv.exit;
