@@ -61,11 +61,11 @@ function npmVersionCheck() {
                 updateStatus.lastCheck = new Date().toISOString();
                 (0, persistent_1.setPersistent)('update', updateStatus);
             })
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 .catch(e => { });
         }, 60 * 1000);
         t.unref();
     }
 }
 exports.npmVersionCheck = npmVersionCheck;
-;
 //# sourceMappingURL=npm.js.map

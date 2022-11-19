@@ -28,17 +28,16 @@ import { spawn } from './spawn';
 import { getPersistent, setPersistent } from './persistent';
 import { logger } from './logger';
 import { packageJson } from './packageJson';
-import  gt  from 'semver/functions/gt';
+import gt from 'semver/functions/gt';
 // windows being windows... it wants the .cmd extension!
 export const npmExecutable = os.platform() === 'win32' ? 'npm.cmd' : 'npm';
 export const npxExecutable = os.platform() === 'win32' ? 'npx.cmd' : 'npx';
-
 
 type PersistentUpdate = {
     newversion: string,
     update: boolean,
     lastCheck: string
-}
+};
 // after some time (3 minutes), just check for newer versions and show a info in the console
 // This is just for a reminder, doesn't do anything else.
 export function npmVersionCheck() {
@@ -49,7 +48,7 @@ export function npmVersionCheck() {
     }
 
     // check for npm registry updates. Do it once each hour to prevent too many calls
-    if ((!updateStatus?.lastCheck) ||  (((new Date().getTime() - new Date(updateStatus.lastCheck).getTime()) / 1000) > 3600)) {
+    if ((!updateStatus?.lastCheck) || (((new Date().getTime() - new Date(updateStatus.lastCheck).getTime()) / 1000) > 3600)) {
         const t = setTimeout(() => {
             const npmParams = ['view', packageJson.name, '--registry=https://registry.npmjs.org/', 'version'];
             spawn(npmExecutable, npmParams, false, { shell: true, cwd: __dirname })
@@ -65,9 +64,10 @@ export function npmVersionCheck() {
                     updateStatus.lastCheck = new Date().toISOString();
                     setPersistent('update', updateStatus);
                 })
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 .catch(e => { /** ignore any error */});
         }, 60*1000);
 
         t.unref();
     }
-};
+}
