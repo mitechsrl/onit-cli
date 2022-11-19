@@ -37,23 +37,22 @@ const exec: CommandExecFunction = async (argv: yargs.ArgumentsCamelCase<unknown>
         // check for manual serve file specifed
         const manualConfigFile: string | null = (argv.c as string) ?? null;
 
-        // load the buildFile
-        
+        // load the config file
         const onitConfigFile = await onitFileLoader(process.cwd(), manualConfigFile);
         logger.warn('Using config files: ' + onitConfigFile.sources.join(', '));
-
         if (!onitConfigFile.json.serve) {
             throw new Error('Serve is not available. Check your onit config file at <serve> property.');
         }
+
         // lock to the required builder version or get the most recent one
         const requiredVersion = onitConfigFile.json.serve.version ?? '*';
 
         // get a list of the available versions (each dir describe one version)
-        const availableVersions = fs.readdirSync(path.join(__dirname, './versions'));
+        const versionsDir = path.join(__dirname, './_versions');
+        const availableVersions = fs.readdirSync(versionsDir);
 
         // use npm semver to select the most recent usable version
         const version = maxSatisfying(availableVersions, requiredVersion);
-
         if (!version){
             throw new Error('No compatible serve version found for required ' + requiredVersion + '. Check your onit config file serve.version value.');
         }
@@ -61,7 +60,7 @@ const exec: CommandExecFunction = async (argv: yargs.ArgumentsCamelCase<unknown>
         // version found: Load that builder and use it.
         logger.info('Using serve version ' + version);
         // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const serve = require(path.join(__dirname, './_versions/' + version + '/index.js'));
+        const serve = require(path.join(versionsDir, `./${version}/index.js`));
 
         // autoset the hardcoded params
         /*

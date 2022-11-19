@@ -46,7 +46,7 @@ const exec = async (argv) => {
         // lock to the required builder version or get the most recent one
         const requiredVersion = (_b = onitConfigFile.json.build.version) !== null && _b !== void 0 ? _b : '*';
         // get a list of the available versions (each dir describe one version)
-        const availableVersions = fs_1.default.readdirSync(path_1.default.join(__dirname, './versions'));
+        const availableVersions = fs_1.default.readdirSync(path_1.default.join(__dirname, './_versions'));
         // use npm semver to select the most recent usable version
         const version = (0, max_satisfying_1.default)(availableVersions, requiredVersion);
         if (!version) {
@@ -55,7 +55,7 @@ const exec = async (argv) => {
         // version found: Load that builder and use it.
         logger_1.logger.info('Using build version ' + version);
         // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const build = require(path_1.default.join(__dirname, './versions/' + version + '/index.js'));
+        const build = require(path_1.default.join(__dirname, './_versions/' + version + '/index.js'));
         // autoset the hardcoded params
         /*
         if (Array.isArray(onitConfigFile.json.build.params)) {

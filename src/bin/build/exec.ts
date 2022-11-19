@@ -49,7 +49,7 @@ const exec: CommandExecFunction = async (argv: yargs.ArgumentsCamelCase<unknown>
         const requiredVersion = onitConfigFile.json.build.version ?? '*';
 
         // get a list of the available versions (each dir describe one version)
-        const availableVersions = fs.readdirSync(path.join(__dirname, './versions'));
+        const availableVersions = fs.readdirSync(path.join(__dirname, './_versions'));
 
         // use npm semver to select the most recent usable version
         const version = maxSatisfying(availableVersions, requiredVersion);
@@ -61,7 +61,7 @@ const exec: CommandExecFunction = async (argv: yargs.ArgumentsCamelCase<unknown>
         // version found: Load that builder and use it.
         logger.info('Using build version ' + version);
         // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const build = require(path.join(__dirname, './versions/' + version + '/index.js'));
+        const build = require(path.join(__dirname, './_versions/' + version + '/index.js'));
 
         // autoset the hardcoded params
         /*

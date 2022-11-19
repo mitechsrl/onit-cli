@@ -37,7 +37,7 @@ const exec = async (argv) => {
     try {
         // check for manual serve file specifed
         const manualConfigFile = (_a = argv.c) !== null && _a !== void 0 ? _a : null;
-        // load the buildFile
+        // load the config file
         const onitConfigFile = await (0, onitFileLoader_1.onitFileLoader)(process.cwd(), manualConfigFile);
         logger_1.logger.warn('Using config files: ' + onitConfigFile.sources.join(', '));
         if (!onitConfigFile.json.serve) {
@@ -46,7 +46,8 @@ const exec = async (argv) => {
         // lock to the required builder version or get the most recent one
         const requiredVersion = (_b = onitConfigFile.json.serve.version) !== null && _b !== void 0 ? _b : '*';
         // get a list of the available versions (each dir describe one version)
-        const availableVersions = fs_1.default.readdirSync(path_1.default.join(__dirname, './versions'));
+        const versionsDir = path_1.default.join(__dirname, './_versions');
+        const availableVersions = fs_1.default.readdirSync(versionsDir);
         // use npm semver to select the most recent usable version
         const version = (0, max_satisfying_1.default)(availableVersions, requiredVersion);
         if (!version) {
@@ -55,7 +56,7 @@ const exec = async (argv) => {
         // version found: Load that builder and use it.
         logger_1.logger.info('Using serve version ' + version);
         // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const serve = require(path_1.default.join(__dirname, './_versions/' + version + '/index.js'));
+        const serve = require(path_1.default.join(versionsDir, `./${version}/index.js`));
         // autoset the hardcoded params
         /*
         if (Array.isArray(onitConfigFile.json.serve.params)) {
