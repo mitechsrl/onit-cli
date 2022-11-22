@@ -134,7 +134,8 @@ export function spawnNodeProcess (
             if (proc) {
                 // we have a previous process. Set the proper cb and kill it.
                 afterKillCb = cb;
-                proc.kill();
+                // this is brutal but we just need it to die as quick as possible
+                proc.kill('SIGKILL');
             } else {
                 // process probably crashed before. Just call the cb
                 cb();

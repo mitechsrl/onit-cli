@@ -28,6 +28,8 @@ import { packageJson } from './packageJson';
 
 export function header() {
 
+    // ANSI Shadow http://patorjk.com/software/taag/#p=display&f=ANSI%20Shadow&t=ONIT-CLI
+    // There was the background at one time, now it ppear there's no background anymore.
     logger.info('');
     logger.info('░█████╗░███╗░░██╗██╗████████╗░░░░░░░█████╗░██╗░░░░░██╗');
     logger.info('██╔══██╗████╗░██║██║╚══██╔══╝░░░░░░██╔══██╗██║░░░░░██║');
@@ -37,6 +39,6 @@ export function header() {
     logger.info('░╚════╝░╚═╝░░╚══╝╚═╝░░░╚═╝░░░░░░░░░░╚════╝░╚══════╝╚═╝');
     logger.info('');
     logger.info('Onit CLI tool ' + packageJson.version);
-    logger.log("")
+    logger.log('');
     logger.log('Add -h flag for more info');
 }

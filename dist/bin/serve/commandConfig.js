@@ -74,6 +74,13 @@ const config = {
                 type: 'boolean',
                 description: 'Start node process with --inspact'
             }
+        },
+        {
+            name: 'preserve-symlinks',
+            config: {
+                type: 'boolean',
+                description: 'Same as node --preserve-symlinks. Valid when launching app with debug flag'
+            }
         }
     ]
 };

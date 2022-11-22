@@ -1,6 +1,6 @@
 /// <reference types="node" />
 import { SpawnOptionsWithoutStdio } from 'child_process';
-export type SpawnResult = {
+export declare type SpawnResult = {
     exitCode: number;
     output: string;
 };

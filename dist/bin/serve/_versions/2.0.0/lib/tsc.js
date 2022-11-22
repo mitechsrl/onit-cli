@@ -29,14 +29,24 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.tscWatchAndRun = void 0;
 const logger_1 = require("../../../../../lib/logger");
+const types_1 = require("../../../../../types");
 const spawnNodeProcess_1 = require("./spawnNodeProcess");
 const spawnSubprocess_1 = require("./spawnSubprocess");
 const readline_1 = __importDefault(require("readline"));
 const lodash_1 = __importDefault(require("lodash"));
 const copyExtraFiles_1 = require("../../../../build/_versions/2.0.0/lib/copyExtraFiles");
 const client_1 = __importDefault(require("tsc-watch/client"));
+const path_1 = require("path");
+const fs_1 = require("fs");
 const subProcesses = [];
 async function tscWatchAndRun(onitConfigFile, argv) {
+    const tsConfigFile = ['./tsconfig.json', './tsconfig.js'].map(f => {
+        return (0, path_1.join)((0, path_1.dirname)(onitConfigFile.sources[0]), f);
+    }).find(fn => {
+        return (0, fs_1.existsSync)(fn);
+    });
+    if (!tsConfigFile)
+        throw new types_1.StringError('No tsconfig file found in project directory');
     const exitAfterTsc = argv.exit;
     const launchNode = !argv.watch;
     // eslint-disable-next-line no-async-promise-executor
@@ -47,21 +57,30 @@ async function tscWatchAndRun(onitConfigFile, argv) {
         });
         let nodeProcess = null;
         const watch = new client_1.default();
+        let nodeProcessLaunchTimeout = null;
+        const debouncedLaunchNodeProcess = (timeout) => {
+            if (nodeProcessLaunchTimeout)
+                clearTimeout(nodeProcessLaunchTimeout);
+            nodeProcessLaunchTimeout = setTimeout(() => {
+                var _a;
+                nodeProcessLaunchTimeout = null;
+                nodeProcess = (0, spawnNodeProcess_1.spawnNodeProcess)(onitConfigFile, (_a = onitConfigFile.json.serve) !== null && _a !== void 0 ? _a : {}, argv);
+            }, timeout);
+        };
         const launchOrReload = () => {
-            var _a;
             if (!launchNode)
                 return;
             if (nodeProcess) {
                 // we have an already running node porcess. kill it and respawn
                 console.log('Reloading node app...');
                 nodeProcess.kill(() => {
-                    var _a;
-                    nodeProcess = (0, spawnNodeProcess_1.spawnNodeProcess)(onitConfigFile, (_a = onitConfigFile.json.serve) !== null && _a !== void 0 ? _a : {}, argv);
+                    nodeProcess = null;
+                    debouncedLaunchNodeProcess(1000);
                 });
             }
             else {
-                // no node processes already running . Spawn a new one
-                nodeProcess = (0, spawnNodeProcess_1.spawnNodeProcess)(onitConfigFile, (_a = onitConfigFile.json.serve) !== null && _a !== void 0 ? _a : {}, argv);
+                // no node processes already running. Spawn a new one
+                debouncedLaunchNodeProcess(1000);
             }
         };
         // the function to run on compilation success.
@@ -75,10 +94,6 @@ async function tscWatchAndRun(onitConfigFile, argv) {
                 launchOrReload();
             }
         });
-        /*watch.on('started', () => {
-            console.log('Compilation started');
-        });
-*/
         watch.on('first_success', () => {
             logger_1.logger.info('First compilation success.');
             // run this callback after the first file copy is successful
@@ -118,7 +133,7 @@ async function tscWatchAndRun(onitConfigFile, argv) {
         });
         // start the watcher. adding --noClear because it's annoying that tsc clear the console
         // when there's stuff from other processes (webpack mainly)!
-        watch.start('--noClear');
+        watch.start('--noClear', '-p', tsConfigFile);
         // kill all the eventually launched subprocesses
         const killSubProcesses = (cb) => {
             if (subProcesses.length > 0) {
@@ -137,6 +152,8 @@ async function tscWatchAndRun(onitConfigFile, argv) {
             //await fileCopy.close();
             //watch.kill();
             killSubProcesses(() => {
+                if (nodeProcessLaunchTimeout)
+                    clearTimeout(nodeProcessLaunchTimeout);
                 if (nodeProcess) {
                     logger_1.logger.warn('Killing node process...');
                     nodeProcess.kill(() => { resolve(); });

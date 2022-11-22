@@ -15,7 +15,7 @@ export declare function buildEnvironment(onitConfigFile: OnitConfigFile, serveCo
  * @returns
  */
 export declare function getMainExecutableFilePath(onitConfigFile: OnitConfigFile, serveConfig: OnitConfigFileServe): string | undefined;
-export type SpawnNodeProcessResult = {
+export declare type SpawnNodeProcessResult = {
     kill: (cb: () => void) => void;
 };
 /**

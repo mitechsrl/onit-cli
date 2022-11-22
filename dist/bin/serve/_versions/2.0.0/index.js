@@ -72,30 +72,29 @@ async function start(onitConfigFile, version, argv) {
     logger_1.logger.log('Checking links...');
     await (0, link_1.processOnitConfigFileLinks)(onitConfigFile);
     if (minusN || (!(minusW || minusT))) {
-        logger_1.logger.log('Verifico app da lanciare con pm2...');
+        logger_1.logger.log('Checking pm2 apps...');
         launchedCount = await (0, pm2_1.pm2start)(onitConfigFile);
     }
     if (minusW) {
-        logger_1.logger.log('Lancio webpack...');
+        logger_1.logger.log('Launching webpack...');
         await (0, webpack_1.webpackDevBuildAndWatch)(onitConfigFile, cwdPackageJson, argv);
     }
     else if (minusT) {
-        logger_1.logger.log('Lancio tsc...');
+        logger_1.logger.log('Launching tsc...');
         await (0, tsc_1.tscWatchAndRun)(onitConfigFile, argv);
     }
     else if (minusN) {
-        logger_1.logger.warn('Lancio node...');
+        logger_1.logger.warn('Launching node...');
         const nodeParams = [];
         if (debug) {
-            logger_1.logger.warn('Modalità debug abilitata');
+            logger_1.logger.warn('Setup node debug flags --inspect --preserve-symlinks');
             nodeParams.push('--inspect');
             nodeParams.push('--preserve-symlinks');
-            nodeParams.push('--preserve-symlinks-main');
         }
         await (0, spawnNodeProcess_1.spawnNodeProcessPromise)(onitConfigFile, onitConfigFile.json.serve, argv, nodeParams);
     }
     else {
-        logger_1.logger.log('Lancio webpack e tsc...');
+        logger_1.logger.log('Launching webpack+tsc...');
         await Promise.all([
             (0, webpack_1.webpackDevBuildAndWatch)(onitConfigFile, cwdPackageJson, argv),
             (0, tsc_1.tscWatchAndRun)(onitConfigFile, argv)
@@ -103,11 +102,11 @@ async function start(onitConfigFile, version, argv) {
     }
     if (launchedCount > 0) {
         // after-serve: run sequentially waiting for each async resolve
-        logger_1.logger.log('Eseguo shutdown pm2');
+        logger_1.logger.log('Shutting down pm2...');
         await (0, pm2_1.pm2stop)();
     }
     // bye!
-    logger_1.logger.error('Exit serve...');
+    logger_1.logger.error('Exiting serve, bye! :wave:');
     // eslint-disable-next-line no-process-exit
     process.exit(0);
 }

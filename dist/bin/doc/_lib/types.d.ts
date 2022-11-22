@@ -1,4 +1,4 @@
-export type DocumentationBlock = {
+export declare type DocumentationBlock = {
     title: string;
     summary: string[];
     chapter: string;

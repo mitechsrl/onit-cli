@@ -1,10 +1,10 @@
 import { GenericObject } from '.';
-export type OnitConfigFileServeOnFirstTscCompilationSuccess = {
+export declare type OnitConfigFileServeOnFirstTscCompilationSuccess = {
     name?: string;
     cmd?: string;
     cwd?: string;
 };
-export type OnitConfigFileServe = {
+export declare type OnitConfigFileServe = {
     version?: string;
     params?: string[];
     environment?: GenericObject;
@@ -15,7 +15,7 @@ export type OnitConfigFileServe = {
     onFirstTscCompilationSuccess?: OnitConfigFileServeOnFirstTscCompilationSuccess[];
     'pm2-dev-ecosystem'?: GenericObject;
 };
-export type OnitConfigFileTestTarget = OnitConfigFileServe & {
+export declare type OnitConfigFileTestTarget = OnitConfigFileServe & {
     grep?: string;
     key?: string;
     launchOnit?: boolean;
@@ -24,21 +24,21 @@ export type OnitConfigFileTestTarget = OnitConfigFileServe & {
     shutdown?: string;
     testFilesDirectories?: string[];
 };
-export type OnitConfigFileLink = {
+export declare type OnitConfigFileLink = {
     link: string;
     target?: string;
 };
-export type OnitConfigFileCopyFile = {
+export declare type OnitConfigFileCopyFile = {
     to?: string;
     from?: string;
     glob?: string[];
 };
-export type OnitConfigFileBuildExtraStep = {
+export declare type OnitConfigFileBuildExtraStep = {
     name?: string;
     cwd?: string;
     cmd?: string | string[];
 };
-export type OnitConfigFileBuildTarget = {
+export declare type OnitConfigFileBuildTarget = {
     key?: string;
     mode?: string;
     version?: {
@@ -51,13 +51,13 @@ export type OnitConfigFileBuildTarget = {
     beforeSteps?: OnitConfigFileBuildExtraStep[];
     afterSteps?: OnitConfigFileBuildExtraStep[];
 };
-export type OnitConfigFileBuild = {
+export declare type OnitConfigFileBuild = {
     version?: string;
     targets?: {
         [k: string]: OnitConfigFileBuildTarget;
     };
 };
-export type OnitConfigFile = {
+export declare type OnitConfigFile = {
     json: {
         component?: boolean;
         copyFiles?: OnitConfigFileCopyFile;

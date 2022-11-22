@@ -77,28 +77,27 @@ export async function start(onitConfigFile: OnitConfigFile, version:string, argv
     await processOnitConfigFileLinks(onitConfigFile);
 
     if (minusN || (!(minusW || minusT))) {
-        logger.log('Verifico app da lanciare con pm2...');
+        logger.log('Checking pm2 apps...');
         launchedCount = await pm2start(onitConfigFile);
     }
 
     if (minusW) {
-        logger.log('Lancio webpack...');
+        logger.log('Launching webpack...');
         await webpackDevBuildAndWatch(onitConfigFile, cwdPackageJson, argv);
     } else if (minusT) {
-        logger.log('Lancio tsc...');
+        logger.log('Launching tsc...');
         await tscWatchAndRun(onitConfigFile, argv);
     } else if (minusN) {
-        logger.warn('Lancio node...');
+        logger.warn('Launching node...');
         const nodeParams = [];
         if (debug) {
-            logger.warn('Modalità debug abilitata');
+            logger.warn('Setup node debug flags --inspect --preserve-symlinks');
             nodeParams.push('--inspect');
             nodeParams.push('--preserve-symlinks');
-            nodeParams.push('--preserve-symlinks-main');
         }
         await spawnNodeProcessPromise(onitConfigFile, onitConfigFile.json.serve!, argv, nodeParams);
     } else {
-        logger.log('Lancio webpack e tsc...');
+        logger.log('Launching webpack+tsc...');
         await Promise.all([
             webpackDevBuildAndWatch(onitConfigFile, cwdPackageJson, argv),
             tscWatchAndRun(onitConfigFile, argv)
@@ -107,12 +106,12 @@ export async function start(onitConfigFile: OnitConfigFile, version:string, argv
 
     if (launchedCount > 0) {
         // after-serve: run sequentially waiting for each async resolve
-        logger.log('Eseguo shutdown pm2');
+        logger.log('Shutting down pm2...');
         await pm2stop();
     }
 
     // bye!
-    logger.error('Exit serve...');
+    logger.error('Exiting serve, bye! :wave:');
     // eslint-disable-next-line no-process-exit
     process.exit(0);
 }

@@ -25,17 +25,27 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 import yargs from 'yargs';
 import { logger } from '../../../../../lib/logger';
-import { OnitConfigFile, OnitConfigFileServeOnFirstTscCompilationSuccess } from '../../../../../types';
+import { OnitConfigFile, OnitConfigFileServeOnFirstTscCompilationSuccess, StringError } from '../../../../../types';
 import { spawnNodeProcess, SpawnNodeProcessResult } from './spawnNodeProcess';
 import { spawnSubprocess, SpawnSubprocessResult } from './spawnSubprocess';
 import readline from 'readline';
 import _ from 'lodash';
 import { copyExtraFiles } from '../../../../build/_versions/2.0.0/lib/copyExtraFiles';
 import TscWatchClient from 'tsc-watch/client';
-
+import { join, dirname } from 'path';
+import { existsSync } from 'fs';
 const subProcesses: SpawnSubprocessResult[]= [];
 
 export async function tscWatchAndRun(onitConfigFile: OnitConfigFile, argv: yargs.ArgumentsCamelCase<unknown>): Promise<void>{
+    
+    const tsConfigFile = ['./tsconfig.json','./tsconfig.js'].map(f => {
+        return join(dirname(onitConfigFile.sources[0]),f);
+    }).find(fn => {
+        return existsSync(fn);
+    });
+    
+    if (!tsConfigFile) throw new StringError('No tsconfig file found in project directory');
+
     const exitAfterTsc = argv.exit;
     const launchNode = !argv.watch;
     // eslint-disable-next-line no-async-promise-executor
@@ -49,17 +59,27 @@ export async function tscWatchAndRun(onitConfigFile: OnitConfigFile, argv: yargs
         let nodeProcess: SpawnNodeProcessResult|null = null;
         const watch = new TscWatchClient();
 
+        let nodeProcessLaunchTimeout: NodeJS.Timeout | null = null;
+        const debouncedLaunchNodeProcess = (timeout: number) => {
+            if (nodeProcessLaunchTimeout) clearTimeout(nodeProcessLaunchTimeout);
+            nodeProcessLaunchTimeout = setTimeout(() => {
+                nodeProcessLaunchTimeout = null;
+                nodeProcess = spawnNodeProcess(onitConfigFile, onitConfigFile.json.serve ?? {}, argv);
+            },timeout);
+        };   
+
         const launchOrReload = () => {
             if (!launchNode) return;
             if (nodeProcess) {
                 // we have an already running node porcess. kill it and respawn
                 console.log('Reloading node app...');
                 nodeProcess.kill(() => {
-                    nodeProcess = spawnNodeProcess(onitConfigFile, onitConfigFile.json.serve ?? {}, argv);
+                    nodeProcess = null;
+                    debouncedLaunchNodeProcess(1000);
                 });
             } else {
-                // no node processes already running . Spawn a new one
-                nodeProcess = spawnNodeProcess(onitConfigFile, onitConfigFile.json.serve ?? {}, argv);
+                // no node processes already running. Spawn a new one
+                debouncedLaunchNodeProcess(1000);
             }
         };
 
@@ -76,10 +96,6 @@ export async function tscWatchAndRun(onitConfigFile: OnitConfigFile, argv: yargs
             }
         });
 
-        /*watch.on('started', () => {
-            console.log('Compilation started');
-        });
-*/
         watch.on('first_success', () => {
             logger.info('First compilation success.');
 
@@ -127,7 +143,7 @@ export async function tscWatchAndRun(onitConfigFile: OnitConfigFile, argv: yargs
 
         // start the watcher. adding --noClear because it's annoying that tsc clear the console
         // when there's stuff from other processes (webpack mainly)!
-        watch.start('--noClear');
+        watch.start('--noClear','-p', tsConfigFile);
 
         // kill all the eventually launched subprocesses
         const killSubProcesses = (cb: () => void) => {
@@ -147,6 +163,7 @@ export async function tscWatchAndRun(onitConfigFile: OnitConfigFile, argv: yargs
             //await fileCopy.close();
             //watch.kill();
             killSubProcesses(() => {
+                if (nodeProcessLaunchTimeout) clearTimeout(nodeProcessLaunchTimeout);
                 if (nodeProcess) {
                     logger.warn('Killing node process...');
                     nodeProcess.kill(() => { resolve(); });

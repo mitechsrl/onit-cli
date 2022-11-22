@@ -1,4 +1,4 @@
-export type ScanCommandResult = {
+export declare type ScanCommandResult = {
     cmd: string;
     file: string;
     children: ScanCommandResult[];

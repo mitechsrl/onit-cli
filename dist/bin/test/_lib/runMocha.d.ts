@@ -1,5 +1,5 @@
 import { OnitConfigFileTestTarget } from '../../../types';
-export type RunMochaResult = {
+export declare type RunMochaResult = {
     failures: number;
     exitCode: number;
 };

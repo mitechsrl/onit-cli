@@ -28,6 +28,8 @@ exports.header = void 0;
 const logger_1 = require("./logger");
 const packageJson_1 = require("./packageJson");
 function header() {
+    // ANSI Shadow http://patorjk.com/software/taag/#p=display&f=ANSI%20Shadow&t=ONIT-CLI
+    // There was the background at one time, now it ppear there's no background anymore.
     logger_1.logger.info('');
     logger_1.logger.info('░█████╗░███╗░░██╗██╗████████╗░░░░░░░█████╗░██╗░░░░░██╗');
     logger_1.logger.info('██╔══██╗████╗░██║██║╚══██╔══╝░░░░░░██╔══██╗██║░░░░░██║');
