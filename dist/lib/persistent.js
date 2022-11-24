@@ -80,7 +80,6 @@ exports.getPersistent = getPersistent;
  * @param filename
  */
 function setPersistent(key, obj, filename) {
-    console.log("AAAAAAAAAAAAAAAAAAA setPersisent");
     checkDir(key);
     let _filename = baseConfigDir;
     if (key) {

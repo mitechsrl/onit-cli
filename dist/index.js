@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const logger_1 = require("./lib/logger");
 // Hack for retrocompatibility: for versions <3.0.0, i was parsing the parameters manually by reading directly 
 // process.argv. I wasn't aware that by standard, long alias were supposed to have double dashes (like --exit)
 // instead of one (like -exit) so a lot of tools are calling onit-cli using single dashes.
@@ -12,8 +13,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // Doing it before anything else to be available globally. 
 ['-exit', '-watch', '-debug'].forEach(c => {
     process.argv.forEach((p, index) => {
-        if (p === c)
+        if (p === c) {
+            logger_1.logger.warn(':warning: Deprecated param ' + p + '. Use double dashed -' + p);
             process.argv[index] = '-' + process.argv[index];
+        }
     });
 });
 const path_1 = __importDefault(require("path"));

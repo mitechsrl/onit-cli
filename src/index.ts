@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+import { logger } from './lib/logger';
+
 // Hack for retrocompatibility: for versions <3.0.0, i was parsing the parameters manually by reading directly 
 // process.argv. I wasn't aware that by standard, long alias were supposed to have double dashes (like --exit)
 // instead of one (like -exit) so a lot of tools are calling onit-cli using single dashes.
@@ -8,7 +10,10 @@
 // Doing it before anything else to be available globally. 
 ['-exit','-watch','-debug'].forEach(c => {
     process.argv.forEach((p,index)=> {
-        if (p === c ) process.argv[index] = '-'+process.argv[index];
+        if (p === c ){
+            logger.warn(':warning:  Deprecated param '+p+'. Use double dashed -'+p);
+            process.argv[index] = '-'+process.argv[index];
+        }
     });
 });
 
