@@ -27,17 +27,9 @@ export class GoogleTranslator implements Translator{
         this.tmpfile.removeCallback();       
     }
 
-    // azure support only 2-char codes
+    // google needs 2-char codes
     private longToShort(longLangCode:string){
         return longLangCode.substring(0,2);
-    }
-
-    // convert 2-char codes to original iso codes
-    private shortToLong(shortCode:string, longCodes: string[]){
-        const long = longCodes.find(l => l.startsWith(shortCode));
-        if (long) return long;
-
-        return shortCode+'_'+shortCode.toUpperCase();
     }
 
     async translate(text: string, fromLangCode: string, toLangCodes: string[]): Promise<TranslatorResponse> {

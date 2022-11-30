@@ -87,6 +87,7 @@ export type OnitConfigFileTranslate = {
     // these strings (entire label text) are skipped
     skip?: string[],
     synomns?: { word: string, syn:string }[],
+    languages?:string[]
 };
 
 export type OnitConfigFile = {

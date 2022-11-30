@@ -7,6 +7,5 @@ export declare class GoogleTranslator implements Translator {
     constructor(config: GenericObject);
     shutdown(): Promise<void>;
     private longToShort;
-    private shortToLong;
     translate(text: string, fromLangCode: string, toLangCodes: string[]): Promise<TranslatorResponse>;
 }

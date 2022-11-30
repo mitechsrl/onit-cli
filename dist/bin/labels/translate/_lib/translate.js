@@ -13,6 +13,18 @@ const path_1 = require("path");
 const supportedTranslationProviders_1 = require("./supportedTranslationProviders");
 const GoogleTranslator_1 = require("./GoogleTranslator");
 /**
+ * Some translators change "%s" in "% s", which breaks string replacements.
+ * Resetting it.
+ *
+ * @param str
+ * @returns
+ */
+function fixPercentS(str) {
+    str = str.replace('% s', '%s');
+    str = str.replace('% S', '%s');
+    return str;
+}
+/**
  * Takes a set of labels as input and return an addidional set of trnslated labels
  * @param labels source OnitLabelConfig[]
  * @param languageCodes
@@ -47,7 +59,8 @@ async function translateLabelSet(labels, languageCodes, translator) {
         Object.keys(translated).forEach(langCode => {
             const newLabel = Object.assign({}, original);
             newLabel.language = langCode;
-            newLabel.text = translated[langCode];
+            const text = fixPercentS(translated[langCode]);
+            newLabel.text = text;
             finalLabelSet.push(newLabel);
         });
     }
@@ -94,11 +107,6 @@ function removeSkipped(labels, translate) {
         return !((_a = translate.skip) === null || _a === void 0 ? void 0 : _a.includes(l.text));
     });
 }
-function fixPercentS(str) {
-    str = str.replace('% s', '%s');
-    str = str.replace('% S', '%s');
-    return str;
-}
 /**
  *
  * @param dir
@@ -106,7 +114,8 @@ function fixPercentS(str) {
  * @returns
  */
 async function translate(onitConfigFile, serviceConfig) {
-    const languageCodes = ['it_IT', 'en_GB', 'de_DE', 'es_ES', 'fr_FR'];
+    var _a, _b;
+    const languageCodes = (_b = (_a = onitConfigFile.json.translate) === null || _a === void 0 ? void 0 : _a.languages) !== null && _b !== void 0 ? _b : ['it_IT', 'en_GB', 'de_DE', 'es_ES', 'fr_FR'];
     const dir = (0, path_1.dirname)(onitConfigFile.sources[0]);
     const files = await (0, scanLabelsFiles_1.scanLabelsFiles)(dir);
     // create a translator instance
@@ -130,9 +139,7 @@ async function translate(onitConfigFile, serviceConfig) {
             const labels = await translateLabelSet(srcLabels, languageCodes, translator);
             // do we have new translations??
             if (labels.length > 0) {
-                // yes, add them to file
-                // fix possibily wrong "%s"
-                labels.forEach(l => l.text = fixPercentS(l.text));
+                // yes, add them to file              
                 file.content.labels.push(...labels);
                 // Sort labels, this will make git merges easier
                 file.content.labels.sort((a, b) => {

@@ -24,16 +24,9 @@ class GoogleTranslator {
         // is this is not working??
         this.tmpfile.removeCallback();
     }
-    // azure support only 2-char codes
+    // google needs 2-char codes
     longToShort(longLangCode) {
         return longLangCode.substring(0, 2);
-    }
-    // convert 2-char codes to original iso codes
-    shortToLong(shortCode, longCodes) {
-        const long = longCodes.find(l => l.startsWith(shortCode));
-        if (long)
-            return long;
-        return shortCode + '_' + shortCode.toUpperCase();
     }
     async translate(text, fromLangCode, toLangCodes) {
         const result = {};
@@ -54,34 +47,6 @@ class GoogleTranslator {
             });
         }
         return result;
-        /*
-        , (error, result) =>{
-
-            stats.googleTranslateCall++;
-            let translatedResultLabel = Object.assign({},label);
-            translatedResultLabel.language = config.translateLanguages[idx];
-            translatedResultLabel.text = text;
-            if(!error){
-                    
-                    for (const translation of result.translations) {
-                    
-                        //catch first...
-                        if(res.length<=0){
-                            res = translation.translatedText;
-                            //clean result
-                            res = res.replace("% s","%s");
-                            res = res.replace("% S","%s");
-                            translatedResultLabel.text = res;
-                        }
-                    }
-                    
-            }
-            translatedLabels.push(translatedResultLabel);
-            process.nextTick(()=>{
-                translateTextInternal(idx+1)
-            });
-
-        });*/
     }
 }
 exports.GoogleTranslator = GoogleTranslator;

@@ -16,6 +16,19 @@ type OnitLabelConfig = {
 };
 
 /**
+ * Some translators change "%s" in "% s", which breaks string replacements.
+ * Resetting it.
+ * 
+ * @param str 
+ * @returns 
+ */
+function fixPercentS(str:string){
+    str = str.replace('% s','%s');
+    str = str.replace('% S','%s');
+    return str;
+}
+
+/**
  * Takes a set of labels as input and return an addidional set of trnslated labels
  * @param labels source OnitLabelConfig[]
  * @param languageCodes 
@@ -54,7 +67,8 @@ async function translateLabelSet(labels: OnitLabelConfig[], languageCodes: strin
         Object.keys(translated).forEach(langCode => {
             const newLabel = Object.assign({}, original);
             newLabel.language=langCode;
-            newLabel.text = translated[langCode];
+            const text = fixPercentS(translated[langCode]);
+            newLabel.text = text;
             finalLabelSet.push(newLabel);
         });
     }
@@ -103,11 +117,7 @@ function removeSkipped(labels: OnitLabelConfig[], translate?: OnitConfigFileTran
     });
 }
 
-function fixPercentS(str:string){
-    str = str.replace('% s','%s');
-    str = str.replace('% S','%s');
-    return str;
-}
+
 /**
  * 
  * @param dir 
@@ -116,7 +126,7 @@ function fixPercentS(str:string){
  */
 export async function translate(onitConfigFile: OnitConfigFile, serviceConfig: GenericObject){
     
-    const languageCodes = ['it_IT','en_GB','de_DE','es_ES','fr_FR'];
+    const languageCodes = onitConfigFile.json.translate?.languages ?? ['it_IT','en_GB','de_DE','es_ES','fr_FR'];
     const dir = dirname(onitConfigFile.sources[0]);
     const files = await scanLabelsFiles(dir);
     
@@ -146,13 +156,9 @@ export async function translate(onitConfigFile: OnitConfigFile, serviceConfig: G
 
             // do we have new translations??
             if (labels.length>0){
-                // yes, add them to file
-
-                // fix possibily wrong "%s"
-                labels.forEach(l => l.text=fixPercentS(l.text));
-                
+                // yes, add them to file              
                 file.content.labels.push(...labels);
-                
+
                 // Sort labels, this will make git merges easier
                 file.content.labels.sort((a: OnitLabelConfig,b: OnitLabelConfig)=>{
                     const sortKeyA = buildSortKey(a);

@@ -63,6 +63,7 @@ export declare type OnitConfigFileTranslate = {
         word: string;
         syn: string;
     }[];
+    languages?: string[];
 };
 export declare type OnitConfigFile = {
     json: {
