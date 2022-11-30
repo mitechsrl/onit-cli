@@ -40,7 +40,7 @@ export type LabelFileInfo = {
 /**
  * Scan for label files in the specified directory
  * 
- * @param dir 
+ * @param dir search in this directory (recursively)
  * @returns 
  */
 export async function scanLabelsFiles(dir: string): Promise<LabelFileInfo[]>{
@@ -54,7 +54,7 @@ export async function scanLabelsFiles(dir: string): Promise<LabelFileInfo[]>{
             './**/tsconfig.json'
         ]
     };
-    let files: string[]= await promisify(globAll)(['./**/*.json'], options);
+    let files: string[] = await promisify(globAll)(['./**/*.json'], options);
     // make sure we have absolute paths
     files = files.map(f=> resolve(dir, f));
     files.sort();
@@ -64,6 +64,10 @@ export async function scanLabelsFiles(dir: string): Promise<LabelFileInfo[]>{
         const json: GenericObject = JSON.parse(fs.readFileSync(filename).toString());
         if (!json.labels) {
             // Not a labels file. Skip;
+            return null;
+        }
+
+        if (!Array.isArray(json.labels)){
             return null;
         }
 

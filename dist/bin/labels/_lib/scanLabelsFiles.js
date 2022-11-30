@@ -37,7 +37,7 @@ const globAll = require('glob-all');
 /**
  * Scan for label files in the specified directory
  *
- * @param dir
+ * @param dir search in this directory (recursively)
  * @returns
  */
 async function scanLabelsFiles(dir) {
@@ -58,6 +58,9 @@ async function scanLabelsFiles(dir) {
         const json = JSON.parse(fs_1.default.readFileSync(filename).toString());
         if (!json.labels) {
             // Not a labels file. Skip;
+            return null;
+        }
+        if (!Array.isArray(json.labels)) {
             return null;
         }
         return {

@@ -3,6 +3,11 @@ import { GenericObject } from '../../../../types';
 import { Translator, TranslatorResponse } from './Translator';
 import { v4 as uuidv4 } from 'uuid';
 
+/**
+ * Microsoft Azure based translator
+ * 
+ * Note: requires a valid azure subscription and a translator resource, in which you should find your api key.
+ */
 export class AzureTranslator implements Translator{
 
     private config: GenericObject;

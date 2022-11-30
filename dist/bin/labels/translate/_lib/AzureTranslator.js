@@ -6,6 +6,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AzureTranslator = void 0;
 const axios_1 = __importDefault(require("axios"));
 const uuid_1 = require("uuid");
+/**
+ * Microsoft Azure based translator
+ *
+ * Note: requires a valid azure subscription and a translator resource, in which you should find your api key.
+ */
 class AzureTranslator {
     constructor(config) {
         this.config = config;

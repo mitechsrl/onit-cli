@@ -92,7 +92,7 @@ function replaceSynonm(labels, translate) {
     return labels;
 }
 /**
- * Return a subset of input labels where some are entirely skipped to prevent translation.
+ * Filter out from labels array the ones whose text matches one of the "skip" string from translate config.
  * @param labels
  * @param translate
  * @returns
@@ -109,6 +109,51 @@ function removeSkipped(labels, translate) {
 }
 /**
  *
+ * @param serviceConfig
+ * @returns
+ */
+function createTranslatorInstance(serviceConfig) {
+    switch (serviceConfig.provider) {
+        case 'azure':
+            return new AzureTranslator_1.AzureTranslator(serviceConfig);
+        case 'google':
+            return new GoogleTranslator_1.GoogleTranslator(serviceConfig);
+        default: throw new types_1.StringError('Unknown translator provider ' + serviceConfig.provider + '. Supported: ' + supportedTranslationProviders_1.supportedTranslationProviders.map(p => p.provider).join(', '));
+    }
+}
+/**
+ * Process a single labels file
+ *
+ * @param file
+ * @param onitConfigFile
+ * @param translator
+ * @param languageCodes
+ * @returns
+ */
+async function processFile(file, onitConfigFile, translator, languageCodes) {
+    logger_1.logger.log('Processing ' + file.filename);
+    let srcLabels = file.content.labels;
+    srcLabels = replaceSynonm(srcLabels, onitConfigFile.json.translate);
+    srcLabels = removeSkipped(srcLabels, onitConfigFile.json.translate);
+    // launch translation on this file label set
+    const labels = await translateLabelSet(srcLabels, languageCodes, translator);
+    // do we have new translations??
+    if (labels.length > 0) {
+        // yes, add them to file              
+        file.content.labels.push(...labels);
+        // Sort labels, this will make git merges easier
+        file.content.labels.sort((a, b) => {
+            const sortKeyA = buildSortKey(a);
+            const sortKeyB = buildSortKey(b);
+            if (sortKeyA === sortKeyB)
+                return 0;
+            return (sortKeyA < sortKeyB) ? -1 : 1;
+        });
+        fs_1.default.writeFileSync(file.filename, JSON.stringify(file.content, null, 4));
+    }
+}
+/**
+ *
  * @param dir
  * @param languageCodes
  * @returns
@@ -121,37 +166,9 @@ async function translate(onitConfigFile, serviceConfig) {
     // create a translator instance
     let translator = null;
     try {
-        switch (serviceConfig.provider) {
-            case 'azure':
-                translator = new AzureTranslator_1.AzureTranslator(serviceConfig);
-                break;
-            case 'google':
-                translator = new GoogleTranslator_1.GoogleTranslator(serviceConfig);
-                break;
-            default: throw new types_1.StringError('Unknown translator provider ' + serviceConfig.provider + '. Supported: ' + supportedTranslationProviders_1.supportedTranslationProviders.map(p => p.provider).join(', '));
-        }
+        translator = createTranslatorInstance(serviceConfig);
         for (const file of files) {
-            logger_1.logger.log('Processing ' + file.filename);
-            let srcLabels = file.content.labels;
-            srcLabels = replaceSynonm(srcLabels, onitConfigFile.json.translate);
-            srcLabels = removeSkipped(srcLabels, onitConfigFile.json.translate);
-            // launch translation on this file label set
-            const labels = await translateLabelSet(srcLabels, languageCodes, translator);
-            // do we have new translations??
-            if (labels.length > 0) {
-                // yes, add them to file              
-                file.content.labels.push(...labels);
-                // Sort labels, this will make git merges easier
-                file.content.labels.sort((a, b) => {
-                    const sortKeyA = buildSortKey(a);
-                    const sortKeyB = buildSortKey(b);
-                    if (sortKeyA === sortKeyB)
-                        return 0;
-                    return (sortKeyA < sortKeyB) ? -1 : 1;
-                });
-                fs_1.default.writeFileSync(file.filename, JSON.stringify(file.content, null, 4));
-                return;
-            }
+            await processFile(file, onitConfigFile, translator, languageCodes);
         }
         await translator.shutdown();
     }

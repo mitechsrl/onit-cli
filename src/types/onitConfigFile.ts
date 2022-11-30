@@ -87,6 +87,8 @@ export type OnitConfigFileTranslate = {
     // these strings (entire label text) are skipped
     skip?: string[],
     synomns?: { word: string, syn:string }[],
+    // array of languages for translations.
+    // languages must follow format en_GB, fr_FR, it_IT etc...
     languages?:string[]
 };
 
@@ -110,8 +112,7 @@ export type OnitConfigFile = {
         build?: OnitConfigFileBuild, 
         // test config
         test?: { [k:string]: OnitConfigFileTestTarget },
-
-        // 
+        // translate config
         translate?: OnitConfigFileTranslate
     },
     sources: string[]

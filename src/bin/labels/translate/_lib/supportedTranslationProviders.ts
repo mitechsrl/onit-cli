@@ -17,8 +17,9 @@ export const supportedTranslationProviders = [
             // this is the inquirer config to ask for additional values
             { type:'input', name:'projectId', message:'Project id' },
             { type:'input', name:'location', message:'Cloud service location/area' },
+            // this is a complex json. Not very nice to enter it as text but i'm not going
+            // to ask the user for >10 fields!
             { type:'input', name:'applicationCredentials', message:'Application credentials JSON. Paste here the stringified json:' }
         ]
     }
-
 ];

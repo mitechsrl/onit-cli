@@ -1,7 +1,7 @@
 import fs from 'fs';
 import { logger } from '../../../../lib/logger';
 import { GenericObject, OnitConfigFile, OnitConfigFileTranslate, StringError } from '../../../../types';
-import { scanLabelsFiles } from '../../_lib/scanLabelsFiles';
+import { LabelFileInfo, scanLabelsFiles } from '../../_lib/scanLabelsFiles';
 import { AzureTranslator } from './AzureTranslator';
 import { Translator } from './Translator';
 import { dirname }from 'path';
@@ -103,7 +103,7 @@ function replaceSynonm(labels: OnitLabelConfig[], translate?: OnitConfigFileTran
 }
 
 /**
- * Return a subset of input labels where some are entirely skipped to prevent translation.
+ * Filter out from labels array the ones whose text matches one of the "skip" string from translate config.
  * @param labels 
  * @param translate 
  * @returns 
@@ -117,6 +117,58 @@ function removeSkipped(labels: OnitLabelConfig[], translate?: OnitConfigFileTran
     });
 }
 
+/**
+ * 
+ * @param serviceConfig 
+ * @returns 
+ */
+function createTranslatorInstance(serviceConfig: GenericObject){
+
+    switch(serviceConfig.provider){
+    case 'azure': 
+        return new AzureTranslator(serviceConfig);
+    case 'google': 
+        return new GoogleTranslator(serviceConfig);
+    default: throw new StringError('Unknown translator provider '+serviceConfig.provider+'. Supported: '+supportedTranslationProviders.map(p => p.provider).join(', '));
+    }
+}
+
+/**
+ * Process a single labels file
+ * 
+ * @param file 
+ * @param onitConfigFile 
+ * @param translator 
+ * @param languageCodes 
+ * @returns 
+ */
+async function processFile(file: LabelFileInfo, onitConfigFile: OnitConfigFile, translator: Translator, languageCodes: string[]){
+    logger.log('Processing '+file.filename);
+    let srcLabels = file.content.labels;
+
+    srcLabels = replaceSynonm(srcLabels, onitConfigFile.json.translate);
+    srcLabels = removeSkipped(srcLabels, onitConfigFile.json.translate);
+
+    // launch translation on this file label set
+    const labels = await translateLabelSet(srcLabels, languageCodes, translator);
+
+    // do we have new translations??
+    if (labels.length>0){
+        // yes, add them to file              
+        file.content.labels.push(...labels);
+
+        // Sort labels, this will make git merges easier
+        file.content.labels.sort((a: OnitLabelConfig,b: OnitLabelConfig)=>{
+            const sortKeyA = buildSortKey(a);
+            const sortKeyB = buildSortKey(b);
+            if (sortKeyA === sortKeyB) return 0;
+            return (sortKeyA < sortKeyB) ? -1: 1;
+        });
+
+        fs.writeFileSync(file.filename,JSON.stringify(file.content, null, 4));
+
+    }
+}
 
 /**
  * 
@@ -134,42 +186,9 @@ export async function translate(onitConfigFile: OnitConfigFile, serviceConfig: G
     let translator: Translator|null = null;
 
     try{
-        switch(serviceConfig.provider){
-        case 'azure': 
-            translator = new AzureTranslator(serviceConfig);
-            break;
-        case 'google': 
-            translator = new GoogleTranslator(serviceConfig);
-            break;
-        default: throw new StringError('Unknown translator provider '+serviceConfig.provider+'. Supported: '+supportedTranslationProviders.map(p => p.provider).join(', '));
-        }
-
+        translator = createTranslatorInstance(serviceConfig);
         for (const file of files){
-            logger.log('Processing '+file.filename);
-            let srcLabels = file.content.labels;
-
-            srcLabels = replaceSynonm(srcLabels, onitConfigFile.json.translate);
-            srcLabels = removeSkipped(srcLabels, onitConfigFile.json.translate);
-
-            // launch translation on this file label set
-            const labels = await translateLabelSet(srcLabels, languageCodes, translator);
-
-            // do we have new translations??
-            if (labels.length>0){
-                // yes, add them to file              
-                file.content.labels.push(...labels);
-
-                // Sort labels, this will make git merges easier
-                file.content.labels.sort((a: OnitLabelConfig,b: OnitLabelConfig)=>{
-                    const sortKeyA = buildSortKey(a);
-                    const sortKeyB = buildSortKey(b);
-                    if (sortKeyA === sortKeyB) return 0;
-                    return (sortKeyA < sortKeyB) ? -1: 1;
-                });
-
-                fs.writeFileSync(file.filename,JSON.stringify(file.content, null, 4));
-                return;
-            }
+            await processFile(file, onitConfigFile,translator, languageCodes);
         }
         await translator.shutdown();
     }catch(error){

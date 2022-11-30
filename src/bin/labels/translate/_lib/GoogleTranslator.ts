@@ -4,7 +4,11 @@ import { GenericObject } from '../../../../types';
 import { Translator, TranslatorResponse } from './Translator';
 import fs from 'fs';
 
-
+/**
+ * Google based translator.
+ * Uses google api to translate a text.
+ * NOTE: this requires a valid google cloud subscription, which is required to create the needed credentials
+ */
 export class GoogleTranslator implements Translator{
 
     private config: GenericObject;
@@ -44,6 +48,7 @@ export class GoogleTranslator implements Translator{
                 sourceLanguageCode: this.longToShort(fromLangCode),
                 targetLanguageCode: this.longToShort(lc)
             });
+
             // [{"translations":[{"translatedText":"Off","model":"","glossaryConfig":null,"detectedLanguageCode":""}],"glossaryTranslations":[]},null,null]
             response.forEach((t: GenericObject|undefined) => {
                 t?.translations.forEach((translated: GenericObject) => {

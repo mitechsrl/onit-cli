@@ -6,7 +6,7 @@ export declare type LabelFileInfo = {
 /**
  * Scan for label files in the specified directory
  *
- * @param dir
+ * @param dir search in this directory (recursively)
  * @returns
  */
 export declare function scanLabelsFiles(dir: string): Promise<LabelFileInfo[]>;

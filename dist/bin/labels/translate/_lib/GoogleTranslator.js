@@ -7,6 +7,11 @@ exports.GoogleTranslator = void 0;
 const translate_1 = require("@google-cloud/translate");
 const tmp_1 = require("tmp");
 const fs_1 = __importDefault(require("fs"));
+/**
+ * Google based translator.
+ * Uses google api to translate a text.
+ * NOTE: this requires a valid google cloud subscription, which is required to create the needed credentials
+ */
 class GoogleTranslator {
     constructor(config) {
         this.translationClient = undefined;
