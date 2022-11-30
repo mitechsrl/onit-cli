@@ -3,6 +3,7 @@ export const supportedTranslationProviders = [
     {
         provider:'azure',
         name:'Microsoft Azure translator',
+        
         fields: [
         // this is the inquirer config to ask for additional values
             { type:'input', name:'key', message:'Rest api key' },

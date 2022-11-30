@@ -16,8 +16,7 @@ type OnitLabelConfig = {
 };
 
 /**
- * Some translators change "%s" in "% s", which breaks string replacements.
- * Resetting it.
+ * Some translators does not handle very well "%s". This fixes them.
  * 
  * @param str 
  * @returns 
@@ -39,30 +38,36 @@ async function translateLabelSet(labels: OnitLabelConfig[], languageCodes: strin
     
     const finalLabelSet: OnitLabelConfig[] = [];
 
+    // group them by page+label
     const groups = labels.reduce((acc: { [k:string]: OnitLabelConfig[] }, item: OnitLabelConfig) => {
         acc[item.page+'-'+item.label] = acc[item.page+'-'+item.label] ?? [];
         acc[item.page+'-'+item.label].push(item);
         return acc;
     },{}) as { [k:string]: OnitLabelConfig[] };
-        
+    
     for (const groupKey of Object.keys(groups)){
+        // for each group get the missing translations (langcodes) 
         const group = groups[groupKey];
-
-        const missingTranslations = languageCodes.filter((code:string) => {
+        const missingLanguages = languageCodes.filter((code:string) => {
             return !group.find(l => l.language === code);
         });
         
         // do nothing in case all the translations are available
-        if (missingTranslations.length === 0) continue;
+        if (missingLanguages.length === 0) continue;
 
+        // get one of the available translations to be used as start text to be
+        // translated later
         let original = group.find(l => l.language === 'it_IT');
         if (!original) original = group.find(l => l.language === 'en_GB');
         if (!original) original = group[0];
+        // no entry avilable??
         if (!original) continue;
 
-        logger.log(`Translating <${original.text}> to ${missingTranslations.join(', ')}`);
+        logger.log(`Translating <${original.text}> to ${missingLanguages.join(', ')}`);
 
-        const translated = await translator.translate(original.text, original.language, missingTranslations );
+        // launch the trnslator function
+        // this will translate text in the missing languages
+        const translated = await translator.translate(original.text, original.language, missingLanguages );
         
         Object.keys(translated).forEach(langCode => {
             const newLabel = Object.assign({}, original);
@@ -77,12 +82,18 @@ async function translateLabelSet(labels: OnitLabelConfig[], languageCodes: strin
         
 }
 
+/**
+ * 
+ * @param v 
+ * @returns 
+ */
 function buildSortKey(v: OnitLabelConfig) {
     return v.label+v.language;
 }
 
 /**
- * Replaces text pieces in labels
+ * Replaces text pieces in labels.
+ * Some translations get wrong words, this tries to fix them by using synonm 
  * 
  * @param labels 
  * @param translate 
@@ -104,6 +115,7 @@ function replaceSynonm(labels: OnitLabelConfig[], translate?: OnitConfigFileTran
 
 /**
  * Filter out from labels array the ones whose text matches one of the "skip" string from translate config.
+ * 
  * @param labels 
  * @param translate 
  * @returns 
@@ -118,12 +130,12 @@ function removeSkipped(labels: OnitLabelConfig[], translate?: OnitConfigFileTran
 }
 
 /**
+ * Create  translator class instance
  * 
  * @param serviceConfig 
  * @returns 
  */
 function createTranslatorInstance(serviceConfig: GenericObject){
-
     switch(serviceConfig.provider){
     case 'azure': 
         return new AzureTranslator(serviceConfig);
@@ -180,11 +192,10 @@ export async function translate(onitConfigFile: OnitConfigFile, serviceConfig: G
     
     const languageCodes = onitConfigFile.json.translate?.languages ?? ['it_IT','en_GB','de_DE','es_ES','fr_FR'];
     const dir = dirname(onitConfigFile.sources[0]);
+    // et all the labels files and their content
     const files = await scanLabelsFiles(dir);
     
-    // create a translator instance
     let translator: Translator|null = null;
-
     try{
         translator = createTranslatorInstance(serviceConfig);
         for (const file of files){
