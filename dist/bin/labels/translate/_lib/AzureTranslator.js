@@ -53,6 +53,10 @@ class AzureTranslator {
         }));
         return result;
     }
+    // run at the end of translate
+    async shutdown() {
+        return;
+    }
 }
 exports.AzureTranslator = AzureTranslator;
 //# sourceMappingURL=AzureTranslator.js.map

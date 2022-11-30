@@ -5,6 +5,8 @@ import { scanLabelsFiles } from '../../_lib/scanLabelsFiles';
 import { AzureTranslator } from './AzureTranslator';
 import { Translator } from './Translator';
 import { dirname }from 'path';
+import { supportedTranslationProviders } from './supportedTranslationProviders';
+import { GoogleTranslator } from './GoogleTranslator';
 
 type OnitLabelConfig = {
     'language': string,
@@ -100,6 +102,12 @@ function removeSkipped(labels: OnitLabelConfig[], translate?: OnitConfigFileTran
         return !(translate.skip?.includes(l.text));
     });
 }
+
+function fixPercentS(str:string){
+    str = str.replace('% s','%s');
+    str = str.replace('% S','%s');
+    return str;
+}
 /**
  * 
  * @param dir 
@@ -115,38 +123,51 @@ export async function translate(onitConfigFile: OnitConfigFile, serviceConfig: G
     // create a translator instance
     let translator: Translator|null = null;
 
-    switch(serviceConfig.provider){
-    case 'azure': 
-        translator = new AzureTranslator(serviceConfig);
-        break;
-    default: throw new StringError('Unknown translator provider '+serviceConfig.provider+'. Supported: \'azure\'');
-    }
-
-    for (const file of files){
-        logger.log('Processing '+file.filename);
-        let srcLabels = file.content.labels;
-
-        srcLabels = replaceSynonm(srcLabels, onitConfigFile.json.translate);
-        srcLabels = removeSkipped(srcLabels, onitConfigFile.json.translate);
-
-        // launch translation on this file label set
-        const labels = await translateLabelSet(srcLabels, languageCodes, translator);
-
-        // do we have new translations??
-        if (labels.length>0){
-            // yes, add them to file
-            file.content.labels.push(...labels);
-            // Sort labels, this will make git merges easier
-            file.content.labels.sort((a: OnitLabelConfig,b: OnitLabelConfig)=>{
-                const sortKeyA = buildSortKey(a);
-                const sortKeyB = buildSortKey(b);
-                if (sortKeyA === sortKeyB) return 0;
-                return (sortKeyA < sortKeyB) ? -1: 1;
-            });
-
-            fs.writeFileSync(file.filename,JSON.stringify(file.content, null, 4));
-            return;
+    try{
+        switch(serviceConfig.provider){
+        case 'azure': 
+            translator = new AzureTranslator(serviceConfig);
+            break;
+        case 'google': 
+            translator = new GoogleTranslator(serviceConfig);
+            break;
+        default: throw new StringError('Unknown translator provider '+serviceConfig.provider+'. Supported: '+supportedTranslationProviders.map(p => p.provider).join(', '));
         }
-        
+
+        for (const file of files){
+            logger.log('Processing '+file.filename);
+            let srcLabels = file.content.labels;
+
+            srcLabels = replaceSynonm(srcLabels, onitConfigFile.json.translate);
+            srcLabels = removeSkipped(srcLabels, onitConfigFile.json.translate);
+
+            // launch translation on this file label set
+            const labels = await translateLabelSet(srcLabels, languageCodes, translator);
+
+            // do we have new translations??
+            if (labels.length>0){
+                // yes, add them to file
+
+                // fix possibily wrong "%s"
+                labels.forEach(l => l.text=fixPercentS(l.text));
+                
+                file.content.labels.push(...labels);
+                
+                // Sort labels, this will make git merges easier
+                file.content.labels.sort((a: OnitLabelConfig,b: OnitLabelConfig)=>{
+                    const sortKeyA = buildSortKey(a);
+                    const sortKeyB = buildSortKey(b);
+                    if (sortKeyA === sortKeyB) return 0;
+                    return (sortKeyA < sortKeyB) ? -1: 1;
+                });
+
+                fs.writeFileSync(file.filename,JSON.stringify(file.content, null, 4));
+                return;
+            }
+        }
+        await translator.shutdown();
+    }catch(error){
+        if (translator) await translator.shutdown();
+        throw error; 
     }
 }

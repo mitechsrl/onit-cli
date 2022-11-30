@@ -27,24 +27,14 @@ import yargs from 'yargs';
 import { CommandExecFunction } from '../../../../../types';
 import { getPersistent, setPersistent } from '../../../../../lib/persistent';
 import inquirer from 'inquirer';
-
-// list of supported providers
-const providers = [{
-    provider:'azure',
-    name:'Microsoft Azure translator',
-    fields: [
-        // this is the inquirer config to ask for additional values
-        { type:'input', name:'key', message:'Rest api key' },
-        { type:'input', name:'location', message:'Cloud service location/area' }
-    ]
-}];
+import { supportedTranslationProviders } from '../../_lib/supportedTranslationProviders';
 
 async function askServiceProvider(){
     const p = await inquirer.prompt([{
         type: 'list',
         name: 'provider',
         message: 'Translation provider',
-        choices: providers.map(p => ({ name: p.name, value: p }))
+        choices: supportedTranslationProviders.map(p => ({ name: p.name, value: p }))
     }]);
     return p.provider;
 }

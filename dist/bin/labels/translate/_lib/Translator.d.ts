@@ -3,4 +3,5 @@ export declare type TranslatorResponse = {
 };
 export interface Translator {
     translate(text: string, fromLangCode: string, toLangCode: string[]): Promise<TranslatorResponse>;
+    shutdown(): Promise<void>;
 }

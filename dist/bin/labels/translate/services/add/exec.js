@@ -29,22 +29,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const persistent_1 = require("../../../../../lib/persistent");
 const inquirer_1 = __importDefault(require("inquirer"));
-// list of supported providers
-const providers = [{
-        provider: 'azure',
-        name: 'Microsoft Azure translator',
-        fields: [
-            // this is the inquirer config to ask for additional values
-            { type: 'input', name: 'key', message: 'Rest api key' },
-            { type: 'input', name: 'location', message: 'Cloud service location/area' }
-        ]
-    }];
+const supportedTranslationProviders_1 = require("../../_lib/supportedTranslationProviders");
 async function askServiceProvider() {
     const p = await inquirer_1.default.prompt([{
             type: 'list',
             name: 'provider',
             message: 'Translation provider',
-            choices: providers.map(p => ({ name: p.name, value: p }))
+            choices: supportedTranslationProviders_1.supportedTranslationProviders.map(p => ({ name: p.name, value: p }))
         }]);
     return p.provider;
 }

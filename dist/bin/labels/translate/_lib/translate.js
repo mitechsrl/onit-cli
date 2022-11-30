@@ -10,6 +10,8 @@ const types_1 = require("../../../../types");
 const scanLabelsFiles_1 = require("../../_lib/scanLabelsFiles");
 const AzureTranslator_1 = require("./AzureTranslator");
 const path_1 = require("path");
+const supportedTranslationProviders_1 = require("./supportedTranslationProviders");
+const GoogleTranslator_1 = require("./GoogleTranslator");
 /**
  * Takes a set of labels as input and return an addidional set of trnslated labels
  * @param labels source OnitLabelConfig[]
@@ -92,6 +94,11 @@ function removeSkipped(labels, translate) {
         return !((_a = translate.skip) === null || _a === void 0 ? void 0 : _a.includes(l.text));
     });
 }
+function fixPercentS(str) {
+    str = str.replace('% s', '%s');
+    str = str.replace('% S', '%s');
+    return str;
+}
 /**
  *
  * @param dir
@@ -104,34 +111,47 @@ async function translate(onitConfigFile, serviceConfig) {
     const files = await (0, scanLabelsFiles_1.scanLabelsFiles)(dir);
     // create a translator instance
     let translator = null;
-    switch (serviceConfig.provider) {
-        case 'azure':
-            translator = new AzureTranslator_1.AzureTranslator(serviceConfig);
-            break;
-        default: throw new types_1.StringError('Unknown translator provider ' + serviceConfig.provider + '. Supported: \'azure\'');
-    }
-    for (const file of files) {
-        logger_1.logger.log('Processing ' + file.filename);
-        let srcLabels = file.content.labels;
-        srcLabels = replaceSynonm(srcLabels, onitConfigFile.json.translate);
-        srcLabels = removeSkipped(srcLabels, onitConfigFile.json.translate);
-        // launch translation on this file label set
-        const labels = await translateLabelSet(srcLabels, languageCodes, translator);
-        // do we have new translations??
-        if (labels.length > 0) {
-            // yes, add them to file
-            file.content.labels.push(...labels);
-            // Sort labels, this will make git merges easier
-            file.content.labels.sort((a, b) => {
-                const sortKeyA = buildSortKey(a);
-                const sortKeyB = buildSortKey(b);
-                if (sortKeyA === sortKeyB)
-                    return 0;
-                return (sortKeyA < sortKeyB) ? -1 : 1;
-            });
-            fs_1.default.writeFileSync(file.filename, JSON.stringify(file.content, null, 4));
-            return;
+    try {
+        switch (serviceConfig.provider) {
+            case 'azure':
+                translator = new AzureTranslator_1.AzureTranslator(serviceConfig);
+                break;
+            case 'google':
+                translator = new GoogleTranslator_1.GoogleTranslator(serviceConfig);
+                break;
+            default: throw new types_1.StringError('Unknown translator provider ' + serviceConfig.provider + '. Supported: ' + supportedTranslationProviders_1.supportedTranslationProviders.map(p => p.provider).join(', '));
         }
+        for (const file of files) {
+            logger_1.logger.log('Processing ' + file.filename);
+            let srcLabels = file.content.labels;
+            srcLabels = replaceSynonm(srcLabels, onitConfigFile.json.translate);
+            srcLabels = removeSkipped(srcLabels, onitConfigFile.json.translate);
+            // launch translation on this file label set
+            const labels = await translateLabelSet(srcLabels, languageCodes, translator);
+            // do we have new translations??
+            if (labels.length > 0) {
+                // yes, add them to file
+                // fix possibily wrong "%s"
+                labels.forEach(l => l.text = fixPercentS(l.text));
+                file.content.labels.push(...labels);
+                // Sort labels, this will make git merges easier
+                file.content.labels.sort((a, b) => {
+                    const sortKeyA = buildSortKey(a);
+                    const sortKeyB = buildSortKey(b);
+                    if (sortKeyA === sortKeyB)
+                        return 0;
+                    return (sortKeyA < sortKeyB) ? -1 : 1;
+                });
+                fs_1.default.writeFileSync(file.filename, JSON.stringify(file.content, null, 4));
+                return;
+            }
+        }
+        await translator.shutdown();
+    }
+    catch (error) {
+        if (translator)
+            await translator.shutdown();
+        throw error;
     }
 }
 exports.translate = translate;

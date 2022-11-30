@@ -59,4 +59,9 @@ export class AzureTranslator implements Translator{
 
         return result;
     }
+
+    // run at the end of translate
+    public async shutdown(){
+        return;
+    }
 }
