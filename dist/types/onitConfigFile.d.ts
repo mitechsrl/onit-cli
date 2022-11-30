@@ -57,6 +57,13 @@ export declare type OnitConfigFileBuild = {
         [k: string]: OnitConfigFileBuildTarget;
     };
 };
+export declare type OnitConfigFileTranslate = {
+    skip?: string[];
+    synomns?: {
+        word: string;
+        syn: string;
+    }[];
+};
 export declare type OnitConfigFile = {
     json: {
         component?: boolean;
@@ -69,6 +76,7 @@ export declare type OnitConfigFile = {
         test?: {
             [k: string]: OnitConfigFileTestTarget;
         };
+        translate?: OnitConfigFileTranslate;
     };
     sources: string[];
     fileNameWithoutExt: string;

@@ -58,6 +58,28 @@
                 "cmd": "extract",
                 "file": "bin/labels/extract/commandConfig.js",
                 "children": []
+            },
+            {
+                "cmd": "translate",
+                "file": "bin/labels/translate/commandConfig.js",
+                "children": [
+                    {
+                        "cmd": "services",
+                        "file": "bin/labels/translate/services/commandConfig.js",
+                        "children": [
+                            {
+                                "cmd": "add",
+                                "file": "bin/labels/translate/services/add/commandConfig.js",
+                                "children": []
+                            },
+                            {
+                                "cmd": "delete",
+                                "file": "bin/labels/translate/services/delete/commandConfig.js",
+                                "children": []
+                            }
+                        ]
+                    }
+                ]
             }
         ]
     },

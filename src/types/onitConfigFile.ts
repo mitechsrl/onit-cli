@@ -83,6 +83,12 @@ export type OnitConfigFileBuild = {
     targets?: { [k:string]:OnitConfigFileBuildTarget }
 };
 
+export type OnitConfigFileTranslate = {
+    // these strings (entire label text) are skipped
+    skip?: string[],
+    synomns?: { word: string, syn:string }[],
+};
+
 export type OnitConfigFile = {
 
     json: {
@@ -102,7 +108,10 @@ export type OnitConfigFile = {
         // build config
         build?: OnitConfigFileBuild, 
         // test config
-        test?: { [k:string]: OnitConfigFileTestTarget }
+        test?: { [k:string]: OnitConfigFileTestTarget },
+
+        // 
+        translate?: OnitConfigFileTranslate
     },
     sources: string[]
     fileNameWithoutExt: string

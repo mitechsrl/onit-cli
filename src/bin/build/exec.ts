@@ -38,7 +38,6 @@ const exec: CommandExecFunction = async (argv: yargs.ArgumentsCamelCase<unknown>
         const manualConfigFile: string | null = (argv.c as string) ?? null;
 
         // load the buildFile
-        
         const onitConfigFile = await onitFileLoader(process.cwd(), manualConfigFile);
         logger.warn('Using config files: ' + onitConfigFile.sources.join(', '));
 

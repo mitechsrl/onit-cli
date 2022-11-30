@@ -14,7 +14,7 @@ const logger_1 = require("./lib/logger");
 ['-exit', '-watch', '-debug'].forEach(c => {
     process.argv.forEach((p, index) => {
         if (p === c) {
-            logger_1.logger.warn(':warning: Deprecated param ' + p + '. Use double dashed -' + p);
+            logger_1.logger.warn(':warning:  Deprecated param ' + p + '. Use double dashed -' + p);
             process.argv[index] = '-' + process.argv[index];
         }
     });
