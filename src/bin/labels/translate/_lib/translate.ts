@@ -189,8 +189,8 @@ async function processFile(file: LabelFileInfo, onitConfigFile: OnitConfigFile, 
  * @returns 
  */
 export async function translate(onitConfigFile: OnitConfigFile, serviceConfig: GenericObject){
-    
-    const languageCodes = onitConfigFile.json.translate?.languages ?? ['it_IT','en_GB','de_DE','es_ES','fr_FR'];
+    // get the languages to translate to. A minimal default set is used
+    const languageCodes = onitConfigFile.json.translate?.languages ?? ['it_IT','en_GB'];
     const dir = dirname(onitConfigFile.sources[0]);
     // et all the labels files and their content
     const files = await scanLabelsFiles(dir);
@@ -199,7 +199,7 @@ export async function translate(onitConfigFile: OnitConfigFile, serviceConfig: G
     try{
         translator = createTranslatorInstance(serviceConfig);
         for (const file of files){
-            await processFile(file, onitConfigFile,translator, languageCodes);
+            await processFile(file, onitConfigFile, translator, languageCodes);
         }
         await translator.shutdown();
     }catch(error){

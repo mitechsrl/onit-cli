@@ -75,15 +75,13 @@ module.exports = {
                 mode: 'production', // production, uat, beta, test
                 version: {
                     additional: {
-                        name: 'Versione successiva da repository npm',
+                        // a command which must ouput a npm version code (MAJ.MIN.PATCH).
+                        // The system propose the next one available based on this
+                        name: 'Check version from npm',
                         cmd: 'npm view "$_PACKAGE_NAME" versions --json'
                     }
                 }
                 afterSteps: [
-                    {
-                        name: 'Publish npm mitech',
-                        cmd: 'mitech npm publish -y'
-                    },
                     {
                         name: 'Commit and tag version with git',
                         cmd: [
@@ -118,6 +116,24 @@ module.exports = {
 			"grep":"*", // https://mochajs.org/api/mocha#grep
 			"timeout": "10s", //https://mochajs.org/api/mocha#timeout
 		}
-	}
+	},
+
+
+    /**
+     * translation config. See ONIT-LABELS.md 
+     */
+    translate: {
+        // replace these words before translating 
+        synomns: [
+            // replaces hi with hello
+            { word: 'hi', syn: 'hello' },
+        ],
+        // do not translate these labels (exact-text match, like /^Error$/)
+        skip: [
+            'Error'
+        ],
+        // destination language codes
+        languages:['de_DE','fr_FR']
+    }
 }
 ```
