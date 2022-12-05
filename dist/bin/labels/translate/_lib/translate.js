@@ -13,8 +13,7 @@ const path_1 = require("path");
 const supportedTranslationProviders_1 = require("./supportedTranslationProviders");
 const GoogleTranslator_1 = require("./GoogleTranslator");
 /**
- * Some translators change "%s" in "% s", which breaks string replacements.
- * Resetting it.
+ * Some translators does not handle very well "%s". This fixes them.
  *
  * @param str
  * @returns
@@ -33,6 +32,7 @@ function fixPercentS(str) {
  */
 async function translateLabelSet(labels, languageCodes, translator) {
     const finalLabelSet = [];
+    // group them by page+label
     const groups = labels.reduce((acc, item) => {
         var _a;
         acc[item.page + '-' + item.label] = (_a = acc[item.page + '-' + item.label]) !== null && _a !== void 0 ? _a : [];
@@ -40,22 +40,28 @@ async function translateLabelSet(labels, languageCodes, translator) {
         return acc;
     }, {});
     for (const groupKey of Object.keys(groups)) {
+        // for each group get the missing translations (langcodes) 
         const group = groups[groupKey];
-        const missingTranslations = languageCodes.filter((code) => {
+        const missingLanguages = languageCodes.filter((code) => {
             return !group.find(l => l.language === code);
         });
         // do nothing in case all the translations are available
-        if (missingTranslations.length === 0)
+        if (missingLanguages.length === 0)
             continue;
+        // get one of the available translations to be used as start text to be
+        // translated later
         let original = group.find(l => l.language === 'it_IT');
         if (!original)
             original = group.find(l => l.language === 'en_GB');
         if (!original)
             original = group[0];
+        // no entry avilable??
         if (!original)
             continue;
-        logger_1.logger.log(`Translating <${original.text}> to ${missingTranslations.join(', ')}`);
-        const translated = await translator.translate(original.text, original.language, missingTranslations);
+        logger_1.logger.log(`Translating <${original.text}> to ${missingLanguages.join(', ')}`);
+        // launch the trnslator function
+        // this will translate text in the missing languages
+        const translated = await translator.translate(original.text, original.language, missingLanguages);
         Object.keys(translated).forEach(langCode => {
             const newLabel = Object.assign({}, original);
             newLabel.language = langCode;
@@ -66,11 +72,17 @@ async function translateLabelSet(labels, languageCodes, translator) {
     }
     return finalLabelSet;
 }
+/**
+ *
+ * @param v
+ * @returns
+ */
 function buildSortKey(v) {
     return v.label + v.language;
 }
 /**
- * Replaces text pieces in labels
+ * Replaces text pieces in labels.
+ * Some translations get wrong words, this tries to fix them by using synonm
  *
  * @param labels
  * @param translate
@@ -93,6 +105,7 @@ function replaceSynonm(labels, translate) {
 }
 /**
  * Filter out from labels array the ones whose text matches one of the "skip" string from translate config.
+ *
  * @param labels
  * @param translate
  * @returns
@@ -108,6 +121,7 @@ function removeSkipped(labels, translate) {
     });
 }
 /**
+ * Create  translator class instance
  *
  * @param serviceConfig
  * @returns
@@ -160,10 +174,11 @@ async function processFile(file, onitConfigFile, translator, languageCodes) {
  */
 async function translate(onitConfigFile, serviceConfig) {
     var _a, _b;
-    const languageCodes = (_b = (_a = onitConfigFile.json.translate) === null || _a === void 0 ? void 0 : _a.languages) !== null && _b !== void 0 ? _b : ['it_IT', 'en_GB', 'de_DE', 'es_ES', 'fr_FR'];
+    // get the languages to translate to. A minimal default set is used
+    const languageCodes = (_b = (_a = onitConfigFile.json.translate) === null || _a === void 0 ? void 0 : _a.languages) !== null && _b !== void 0 ? _b : ['it_IT', 'en_GB'];
     const dir = (0, path_1.dirname)(onitConfigFile.sources[0]);
+    // et all the labels files and their content
     const files = await (0, scanLabelsFiles_1.scanLabelsFiles)(dir);
-    // create a translator instance
     let translator = null;
     try {
         translator = createTranslatorInstance(serviceConfig);

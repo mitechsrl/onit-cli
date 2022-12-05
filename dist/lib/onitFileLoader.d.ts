@@ -11,4 +11,4 @@ import { OnitConfigFile } from '../types';
  * @param {*} context
  * @param {*} customFileName Filename to be loaded
  */
-export declare function onitFileLoader(context?: string, configFileNameOverride?: string): Promise<OnitConfigFile>;
+export declare function onitFileLoader(context?: string, manualConfigFile?: string): Promise<OnitConfigFile>;

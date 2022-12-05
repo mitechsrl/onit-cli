@@ -35,8 +35,28 @@ const types_1 = require("../types");
 // try to load a file. Throw a customized error in case of failure
 async function loadJs(filename) {
     try {
+        // we're using plain js files for config. Load them with require.
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const loaded = require(filename);
+        // required value is a function. Run it.
+        if (typeof loaded === 'function') {
+            return {
+                // this accept both sync and async functions
+                // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await    
+                json: await loaded(),
+                filename: filename
+            };
+        }
+        // Returned value is a promise. Await it.
+        if (loaded instanceof Promise) {
+            return {
+                json: await loaded,
+                filename: filename
+            };
+        }
+        // simple object fallback
         return {
-            json: require(filename),
+            json: loaded,
             filename: filename
         };
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -67,11 +87,11 @@ async function loadJson(filename) {
  * @returns Promise, which resolve to Object, {filename:string, json: object, fileNameWithoutExt: string }
  *
  */
-async function loadBase(context, configFileNameOverride) {
+async function loadBase(context, manualConfigFile) {
     let fileNameWithoutExt = 'onit.config'; // default config filename
-    if (configFileNameOverride) {
+    if (manualConfigFile) {
         // remove extension (only js or json)
-        fileNameWithoutExt = configFileNameOverride.replace(/\.js(on)?$/, '');
+        fileNameWithoutExt = manualConfigFile.replace(/\.js(on)?$/, '');
     }
     let json = null;
     let filename = null;
@@ -101,7 +121,7 @@ async function loadBase(context, configFileNameOverride) {
 }
 /**
  * Load the local config file. Throws an error only if the file syntax is wrong.
- * Does nothing when the file does not exists since it is options.
+ * The local fie is optional, so this does nothing when the file does not exists.
  *
  * @param {*} context directory where to search for files
  * @param {*} file the previous, non-local loaded file
@@ -149,8 +169,8 @@ async function loadLocal(context, file) {
  * @param {*} context
  * @param {*} customFileName Filename to be loaded
  */
-async function onitFileLoader(context = process.cwd(), configFileNameOverride) {
-    let file = await loadBase(context, configFileNameOverride);
+async function onitFileLoader(context = process.cwd(), manualConfigFile) {
+    let file = await loadBase(context, manualConfigFile);
     file = await loadLocal(context, file);
     return file;
 }

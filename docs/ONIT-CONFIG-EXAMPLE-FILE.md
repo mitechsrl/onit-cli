@@ -1,3 +1,22 @@
+## Onit config example file
+
+The onit config file must export one of the following values:
+
+- Object (see below example)
+- Sync/async function which must return an object(see below example for object properties)
+   ```js
+   module.exports = async ()=> {
+    // return an object. Equal to the example below
+   } 
+   ```
+- Promise. Must resolve with an object (see below example)
+  ```js
+   module.exports = Promise.resolve({
+     // object. Equal to the example below
+   })
+   ```
+   
+#### Example
 ```js
 
 module.exports = {

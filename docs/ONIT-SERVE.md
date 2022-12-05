@@ -15,7 +15,8 @@ Il file contiene una serie di istruzioni per il lancio del progetto in ambiente 
         "environment": Object, oggetto iniettato in environment app
         "main": string, main js file to launch
         "componentsScanDirs": directories to be scanned for components
-    }
+    },
+    'pm2-dev-ecosystem': Array di apps pm2
 }
 ```
 
@@ -54,6 +55,14 @@ Oggetto strutturato come
 
 Questo oggetto viene iniettato automaticamente nel **process.env** dell'istanza di onit lanciata.
 **someValue** può essere di qualsiasi tipo, gli ogetti nel caso vengono stringificati prima di essere passati nel process.env (Process.env suporta dolo stringhe) 
+
+### pm2-dev-ecosystem
+Array di app pm2. Vedi [pm2 ecosystem](https://pm2.keymetrics.io/docs/usage/application-declaration/) per maggiorni info.
+
+Al serve, onit-cli lancia in automatico le app specificate in questo array.
+
+Le app vengono chiuse al termine di onit-cli.
+
 
 ### Parametri
 

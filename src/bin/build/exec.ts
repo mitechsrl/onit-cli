@@ -39,7 +39,7 @@ const exec: CommandExecFunction = async (argv: yargs.ArgumentsCamelCase<unknown>
 
         // load the buildFile
         const onitConfigFile = await onitFileLoader(process.cwd(), manualConfigFile);
-        logger.warn('Using config files: ' + onitConfigFile.sources.join(', '));
+        logger.warn('Using config files: ' + onitConfigFile.sources.map(f =>path.relative(process.cwd(), f)).join(', '));
 
         if (!onitConfigFile.json.build) {
             throw new Error('Build is not available. Check your onit config file at <build> property.');

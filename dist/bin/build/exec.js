@@ -39,7 +39,7 @@ const exec = async (argv) => {
         const manualConfigFile = (_a = argv.c) !== null && _a !== void 0 ? _a : null;
         // load the buildFile
         const onitConfigFile = await (0, onitFileLoader_1.onitFileLoader)(process.cwd(), manualConfigFile);
-        logger_1.logger.warn('Using config files: ' + onitConfigFile.sources.join(', '));
+        logger_1.logger.warn('Using config files: ' + onitConfigFile.sources.map(f => path_1.default.relative(process.cwd(), f)).join(', '));
         if (!onitConfigFile.json.build) {
             throw new Error('Build is not available. Check your onit config file at <build> property.');
         }

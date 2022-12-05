@@ -5,7 +5,6 @@ Permette il build del progetto e la creazione dei files destinati alla pacchetti
 ##### onit.config.[js|json]
 
 ```
-
 module.exports = {
     link: array, gestione automatica di npm link,
     export: {
@@ -16,7 +15,6 @@ module.exports = {
         version: String, versione (in formato stile npm) del builder richiesto.      
         targets: Object, configurazione targets di build. Deve essere definito almeno un build target. Vedi sezione **build target**
     }
-
 };
 
 ```
