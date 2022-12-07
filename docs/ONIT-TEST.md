@@ -5,9 +5,9 @@ Run project tests
 ### onit.config.[js|json]
 
 
-Il file onit.config.js definisce una nuova sezione "test" nel quale contiene la configurazione da lanciare al comando **onit test**
+Il file onit.config.js definisce una nuova sezione "test" nel quale contiene la configurazione da lanciare al comando **onit test**:
 
-**onit-config.js**
+
 ```js
 
 	test: {
@@ -20,8 +20,8 @@ Il file onit.config.js definisce una nuova sezione "test" nel quale contiene la 
 			"startup":"someFile.js",
 			"beforeTest":"someFile2.js"
 			"testFilesDirectories":["./src/test/cases", "../../onit-next/dist/test/cases"], // array di stirng 
-			"shutdown":pathToFile.js"
-			
+			"shutdown":"pathToFile.js"
+			"launchOnit":true,
 			// Inserire le proprietà come voluto da mocha. Vedi lista di proprietà: https://mochajs.org/api/mocha,
 			// Vengono passate direttamente a mocha. Vedi "Proprietà specifiche mocha" per info.
 			"grep":"*", // https://mochajs.org/api/mocha#grep
@@ -30,22 +30,22 @@ Il file onit.config.js definisce una nuova sezione "test" nel quale contiene la 
 	}
 ```
 
-L'idea è la seguente:
-Step 1: **nomeSet** definisce cosa caricare per l'esecuzione del test. In fase di avvio, onit-cli chiede quale set utilizzare sulla falsariga di onit build.
- - Viene lanciato, se esiste, file di startup, che ha il compito di preparare l'ambiente per i test successivi (prima del lanciodi onit)
- - viene lanciato onit con la configurazione environment specificata,
- - Viene lanciato, se esiste, file beforeTest, che ha il compito di preparare l'ambiente per i test successivi. (dopo il lancio di onit)
-Step 2: vengono lanciati i test di tutti i files puntati dall'array testFilesDirectories.
-Step 3: codice da eseguire in chiusura dei test
+**NomeSet** definisce cosa caricare per l'esecuzione del test. In fase di avvio, onit-cli chiede quale set utilizzare sulla falsariga di onit build.
+1. Viene lanciato, se esiste, file di startup, che ha il compito di preparare l'ambiente per i test successivi (prima del lanciodi onit)
+2. Opzionalmene, viene lanciato onit con la configurazione environment specificata,
+3. Viene lanciato, se esiste, file beforeTest, che ha il compito di preparare l'ambiente per i test successivi. (dopo il lancio di onit)
+4. Vengono lanciati i test di tutti i files puntati dall'array testFilesDirectories.
+5. Viene lanciato, se esiste, il file shutdown con codice da eseguire in chiusura dei test
 
-Ogni pacchetto dovrebbe definire i propri test, ma può richiamar files js da altri pacchetti.
-Esempio: onit-prodocu non ha particolare codice da testare ad ora, ma può essere usato come entry point per i test. Definisce le fasi e quali test eseguire riferendosi a files js di altri pacchetti (onit-material-certificates ad esempio)
+Ogni pacchetto dovrebbe definire i propri test, ma può richiamare files js da altri pacchetti.
+
+Esempio: onit-prodocu non ha particolare codice da testare ad ora, ma può essere usato come entry point per i test. Esso definisce le fasi e quali test eseguire riferendosi a files js di altri pacchetti (onit-material-certificates ad esempio)
 
 
-**file startup**
+### File startup
 
-Il file startup implementa una parte dell'avvio della fase.. Viene chiamato PRIMA dell'avvio di onit, pertanto NON si ha a disposizione una istanza onit per interazioni.
-Usa questo file per eseguire eventuali inizializzazioni del database che devono essere eseguite prima dell'avvio di onit (ad esempio restore di dump)
+Il file startup implementa una parte dell'avvio della fase. Viene chiamato **prima** dell'avvio di onit, pertanto NON si ha a disposizione una istanza onit per interazioni.
+Usa questo file per eseguire eventuali inizializzazioni del database che devono essere eseguite prima dell'avvio di onit (ad esempio restore di dump).
 
 La struttura del file è la seguente:
 
@@ -63,7 +63,7 @@ export const startup: StartupFunction<any> = async (testEnv: TestEnvironment<any
 ```
 	
 	
-**file beforeTest**
+### File beforeTest
 
 Il file startup implementa una parte dell'avvio della fase. Viene chiamato DOPO l'avvio di onit, pertanto si ha a disposizione una istanza onit per interazioni.
 L'ecosistema di test onit dovrebbe fornire una serie di funzioni per facilitare la scrittura di questo codice, come ad esempio la pulizia del database o la funzione di avvio onit
@@ -82,7 +82,7 @@ export const beforeTest: BeforeTestFunction<ExpressServer> = async (testEnv: Tes
 }
 ```
 
-**file shutdown**
+### File shutdown
 
 Il file viene eseguito in coda ai test per eventuale codice di terminazione:
 
@@ -97,8 +97,9 @@ export const shutdown: ShutdownFunction<ExpressServer> = async (testEnv: TestEnv
 ```
 
 
-**testFilesDirectories**
+### testFilesDirectories
 Array di directories dalle quali caricare i files dei test da eseguire.
+
 I singoli elementi di quetso array seguono il formato glob: https://www.npmjs.com/package/glob
 Il file dovrebbe avere una struttura di questo tipo:
 
@@ -120,13 +121,22 @@ describe('nomeTest',() => {
 
 In questo modo, alla funzione viene passata l'istanza corrente di onit che può essere usata per chiamare le funzioni su repository/service/controller, indipendentemente da quale sia la sorgente dell'istanza stessa.
 
-#### Proprietà specifiche mocha
+### LaunchOnit
 
-All'interno del json di configurazione è possibile inserire qualsiasi proprietà attesa da mocha. Vedi api mocha https://mochajs.org/api/mocha per lista completa.
+Valore booleano, definisce se avviare o meno onit. Default true.
+
+Utile per esecuzione unit test indipendenti da runtime.
+
+### Proprietà specifiche mocha
+
+All'interno del json di configurazione è possibile inserire qualsiasi proprietà attesa da mocha.
+
+Vedi api mocha https://mochajs.org/api/mocha per lista completa.
 
 Alcuni parametri degni di nota:
 
-**grep** 
+**grep** ([Vedi doc mocha](https://mochajs.org/api/mocha#grep+))
+
 Il parametro può essere usato per il macth dei test effettivi da eseguire.
 In questo modo si può decidere quali dei test caricati vengono effettivamente eseguiti. Il filtro avviene tramite match dei tag specificati nei singoli test, sotto la funzione "it".
 Non è possibile inserire un array per piu match, mocha non lo supporta(é possibile però inserire una regex che matcha piu tag)
@@ -143,7 +153,8 @@ La funzione grep accetta in input una regex, pertanto:
 - specificando ".\*" si vanno ad eseguire tutti i test
 - con "a.\+" si eseguono i test per nomi **a, a.b, a.b.c** e così via.
   
-Vedi grep per info: https://mochajs.org/api/mocha#grep+
+Vedi grep per info: 
 
-**timeout**
-Vedi mocha timeout: https://mochajs.org/api/mocha#timeout
+**timeout** ([Vedi doc mocha](https://mochajs.org/api/mocha#timeout))
+
+Timeout run test. I test che non terminano entro questo timeout vengono considerati falliti.

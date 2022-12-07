@@ -59,6 +59,7 @@ function recourseRegisterCommand(parentYargs, commandConfig) {
         if (redirectOutput) {
             promise = (0, outputRedirection_1.setupOutputRedirecion)();
         }
+        let hadError = false;
         promise.then(() => {
             // Non c'è exec specificato
             if (!command.exec)
@@ -74,10 +75,16 @@ function recourseRegisterCommand(parentYargs, commandConfig) {
         })
             .then((execFn) => execFn(argv))
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            .catch((e) => (0, errorHandler_1.errorHandler)(e, argv))
+            .catch((e) => {
+            hadError = true;
+            (0, errorHandler_1.errorHandler)(e, argv);
+        })
             .then(() => {
             if (redirectOutput)
                 return (0, outputRedirection_1.closeOutputRedirction)();
+        })
+            .then(() => {
+            process.exit(hadError ? -1 : 0);
         });
     });
 }

@@ -68,6 +68,7 @@ export function npmVersionCheck() {
                 .catch(e => { /** ignore any error */});
         }, 60*1000);
 
+        // make this process go by it's own life, otherwise it might block this cli from exiting
         t.unref();
     }
 }

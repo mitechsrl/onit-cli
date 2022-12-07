@@ -66,7 +66,7 @@ function recourseRegisterCommand(parentYargs: yargs.Argv, commandConfig: ScanCom
         if (redirectOutput){
             promise = setupOutputRedirecion();
         }
-
+        let hadError = false;
         promise.then(() => {
             // Non c'è exec specificato
             if (!command.exec) throw new StringError('No exec file defined. This is a onit-cli error, please report it.');
@@ -83,9 +83,16 @@ function recourseRegisterCommand(parentYargs: yargs.Argv, commandConfig: ScanCom
         })
             .then((execFn) => execFn(argv))
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            .catch((e:any) => errorHandler(e, argv))
+            .catch((e:any) => {
+                hadError = true;
+                errorHandler(e, argv);
+                
+            })
             .then(() => {
                 if (redirectOutput) return closeOutputRedirction();
+            })
+            .then(() => {
+                process.exit(hadError ? -1: 0);
             });
     });
 }
