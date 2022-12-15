@@ -64,6 +64,7 @@ function npmVersionCheck() {
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 .catch(e => { });
         }, 60 * 1000);
+        // make this process go by it's own life, otherwise it might block this cli from exiting
         t.unref();
     }
 }

@@ -6,15 +6,16 @@ Permette il serve del progetto al path attuale.
 
 Il file contiene una serie di istruzioni per il lancio del progetto in ambiente di sviluppo.
 
-```
+```js
 {
-    "component": boolean, se true avvia il progetto corrente in modalità "component",
-    "link": utility helper allo sviluppo per la gestione automatica di npm link,
-    serve:{
-        "nodeArgs": Array di aromenti da passare al processo node
-        "environment": Object, oggetto iniettato in environment app
-        "main": string, main js file to launch
-        "componentsScanDirs": directories to be scanned for components
+    component: true //boolean, se true avvia il progetto corrente in modalità "component",
+    link: [],// utility helper allo sviluppo per la gestione automatica di npm link,
+    copyFiles: {} // copia files arbitrari
+    serve: {
+        nodeArgs: ['string'], // Array di aromenti da passare al processo node
+        environment: {} // oggetto iniettato in environment app
+        main: "./path/to/js", // string, main js file to launch
+        componentsScanDirs: ['string'] //directories to be scanned for components
     },
     'pm2-dev-ecosystem': Array di apps pm2
 }
@@ -41,6 +42,10 @@ Questo array di oggetti viene utilizzato per verificare la presenza dei moduli c
 
 Se **target** è specificato, viene creato un symlink alla directory specificata. Se il target specificato è un path relativo, esso deve essere relativo al file *.onit.js in cui è definito. é possibile utilizzare path assoluti. 
 Questo permette di avere diverse versioni in uso dello stesso pacchetto in diversi progetti (occorre clonare piu volte lo stesso progetto in path diversi e gestire da se le versioni)
+
+### Copy files
+Vedi [COPY-FILES.md](COPY-FILES.md) per info su copia files in fase di serve
+
 
 ### Environment
 
@@ -77,6 +82,9 @@ Le app vengono chiuse al termine di onit-cli.
 **--dangerouslyenablesmtpserver** Abilita la variabile di ambiente SMTP_SERVER, in caso contrario non viene inserita nell'environment. Questo è un flag per assicurarsi che nessuna mail venga mai inviata in sviluppo.
 
 **--exit** esce dopo la build iniziale
+
+
+
 
 ### Debug
 

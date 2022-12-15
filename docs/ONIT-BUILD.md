@@ -11,6 +11,8 @@ module.exports = {
         webpack: Object, configurazione webpack aggiuntiva iniettata da questo componente. Vedi **Export webpack**
     },
 
+    copyFiles: {...},
+    
     build:{
         version: String, versione (in formato stile npm) del builder richiesto.      
         targets: Object, configurazione targets di build. Deve essere definito almeno un build target. Vedi sezione **build target**
@@ -22,6 +24,8 @@ module.exports = {
 ##### Link
 Vedi [link in ONIT-SERVE.md](./ONIT-SERVE.md)
 
+### Copy files
+Vedi [COPY-FILES.md](COPY-FILES.md) per info su copia files in fase di serve
 
 ##### Export
 

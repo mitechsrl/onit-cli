@@ -23,7 +23,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { GenericObject, OnitConfigFile, OnitConfigFileTestTarget } from '../../../types';
+import { GenericObject, OnitConfigFile, OnitConfigFileTestTarget, StringError } from '../../../types';
 import yargs from 'yargs';
 import { logger } from '../../../lib/logger';
 import { requireMochaFromProcessCwd } from './requireMochaFromProcessCwd';
@@ -68,7 +68,8 @@ export async function startTest(onitConfigFile: OnitConfigFile, testTarget: Onit
             logger.info('Cleaning project build...');
             await spawn(npmExecutable, ['run', 'clean'], true);
             logger.info('Building project...');
-            await spawn(onitCliExecutable, ['serve', '-t', '-exit'], true);
+            const buildResult = await spawn(onitCliExecutable, ['serve', '-t', '-exit'], true);
+            if (buildResult.exitCode !== 0) throw new StringError('Tsc build failed. Aborting test');
         }
 
         let testEnvironment: GenericObject = {
@@ -150,7 +151,7 @@ export async function startTest(onitConfigFile: OnitConfigFile, testTarget: Onit
             throw new Error('Mocha report some tests are failed');
         }
     } catch (e) {
-        logger.error('Test failed!');
+        logger.error('Catched error');
         throw e;
     }
 

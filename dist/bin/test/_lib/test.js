@@ -28,6 +28,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.startTest = void 0;
+const types_1 = require("../../../types");
 const logger_1 = require("../../../lib/logger");
 const requireMochaFromProcessCwd_1 = require("./requireMochaFromProcessCwd");
 const onitProcessLauncher_1 = require("./onitProcessLauncher");
@@ -66,7 +67,9 @@ async function startTest(onitConfigFile, testTarget, argv) {
             logger_1.logger.info('Cleaning project build...');
             await (0, spawn_1.spawn)(npm_1.npmExecutable, ['run', 'clean'], true);
             logger_1.logger.info('Building project...');
-            await (0, spawn_1.spawn)(onitCliExecutable, ['serve', '-t', '-exit'], true);
+            const buildResult = await (0, spawn_1.spawn)(onitCliExecutable, ['serve', '-t', '-exit'], true);
+            if (buildResult.exitCode !== 0)
+                throw new types_1.StringError('Tsc build failed. Aborting test');
         }
         let testEnvironment = {
             env: testTarget.environment
@@ -140,7 +143,7 @@ async function startTest(onitConfigFile, testTarget, argv) {
         }
     }
     catch (e) {
-        logger_1.logger.error('Test failed!');
+        logger_1.logger.error('Catched error');
         throw e;
     }
     logger_1.logger.info('Test success!');
