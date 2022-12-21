@@ -64,11 +64,11 @@ export function npmVersionCheck() {
                     updateStatus.lastCheck = new Date().toISOString();
                     setPersistent('update', updateStatus);
                 })
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                .catch(e => { /** ignore any error */});
+                .catch(() => { /** ignore any error. Just don't annoy the user and ignore everything. */});
         }, 60*1000);
 
-        // make this process go by it's own life, otherwise it might block this cli from exiting
+        // detach this timer to it's own life, otherwise it might "block" the main event loop
+        // and prevent this cli from exiting when commands finish
         t.unref();
     }
 }
