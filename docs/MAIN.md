@@ -43,3 +43,11 @@ You can also create the files **onit.config.local.js** or **onit.config.local.js
 The tool will automatically merge the content of the local and non-local file when needed.
 
 For more info, [see here a complete example of config file](./ONIT-CONFIG-EXAMPLE-FILE.md)
+
+## Common flags
+
+`-h` Add this flag to any command to show help without actually running the command.
+
+`--log-to-file` Logs all the cli output to file while still displaying it to console. Useful in case of long running sessions for error logging.
+
+`--verbose` Enable verbose output on commands which supports them.

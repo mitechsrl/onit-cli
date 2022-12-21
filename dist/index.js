@@ -57,7 +57,7 @@ function recourseRegisterCommand(parentYargs, commandConfig) {
         // Command method runner        
         let promise = Promise.resolve();
         if (redirectOutput) {
-            promise = (0, outputRedirection_1.setupOutputRedirecion)();
+            promise = (0, outputRedirection_1.setupOutputRedirection)();
         }
         let hadError = false;
         promise.then(() => {
@@ -81,7 +81,7 @@ function recourseRegisterCommand(parentYargs, commandConfig) {
         })
             .then(() => {
             if (redirectOutput)
-                return (0, outputRedirection_1.closeOutputRedirction)();
+                return (0, outputRedirection_1.closeOutputRedirection)();
         })
             .then(() => {
             process.exit(hadError ? -1 : 0);

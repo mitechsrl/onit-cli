@@ -24,7 +24,7 @@ import { errorHandler } from './lib/errorHandler';
 import { cli } from './bin/main';
 import yargs from 'yargs';
 import fs from 'fs';
-import { closeOutputRedirction, setupOutputRedirecion } from './lib/outputRedirection';
+import { closeOutputRedirection, setupOutputRedirection } from './lib/outputRedirection';
 import { npmVersionCheck } from './lib/npm';
 
 // generic check for log to file.
@@ -64,7 +64,7 @@ function recourseRegisterCommand(parentYargs: yargs.Argv, commandConfig: ScanCom
         // Command method runner        
         let promise = Promise.resolve();
         if (redirectOutput){
-            promise = setupOutputRedirecion();
+            promise = setupOutputRedirection();
         }
         let hadError = false;
         promise.then(() => {
@@ -89,7 +89,7 @@ function recourseRegisterCommand(parentYargs: yargs.Argv, commandConfig: ScanCom
                 
             })
             .then(() => {
-                if (redirectOutput) return closeOutputRedirction();
+                if (redirectOutput) return closeOutputRedirection();
             })
             .then(() => {
                 process.exit(hadError ? -1: 0);
