@@ -45,6 +45,8 @@ The tool will automatically merge the content of the local and non-local file wh
 For more info, [see here a complete example of config file](./ONIT-CONFIG-EXAMPLE-FILE.md)
 
 ## Common flags
+These flags can be applied to any command:
+
 
 `-h` Add this flag to any command to show help without actually running the command.
 
