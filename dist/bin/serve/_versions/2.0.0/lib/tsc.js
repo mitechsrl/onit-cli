@@ -39,7 +39,7 @@ const client_1 = __importDefault(require("tsc-watch/client"));
 const path_1 = require("path");
 const fs_1 = require("fs");
 const subProcesses = [];
-async function tscWatchAndRun(onitConfigFile, argv) {
+async function tscWatchAndRun(onitConfigFile, cwdPackageJson, argv) {
     const tsConfigFile = ['./tsconfig.json', './tsconfig.js'].map(f => {
         return (0, path_1.join)((0, path_1.dirname)(onitConfigFile.sources[0]), f);
     }).find(fn => {
@@ -64,7 +64,7 @@ async function tscWatchAndRun(onitConfigFile, argv) {
             nodeProcessLaunchTimeout = setTimeout(() => {
                 var _a;
                 nodeProcessLaunchTimeout = null;
-                nodeProcess = (0, spawnNodeProcess_1.spawnNodeProcess)(onitConfigFile, (_a = onitConfigFile.json.serve) !== null && _a !== void 0 ? _a : {}, argv);
+                nodeProcess = (0, spawnNodeProcess_1.spawnNodeProcess)(onitConfigFile, (_a = onitConfigFile.json.serve) !== null && _a !== void 0 ? _a : {}, cwdPackageJson, argv);
             }, timeout);
         };
         const launchOrReload = () => {

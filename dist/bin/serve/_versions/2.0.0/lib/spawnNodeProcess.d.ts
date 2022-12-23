@@ -26,7 +26,7 @@ export declare type SpawnNodeProcessResult = {
  * @param {*} options options for child_process.spawn
  * @returns
  */
-export declare function spawnNodeProcess(onitConfigFile: OnitConfigFile, serveConfig: OnitConfigFileServe, argv: yargs.ArgumentsCamelCase<unknown>, nodeParams?: string[], spawnOptions?: GenericObject): SpawnNodeProcessResult;
+export declare function spawnNodeProcess(onitConfigFile: OnitConfigFile, serveConfig: OnitConfigFileServe, cwdPackageJson: GenericObject, argv: yargs.ArgumentsCamelCase<unknown>, nodeParams?: string[], spawnOptions?: GenericObject): SpawnNodeProcessResult;
 /**
  * Promise version of the spawnNodeProcess.
  * Stay appended until the user send the SIGINT event.
@@ -34,4 +34,4 @@ export declare function spawnNodeProcess(onitConfigFile: OnitConfigFile, serveCo
  * @param {*} nodeParams
  * @returns
  */
-export declare function spawnNodeProcessPromise(onitConfigFile: OnitConfigFile, serveConfig: OnitConfigFileServe, argv: yargs.ArgumentsCamelCase<unknown>, nodeParams: string[]): Promise<void>;
+export declare function spawnNodeProcessPromise(onitConfigFile: OnitConfigFile, serveConfig: OnitConfigFileServe, packageJson: GenericObject, argv: yargs.ArgumentsCamelCase<unknown>, nodeParams: string[]): Promise<void>;

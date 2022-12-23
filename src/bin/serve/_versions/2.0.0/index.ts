@@ -86,7 +86,7 @@ export async function start(onitConfigFile: OnitConfigFile, version:string, argv
         await webpackDevBuildAndWatch(onitConfigFile, cwdPackageJson, argv);
     } else if (minusT) {
         logger.log('Launching tsc...');
-        await tscWatchAndRun(onitConfigFile, argv);
+        await tscWatchAndRun(onitConfigFile, cwdPackageJson, argv);
     } else if (minusN) {
         logger.warn('Launching node...');
         const nodeParams = [];
@@ -95,12 +95,12 @@ export async function start(onitConfigFile: OnitConfigFile, version:string, argv
             nodeParams.push('--inspect');
             nodeParams.push('--preserve-symlinks');
         }
-        await spawnNodeProcessPromise(onitConfigFile, onitConfigFile.json.serve!, argv, nodeParams);
+        await spawnNodeProcessPromise(onitConfigFile, onitConfigFile.json.serve!, cwdPackageJson, argv, nodeParams);
     } else {
         logger.log('Launching webpack+tsc...');
         await Promise.all([
             webpackDevBuildAndWatch(onitConfigFile, cwdPackageJson, argv),
-            tscWatchAndRun(onitConfigFile, argv)
+            tscWatchAndRun(onitConfigFile, cwdPackageJson, argv)
         ]);
     }
 

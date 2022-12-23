@@ -87,10 +87,11 @@ exports.getMainExecutableFilePath = getMainExecutableFilePath;
  * @param {*} options options for child_process.spawn
  * @returns
  */
-function spawnNodeProcess(onitConfigFile, serveConfig, argv, nodeParams = [], spawnOptions = {}) {
+function spawnNodeProcess(onitConfigFile, serveConfig, cwdPackageJson, argv, nodeParams = [], spawnOptions = {}) {
     const paramsFromOnitConfigFile = serveConfig.nodeArgs || [];
     // Prepare the env variables
     const env = buildEnvironment(onitConfigFile, serveConfig, argv);
+    env.ONIT_LAUNCH_PACKAGE_NAME = cwdPackageJson.name;
     const mainJsFile = getMainExecutableFilePath(onitConfigFile, serveConfig);
     if (!mainJsFile) {
         throw new types_1.StringError('Cannot find main js file');
@@ -137,9 +138,9 @@ exports.spawnNodeProcess = spawnNodeProcess;
  * @param {*} nodeParams
  * @returns
  */
-async function spawnNodeProcessPromise(onitConfigFile, serveConfig, argv, nodeParams) {
+async function spawnNodeProcessPromise(onitConfigFile, serveConfig, packageJson, argv, nodeParams) {
     return new Promise(resolve => {
-        const nodeProcess = spawnNodeProcess(onitConfigFile, serveConfig, argv, nodeParams);
+        const nodeProcess = spawnNodeProcess(onitConfigFile, serveConfig, packageJson, argv, nodeParams);
         // Catch SIGINT (ctrl+c from console) so we stop nodemon when the user ask for it
         process.on('SIGINT', async () => {
             logger_1.logger.warn('Killing node process...');

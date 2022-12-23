@@ -25,7 +25,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 import yargs from 'yargs';
 import { logger } from '../../../../../lib/logger';
-import { OnitConfigFile, OnitConfigFileServeOnFirstTscCompilationSuccess, StringError } from '../../../../../types';
+import { GenericObject, OnitConfigFile, OnitConfigFileServeOnFirstTscCompilationSuccess, StringError } from '../../../../../types';
 import { spawnNodeProcess, SpawnNodeProcessResult } from './spawnNodeProcess';
 import { spawnSubprocess, SpawnSubprocessResult } from './spawnSubprocess';
 import readline from 'readline';
@@ -36,7 +36,7 @@ import { join, dirname } from 'path';
 import { existsSync } from 'fs';
 const subProcesses: SpawnSubprocessResult[]= [];
 
-export async function tscWatchAndRun(onitConfigFile: OnitConfigFile, argv: yargs.ArgumentsCamelCase<unknown>): Promise<void>{
+export async function tscWatchAndRun(onitConfigFile: OnitConfigFile, cwdPackageJson: GenericObject, argv: yargs.ArgumentsCamelCase<unknown>): Promise<void>{
     
     const tsConfigFile = ['./tsconfig.json','./tsconfig.js'].map(f => {
         return join(dirname(onitConfigFile.sources[0]),f);
@@ -64,7 +64,7 @@ export async function tscWatchAndRun(onitConfigFile: OnitConfigFile, argv: yargs
             if (nodeProcessLaunchTimeout) clearTimeout(nodeProcessLaunchTimeout);
             nodeProcessLaunchTimeout = setTimeout(() => {
                 nodeProcessLaunchTimeout = null;
-                nodeProcess = spawnNodeProcess(onitConfigFile, onitConfigFile.json.serve ?? {}, argv);
+                nodeProcess = spawnNodeProcess(onitConfigFile, onitConfigFile.json.serve ?? {}, cwdPackageJson, argv);
             },timeout);
         };   
 

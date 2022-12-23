@@ -95,6 +95,7 @@ export type SpawnNodeProcessResult = {
 export function spawnNodeProcess (
     onitConfigFile: OnitConfigFile,
     serveConfig: OnitConfigFileServe,
+    cwdPackageJson: GenericObject,
     argv: yargs.ArgumentsCamelCase<unknown>,
     nodeParams: string[] = [],
     spawnOptions: GenericObject = {}
@@ -103,6 +104,9 @@ export function spawnNodeProcess (
 
     // Prepare the env variables
     const env = buildEnvironment(onitConfigFile, serveConfig, argv);
+    // set the name of the run package. This is useful to some dev checks (like the one for dev:true on nexjs)
+    env.ONIT_LAUNCH_PACKAGE_NAME = cwdPackageJson.name;
+
     const mainJsFile = getMainExecutableFilePath(onitConfigFile, serveConfig);
     if (!mainJsFile) {
         throw new StringError('Cannot find main js file');
@@ -151,9 +155,14 @@ export function spawnNodeProcess (
  * @param {*} nodeParams
  * @returns
  */
-export async function spawnNodeProcessPromise (onitConfigFile: OnitConfigFile, serveConfig: OnitConfigFileServe, argv: yargs.ArgumentsCamelCase<unknown>, nodeParams: string[]): Promise<void> {
+export async function spawnNodeProcessPromise (
+    onitConfigFile: OnitConfigFile, 
+    serveConfig: OnitConfigFileServe, 
+    packageJson: GenericObject, 
+    argv: yargs.ArgumentsCamelCase<unknown>, 
+    nodeParams: string[]): Promise<void> {
     return new Promise(resolve => {
-        const nodeProcess = spawnNodeProcess(onitConfigFile, serveConfig, argv, nodeParams);
+        const nodeProcess = spawnNodeProcess(onitConfigFile, serveConfig, packageJson, argv, nodeParams);
 
         // Catch SIGINT (ctrl+c from console) so we stop nodemon when the user ask for it
         process.on('SIGINT', async () => {

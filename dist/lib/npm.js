@@ -61,10 +61,10 @@ function npmVersionCheck() {
                 updateStatus.lastCheck = new Date().toISOString();
                 (0, persistent_1.setPersistent)('update', updateStatus);
             })
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                .catch(e => { });
+                .catch(() => { });
         }, 60 * 1000);
-        // make this process go by it's own life, otherwise it might block this cli from exiting
+        // detach this timer to it's own life, otherwise it might "block" the main event loop
+        // and prevent this cli from exiting when commands finish
         t.unref();
     }
 }
