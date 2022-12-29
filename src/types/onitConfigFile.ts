@@ -92,6 +92,15 @@ export type OnitConfigFileTranslate = {
     languages?:string[]
 };
 
+export type OnitConfigFileEngineFrontend = 'onit-webpack' | 'nextjs';
+export type OnitConfigFileEngineBackend = 'lb4';
+
+export type OnitConfigFileEngine = {
+    frontend?: OnitConfigFileEngineFrontend[],
+    backend?: OnitConfigFileEngineBackend[],
+
+};
+
 export type OnitConfigFile = {
 
     json: {
@@ -103,7 +112,8 @@ export type OnitConfigFile = {
         //optional entry point search paths
         reactPaths?:string[]
         webpackEntryPointPaths?:string[];
-
+        // defines which engines are used in the project. Defaults to 'lb4' for backend, 'onit-webpack' for frontend
+        engines?: OnitConfigFileEngine;
         // link config
         link?: OnitConfigFileLink[],
         // serve config

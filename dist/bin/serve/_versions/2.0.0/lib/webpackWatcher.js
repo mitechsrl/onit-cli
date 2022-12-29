@@ -39,7 +39,12 @@ const logger_1 = require("../../../../../lib/logger");
  */
 async function webpackWatcher(webpackConfig, argv) {
     const exitAfterCompile = argv.exit;
-    return new Promise(resolve => {
+    return new Promise(_resolve => {
+        let resolve = () => {
+            // overwrite the resolve method to prevent bveing called again;
+            resolve = () => null;
+            _resolve();
+        };
         // watcher callback
         const componentName = path_1.default.basename(webpackConfig.context);
         let booting = true;
@@ -77,7 +82,9 @@ async function webpackWatcher(webpackConfig, argv) {
             logger_1.logger.info('[WEBPACK] ' + componentName + ' - Compile completed');
             if (exitAfterCompile) {
                 // eslint-disable-next-line no-process-exit
-                process.exit(0);
+                // process.exit(0);
+                watcher === null || watcher === void 0 ? void 0 : watcher.close(() => { return; });
+                return resolve();
             }
         };
         startsWatch = function () {
@@ -92,12 +99,8 @@ async function webpackWatcher(webpackConfig, argv) {
         // start the watcher!
         watcher = startsWatch();
         // catch the SIGINT and then stop the watcher
-        let called = false;
         process.on('SIGINT', () => {
-            if (!called) {
-                called = true;
-                resolve();
-            }
+            resolve();
         });
     });
 }

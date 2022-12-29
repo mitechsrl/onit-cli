@@ -23,35 +23,25 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { join } from 'path';
 import { logger } from '../../../lib/logger';
 import Mocha from 'mocha';
+import resolve from 'resolve';
+import { StringError } from '../../../types';
 
 /**
- * Search and require an instance of mocha in the target workspace
- * @returns;
+ * We relies on the local installed mocha instance to get the job done. Getting it
+ * @returns 
  */
-export function requireMochaFromProcessCwd (): null|Mocha {
-    const base = process.cwd();
-    let importPath = null;
-    let mocha: Mocha|null = null;
-    [
-        './node_modules/mocha',
-        '../node_modules/mocha'
-    ].find(p => {
-        try {
-            // console.log(path.join(base, p));
-            importPath = join(base, p);
-            mocha = require(importPath);
-            return true;
-        } catch (e) {
-            importPath = null;
-            return false;
+export function requireMochaFromProcessCwd(): null|Mocha {
+    try{
+        const requirePath = resolve.sync('mocha', { basedir: process.cwd() });
+        if (requirePath) {
+            logger.log('Found a mocha instance in ' + requirePath);
         }
-    });
-    if (importPath) {
-        logger.log('Found a mocha instance in ' + importPath);
+        return require(requirePath);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    }catch(e: any){
+        if (e.code === 'MODULE_NOT_FOUND') throw new StringError('Cannot find a local instance of mocha. Please add the dependency @mitech/onit-dev-tools.');
+        throw e;
     }
-    return mocha;
 }
-

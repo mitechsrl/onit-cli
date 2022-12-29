@@ -1,4 +1,9 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.resolveNextBinImportPath = void 0;
 /*
 Copyright (c) 2021 Mitech S.R.L.
 
@@ -23,32 +28,34 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.requireMochaFromProcessCwd = void 0;
-const logger_1 = require("../../../lib/logger");
+const path_1 = __importDefault(require("path"));
+const types_1 = require("../../../../../types");
 const resolve_1 = __importDefault(require("resolve"));
-const types_1 = require("../../../types");
+const lodash_1 = __importDefault(require("lodash"));
 /**
- * We relies on the local installed mocha instance to get the job done. Getting it
+ * Get the next bin path
  * @returns
  */
-function requireMochaFromProcessCwd() {
+function resolveNextBinImportPath() {
+    // Cheat on the "main" path by setting it with the bin path. 
+    // Resolve will retrn that value instead of mail.
+    function packageFilter(pkg, dir) {
+        const nextBinPath = lodash_1.default.get(pkg, 'bin.next', undefined);
+        if (!nextBinPath)
+            throw new types_1.StringError('No next-cli bin found');
+        pkg.main = path_1.default.join(dir, nextBinPath);
+        return pkg;
+    }
     try {
-        const requirePath = resolve_1.default.sync('mocha', { basedir: process.cwd() });
-        if (requirePath) {
-            logger_1.logger.log('Found a mocha instance in ' + requirePath);
-        }
-        return require(requirePath);
+        return resolve_1.default.sync('next', { packageFilter: packageFilter, basedir: process.cwd() });
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }
     catch (e) {
+        console.log(e);
         if (e.code === 'MODULE_NOT_FOUND')
-            throw new types_1.StringError('Cannot find a local instance of mocha. Please add the dependency @mitech/onit-dev-tools.');
+            throw new types_1.StringError('Nextjs package not found. Make sure to have it installed as dependencty');
         throw e;
     }
 }
-exports.requireMochaFromProcessCwd = requireMochaFromProcessCwd;
-//# sourceMappingURL=requireMochaFromProcessCwd.js.map
+exports.resolveNextBinImportPath = resolveNextBinImportPath;
+//# sourceMappingURL=resolveNextBinImportPath.js.map

@@ -37,7 +37,14 @@ import { GenericObject } from '../../../../../types';
  */
 export async function webpackWatcher(webpackConfig: GenericObject, argv: yargs.ArgumentsCamelCase<unknown>): Promise<void>{
     const exitAfterCompile = argv.exit;
-    return new Promise(resolve => {
+    return new Promise(_resolve => {
+
+        let resolve = () => {
+            // overwrite the resolve method to prevent bveing called again;
+            resolve = () => null;
+            _resolve();
+        };
+        
         // watcher callback
         const componentName = path.basename(webpackConfig.context);
 
@@ -79,7 +86,9 @@ export async function webpackWatcher(webpackConfig: GenericObject, argv: yargs.A
 
             if (exitAfterCompile) {
                 // eslint-disable-next-line no-process-exit
-                process.exit(0);
+                // process.exit(0);
+                watcher?.close(() => { return; });
+                return resolve();
             }
         };
 
@@ -97,12 +106,8 @@ export async function webpackWatcher(webpackConfig: GenericObject, argv: yargs.A
         watcher = startsWatch();
 
         // catch the SIGINT and then stop the watcher
-        let called = false;
         process.on('SIGINT', () => {
-            if (!called) {
-                called = true;
-                resolve();
-            }
+            resolve();
         });
     });
 }

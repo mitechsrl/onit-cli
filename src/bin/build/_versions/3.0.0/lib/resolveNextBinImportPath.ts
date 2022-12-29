@@ -1,4 +1,3 @@
-"use strict";
 /*
 Copyright (c) 2021 Mitech S.R.L.
 
@@ -23,32 +22,33 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.requireMochaFromProcessCwd = void 0;
-const logger_1 = require("../../../lib/logger");
-const resolve_1 = __importDefault(require("resolve"));
-const types_1 = require("../../../types");
+import path from 'path';
+import { GenericObject, StringError } from '../../../../../types';
+import resolve from 'resolve';
+import _ from 'lodash';
+
 /**
- * We relies on the local installed mocha instance to get the job done. Getting it
+ * Get the next bin path
  * @returns
  */
-function requireMochaFromProcessCwd() {
-    try {
-        const requirePath = resolve_1.default.sync('mocha', { basedir: process.cwd() });
-        if (requirePath) {
-            logger_1.logger.log('Found a mocha instance in ' + requirePath);
-        }
-        return require(requirePath);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function resolveNextBinImportPath() {
+    // Cheat on the "main" path by setting it with the bin path. 
+    // Resolve will retrn that value instead of mail.
+    function packageFilter(pkg: GenericObject, dir: string) {
+        const nextBinPath = _.get(pkg, 'bin.next', undefined);
+        if (!nextBinPath)
+            throw new StringError('No next-cli bin found');
+        pkg.main = path.join(dir, nextBinPath);
+        return pkg;
     }
-    catch (e) {
+
+    try {
+        return resolve.sync('next', { packageFilter: packageFilter, basedir: process.cwd() });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (e: any) {
+        console.log(e);
         if (e.code === 'MODULE_NOT_FOUND')
-            throw new types_1.StringError('Cannot find a local instance of mocha. Please add the dependency @mitech/onit-dev-tools.');
+            throw new StringError('Nextjs package not found. Make sure to have it installed as dependencty');
         throw e;
     }
 }
-exports.requireMochaFromProcessCwd = requireMochaFromProcessCwd;
-//# sourceMappingURL=requireMochaFromProcessCwd.js.map

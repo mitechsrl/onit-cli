@@ -69,7 +69,10 @@ const exec: CommandExecFunction = async (argv: yargs.ArgumentsCamelCase<unknown>
         }*/
 
         await serve.start(onitConfigFile, version, argv);
-    } catch (e) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (e: any) {
+        logger.log('');
+        logger.verbose(e.message);
         logger.error('Serve aborted');
         throw e;
     }

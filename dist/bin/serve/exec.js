@@ -63,8 +63,11 @@ const exec = async (argv) => {
             params.push(...onitConfigFile.json.serve.params);
         }*/
         await serve.start(onitConfigFile, version, argv);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }
     catch (e) {
+        logger_1.logger.log('');
+        logger_1.logger.verbose(e.message);
         logger_1.logger.error('Serve aborted');
         throw e;
     }

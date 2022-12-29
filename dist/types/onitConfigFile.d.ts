@@ -65,12 +65,19 @@ export declare type OnitConfigFileTranslate = {
     }[];
     languages?: string[];
 };
+export declare type OnitConfigFileEngineFrontend = 'onit-webpack' | 'nextjs';
+export declare type OnitConfigFileEngineBackend = 'lb4';
+export declare type OnitConfigFileEngine = {
+    frontend?: OnitConfigFileEngineFrontend[];
+    backend?: OnitConfigFileEngineBackend[];
+};
 export declare type OnitConfigFile = {
     json: {
         component?: boolean;
         copyFiles?: OnitConfigFileCopyFile;
         reactPaths?: string[];
         webpackEntryPointPaths?: string[];
+        engines?: OnitConfigFileEngine;
         link?: OnitConfigFileLink[];
         serve?: OnitConfigFileServe;
         build?: OnitConfigFileBuild;

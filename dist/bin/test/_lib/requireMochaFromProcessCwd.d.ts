@@ -1,6 +1,6 @@
 import Mocha from 'mocha';
 /**
- * Search and require an instance of mocha in the target workspace
- * @returns;
+ * We relies on the local installed mocha instance to get the job done. Getting it
+ * @returns
  */
 export declare function requireMochaFromProcessCwd(): null | Mocha;

@@ -58,10 +58,7 @@ export async function startTest(onitConfigFile: OnitConfigFile, testTarget: Onit
 
         // get the mocha instance from the target workspace
         const Mocha = requireMochaFromProcessCwd();
-        if (!Mocha) {
-            throw new Error('Cannot find a local instance of mocha. Please add the dependency @mitech/onit-dev-tools.');
-        }
-
+    
         // do not recompile
 
         if (!doNotRebuild) {

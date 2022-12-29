@@ -91,6 +91,7 @@ function spawnNodeProcess(onitConfigFile, serveConfig, cwdPackageJson, argv, nod
     const paramsFromOnitConfigFile = serveConfig.nodeArgs || [];
     // Prepare the env variables
     const env = buildEnvironment(onitConfigFile, serveConfig, argv);
+    // set the name of the run package. This is useful to some dev checks (like the one for dev:true on nexjs)
     env.ONIT_LAUNCH_PACKAGE_NAME = cwdPackageJson.name;
     const mainJsFile = getMainExecutableFilePath(onitConfigFile, serveConfig);
     if (!mainJsFile) {

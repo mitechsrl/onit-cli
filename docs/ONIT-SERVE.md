@@ -11,6 +11,7 @@ Il file contiene una serie di istruzioni per il lancio del progetto in ambiente 
     component: true //boolean, se true avvia il progetto corrente in modalità "component",
     link: [],// utility helper allo sviluppo per la gestione automatica di npm link,
     copyFiles: {} // copia files arbitrari
+    engines: {} // engines config
     serve: {
         nodeArgs: ['string'], // Array di aromenti da passare al processo node
         environment: {} // oggetto iniettato in environment app
@@ -46,6 +47,8 @@ Questo permette di avere diverse versioni in uso dello stesso pacchetto in diver
 ### Copy files
 Vedi [COPY-FILES.md](COPY-FILES.md) per info su copia files in fase di serve
 
+### Engines
+Vedi [ENGINES.md](ENGINES.md) per info engines
 
 ### Environment
 

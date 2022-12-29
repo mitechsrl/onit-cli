@@ -12,6 +12,13 @@ const config = {
             }
         },
         {
+            name: 'b',
+            config: {
+                type: 'boolean',
+                description: 'Run backends dev builds and serve the node app. Same as -t, but renamed for better comprehension'
+            }
+        },
+        {
             name: 'n',
             config: {
                 type: 'boolean',
@@ -51,6 +58,13 @@ const config = {
             config: {
                 type: 'boolean',
                 description: 'Run webpack only. The app will not be launched'
+            }
+        },
+        {
+            name: 'f',
+            config: {
+                type: 'boolean',
+                description: 'Run frontend dev builds only. Same as -w, but renamed for better comprehension'
             }
         },
         {
