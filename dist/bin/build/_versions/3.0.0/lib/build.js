@@ -57,8 +57,11 @@ async function runBuild(cwdPackageJson, buildTarget, onitConfigFile) {
     // launch frontend build. We need to select the correct engine based on project config
     // Eventually multiple engines are launched
     const frontendEngines = (0, onitConfigFileEngines_1.getConfigFileFrontendEngine)(onitConfigFile);
-    for (const engine of frontendEngines) {
-        switch (engine) {
+    for (const _key of Object.keys(frontendEngines)) {
+        const key = _key;
+        if (!frontendEngines[key])
+            return;
+        switch (key) {
             case 'nextjs': {
                 //launch nextjs build
                 await (0, nextjs_1.nextJsBuild)(onitConfigFile, cwdPackageJson, buildMode);
@@ -73,8 +76,11 @@ async function runBuild(cwdPackageJson, buildTarget, onitConfigFile) {
     }
     // launch backend server build. We need to selectthe correct engine based on project config
     const backendEngines = (0, onitConfigFileEngines_1.getConfigFileBackendEngine)(onitConfigFile);
-    for (const engine of backendEngines) {
-        switch (engine) {
+    for (const _key of Object.keys(backendEngines)) {
+        const key = _key;
+        if (!backendEngines[key])
+            return;
+        switch (key) {
             case 'lb4': {
                 await (0, tsc_1.runTsc)(onitConfigFile, cwdPackageJson);
                 break;

@@ -82,8 +82,11 @@ async function start(onitConfigFile, version, argv) {
         const parallelPromises = [];
         const _createFrontendPromises = (isFrontendRunOnly) => {
             const frontendEngines = (0, onitConfigFileEngines_1.getConfigFileFrontendEngine)(onitConfigFile);
-            frontendEngines.forEach(e => {
-                switch (e) {
+            Object.keys(frontendEngines).forEach((_key) => {
+                const key = _key;
+                if (!frontendEngines[key])
+                    return;
+                switch (key) {
                     case 'nextjs': {
                         // nextjs serve launches a 3rd party cli.
                         // adding it on serialPromises so we will launch it before all the other stuff
@@ -112,8 +115,11 @@ async function start(onitConfigFile, version, argv) {
         };
         const _createBackendPromises = () => {
             const backendEngines = (0, onitConfigFileEngines_1.getConfigFileBackendEngine)(onitConfigFile);
-            backendEngines.forEach(e => {
-                switch (e) {
+            Object.keys(backendEngines).forEach((_key) => {
+                const key = _key;
+                if (!backendEngines[key])
+                    return;
+                switch (key) {
                     case 'lb4': {
                         parallelPromises.push(() => {
                             logger_1.logger.log('Serving lb4...');

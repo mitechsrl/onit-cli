@@ -65,11 +65,15 @@ export declare type OnitConfigFileTranslate = {
     }[];
     languages?: string[];
 };
-export declare type OnitConfigFileEngineFrontend = 'onit-webpack' | 'nextjs';
-export declare type OnitConfigFileEngineBackend = 'lb4';
+export declare type OnitConfigFileEngineFrontend = {
+    [k in 'onit-webpack' | 'nextjs']?: boolean | GenericObject;
+};
+export declare type OnitConfigFileEngineBackend = {
+    [k in 'lb4']?: boolean | GenericObject;
+};
 export declare type OnitConfigFileEngine = {
-    frontend?: OnitConfigFileEngineFrontend[];
-    backend?: OnitConfigFileEngineBackend[];
+    frontend?: OnitConfigFileEngineFrontend;
+    backend?: OnitConfigFileEngineBackend;
 };
 export declare type OnitConfigFile = {
     json: {

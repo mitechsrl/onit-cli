@@ -92,12 +92,17 @@ export type OnitConfigFileTranslate = {
     languages?:string[]
 };
 
-export type OnitConfigFileEngineFrontend = 'onit-webpack' | 'nextjs';
-export type OnitConfigFileEngineBackend = 'lb4';
+// defines the frontend engines. The generic object values as true-is, but you can use it to configure
+// options for the engine (not now, set it for future uses). In nextjs as example you can add the "next directory" property (to be managed in the proper file)
+export type OnitConfigFileEngineFrontend = { [k in 'onit-webpack' | 'nextjs' ]?: boolean | GenericObject };
+
+// defines the frontend engines. The generic object values as true-is, but you can use it to configure
+// options for the engine 
+export type OnitConfigFileEngineBackend = { [k in 'lb4']?: boolean | GenericObject };
 
 export type OnitConfigFileEngine = {
-    frontend?: OnitConfigFileEngineFrontend[],
-    backend?: OnitConfigFileEngineBackend[],
+    frontend?: OnitConfigFileEngineFrontend,
+    backend?: OnitConfigFileEngineBackend
 
 };
 

@@ -24,7 +24,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 */
 
 import yargs from 'yargs';
-import { GenericObject, OnitConfigFile } from '../../../../types';
+import { GenericObject, OnitConfigFile, OnitConfigFileEngineBackend, OnitConfigFileEngineFrontend } from '../../../../types';
 import path from 'path';
 import fs from 'fs';
 import semver from 'semver';
@@ -88,8 +88,12 @@ export async function start(onitConfigFile: OnitConfigFile, version:string, argv
 
         const _createFrontendPromises = (isFrontendRunOnly: boolean) => {
             const frontendEngines = getConfigFileFrontendEngine(onitConfigFile);
-            frontendEngines.forEach(e => {
-                switch(e){
+            Object.keys(frontendEngines).forEach((_key: string) => {
+
+                const key = _key as keyof OnitConfigFileEngineFrontend;
+                if (!frontendEngines[key]) return;
+
+                switch(key){
                 case 'nextjs': {
                     // nextjs serve launches a 3rd party cli.
                     // adding it on serialPromises so we will launch it before all the other stuff
@@ -119,8 +123,12 @@ export async function start(onitConfigFile: OnitConfigFile, version:string, argv
 
         const _createBackendPromises = () => {
             const backendEngines = getConfigFileBackendEngine(onitConfigFile);
-            backendEngines.forEach(e => {
-                switch(e){
+            Object.keys(backendEngines).forEach((_key: string) => {
+
+                const key = _key as keyof OnitConfigFileEngineBackend;
+                if (!backendEngines[key]) return;
+                
+                switch(key){
                 case 'lb4': {
                     parallelPromises.push(() => {
                         logger.log('Serving lb4...');
@@ -129,6 +137,7 @@ export async function start(onitConfigFile: OnitConfigFile, version:string, argv
                     break;
                 }
                 }
+                
             });
         };
 

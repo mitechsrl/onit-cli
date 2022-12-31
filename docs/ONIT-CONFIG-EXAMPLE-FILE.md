@@ -48,9 +48,18 @@ module.exports = {
      * Select th engines to be run
     */
     engines: {
-        backend: ['lb4'], // on backend only lb4 is available currently. If omiteed, 'lb4' is used asdefault
-        frontend: ['onit-webpack','nextjs'] // on frontend onit-webpack defines the legacy mode, where nexjs defines to use the nextjs engine. Defaults to 'onit-webpack'. Multiple engines can be set.
+        backend: {
+            // on backend only lb4 is available currently. If omiteed, 'lb4:true' is used as default
+            'lb4': true, 
+        }
+        frontend: {
+            // on frontend onit-webpack defines the legacy mode, where nexjs defines to use the nextjs engine.
+            // Defaults to 'onit-webpack'. Multiple engines can be set at once.
+            'onit-webpack':true,
+            'nextjs':true
+        }
     }
+    
     /**
      * Serve configuration
      */

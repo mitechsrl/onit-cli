@@ -25,7 +25,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 import { logger } from '../../../../../lib/logger';
 import { getConfigFileBackendEngine, getConfigFileFrontendEngine } from '../../../../../lib/onitConfigFileEngines';
-import { GenericObject, OnitConfigFile, OnitConfigFileBuildTarget } from '../../../../../types';
+import { GenericObject, OnitConfigFile, OnitConfigFileBuildTarget, OnitConfigFileEngineBackend, OnitConfigFileEngineFrontend } from '../../../../../types';
 import { runClean } from '../../2.0.0/lib/clean';
 import { runTsc } from '../../2.0.0/lib/tsc';
 import { runWebpack } from '../../2.0.0/lib/webpack';
@@ -63,8 +63,12 @@ export async function runBuild(
     // Eventually multiple engines are launched
     const frontendEngines = getConfigFileFrontendEngine(onitConfigFile);
 
-    for(const engine of frontendEngines){
-        switch(engine){
+    for (const _key of Object.keys(frontendEngines)){
+
+        const key = _key as keyof OnitConfigFileEngineFrontend;
+        if (!frontendEngines[key]) return;
+
+        switch(key){
         case 'nextjs': {
             //launch nextjs build
             await nextJsBuild(onitConfigFile, cwdPackageJson, buildMode);
@@ -80,8 +84,12 @@ export async function runBuild(
 
     // launch backend server build. We need to selectthe correct engine based on project config
     const backendEngines = getConfigFileBackendEngine(onitConfigFile);
-    for(const engine of backendEngines){
-        switch(engine){
+    for (const _key of Object.keys(backendEngines)){
+
+        const key = _key as keyof OnitConfigFileEngineBackend;
+        if (!backendEngines[key]) return;
+
+        switch(key){
         case 'lb4': {
             await runTsc(onitConfigFile, cwdPackageJson);
             break;

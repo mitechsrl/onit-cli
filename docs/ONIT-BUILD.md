@@ -13,6 +13,8 @@ module.exports = {
 
     copyFiles: {...},
     
+    engines: {},
+
     build:{
         version: String, versione (in formato stile npm) del builder richiesto.      
         targets: Object, configurazione targets di build. Deve essere definito almeno un build target. Vedi sezione **build target**
@@ -26,6 +28,9 @@ Vedi [link in ONIT-SERVE.md](./ONIT-SERVE.md)
 
 ### Copy files
 Vedi [COPY-FILES.md](COPY-FILES.md) per info su copia files in fase di serve
+
+### Engines
+Vedi [ENGINES.md](ENGINES.md) per info engines
 
 ##### Export
 
