@@ -33,6 +33,9 @@ Here's the list of main commands. For further docs, see the command-specific pag
 - [onit labels](ONIT-LABELS.md), labels management utility
 - [onit create](ONIT-CREATE.md), artifact creation utilities
 
+To create new commands, see [How to create a new command](CREATE-COMMAND.md)
+
+
 ## onit.config.js file
 Commands **serve**, **test** and **build** requires a configuration file.
 
