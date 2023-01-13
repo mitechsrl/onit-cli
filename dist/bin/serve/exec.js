@@ -29,11 +29,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const logger_1 = require("../../lib/logger");
 const onitFileLoader_1 = require("../../lib/onitFileLoader");
+const types_1 = require("../../types");
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const max_satisfying_1 = __importDefault(require("semver/ranges/max-satisfying"));
 const exec = async (argv) => {
-    var _a, _b;
+    var _a, _b, _c;
     try {
         // check for manual serve file specifed
         const manualConfigFile = (_a = argv.c) !== null && _a !== void 0 ? _a : null;
@@ -67,9 +68,12 @@ const exec = async (argv) => {
     }
     catch (e) {
         logger_1.logger.log('');
-        logger_1.logger.verbose(e.message);
-        logger_1.logger.error('Serve aborted');
-        throw e;
+        if (e.message) {
+            logger_1.logger.error(e.message);
+        }
+        // print out stack trace only in verbose mode
+        logger_1.logger.verbose(JSON.stringify((_c = e.stack) !== null && _c !== void 0 ? _c : e, null, 4));
+        throw new types_1.StringError('Serve aborted');
     }
 };
 exports.default = exec;

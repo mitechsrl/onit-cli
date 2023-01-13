@@ -182,7 +182,7 @@ export async function start(onitConfigFile: OnitConfigFile, version:string, argv
     }
 
     // bye!
-    logger.error('Exiting serve, bye! :wave:');
+    logger.success('Exiting serve, bye! :wave:');
     // eslint-disable-next-line no-process-exit
     process.exit(0);
 }

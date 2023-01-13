@@ -26,7 +26,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 import yargs from 'yargs';
 import { logger } from '../../lib/logger';
 import { onitFileLoader } from '../../lib/onitFileLoader';
-import { CommandExecFunction } from '../../types';
+import { CommandExecFunction, StringError } from '../../types';
 import fs from 'fs';
 import path from 'path';
 import maxSatisfying from 'semver/ranges/max-satisfying';
@@ -72,9 +72,12 @@ const exec: CommandExecFunction = async (argv: yargs.ArgumentsCamelCase<unknown>
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
         logger.log('');
-        logger.verbose(e.message);
-        logger.error('Serve aborted');
-        throw e;
+        if (e.message){
+            logger.error(e.message);
+        }
+        // print out stack trace only in verbose mode
+        logger.verbose(JSON.stringify(e.stack ?? e, null, 4));
+        throw new StringError('Serve aborted');
     }
 };
 
