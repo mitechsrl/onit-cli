@@ -12,7 +12,7 @@
                 "<node_internals>/**"
             ],
             "runtimeExecutable": "node",
-            "runtimeArgs":["./dist/index.js","add-here-your-param"],
+            "runtimeArgs":["./dist/index.js"],
         },
        
     ]
