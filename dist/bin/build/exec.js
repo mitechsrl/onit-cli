@@ -29,11 +29,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const logger_1 = require("../../lib/logger");
 const onitFileLoader_1 = require("../../lib/onitFileLoader");
-const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
-const max_satisfying_1 = __importDefault(require("semver/ranges/max-satisfying"));
+const loadVersionDir_1 = require("../../lib/loadVersionDir");
 const exec = async (argv) => {
-    var _a, _b;
+    var _a, _b, _c;
     try {
         // check for manual build file specifed
         const manualConfigFile = (_a = argv.c) !== null && _a !== void 0 ? _a : null;
@@ -44,24 +43,17 @@ const exec = async (argv) => {
             throw new Error('Build is not available. Check your onit config file at <build> property.');
         }
         // lock to the required builder version or get the most recent one
-        const requiredVersion = (_b = onitConfigFile.json.build.version) !== null && _b !== void 0 ? _b : '*';
+        const requiredVersion = (_c = (_b = onitConfigFile.json.build.version) !== null && _b !== void 0 ? _b : onitConfigFile.json.version) !== null && _c !== void 0 ? _c : '*';
         // get a list of the available versions (each dir describe one version)
-        const availableVersions = fs_1.default.readdirSync(path_1.default.join(__dirname, './_versions'));
-        // use npm semver to select the most recent usable version
-        const version = (0, max_satisfying_1.default)(availableVersions, requiredVersion);
-        if (!version) {
-            throw new Error('No compatible build version found for required ' + requiredVersion + '. Check your onit config file build.version value.');
-        }
-        // version found: Load that builder and use it.
-        logger_1.logger.info('Using build version ' + version);
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const build = require(path_1.default.join(__dirname, './_versions/' + version + '/index.js'));
+        const versionsDir = path_1.default.join(__dirname, './_versions');
+        // load a serve based on required version
+        const build = (0, loadVersionDir_1.loadVersionDir)(versionsDir, requiredVersion, 'serve');
         // autoset the hardcoded params
         /*
         if (Array.isArray(onitConfigFile.json.build.params)) {
             params.push(...onitConfigFile.json.build.params);
         }*/
-        await build.default(onitConfigFile, argv);
+        await build.required.default(onitConfigFile, argv);
     }
     catch (e) {
         logger_1.logger.error('Build aborted');

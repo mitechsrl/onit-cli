@@ -30,11 +30,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const logger_1 = require("../../lib/logger");
 const onitFileLoader_1 = require("../../lib/onitFileLoader");
 const types_1 = require("../../types");
-const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
-const max_satisfying_1 = __importDefault(require("semver/ranges/max-satisfying"));
+const loadVersionDir_1 = require("../../lib/loadVersionDir");
 const exec = async (argv) => {
-    var _a, _b, _c;
+    var _a, _b, _c, _d;
     try {
         // check for manual serve file specifed
         const manualConfigFile = (_a = argv.c) !== null && _a !== void 0 ? _a : null;
@@ -45,25 +44,17 @@ const exec = async (argv) => {
             throw new Error('Serve is not available. Check your onit config file at <serve> property.');
         }
         // lock to the required builder version or get the most recent one
-        const requiredVersion = (_b = onitConfigFile.json.serve.version) !== null && _b !== void 0 ? _b : '*';
+        const requiredVersion = (_c = (_b = onitConfigFile.json.serve.version) !== null && _b !== void 0 ? _b : onitConfigFile.json.version) !== null && _c !== void 0 ? _c : '*';
         // get a list of the available versions (each dir describe one version)
         const versionsDir = path_1.default.join(__dirname, './_versions');
-        const availableVersions = fs_1.default.readdirSync(versionsDir);
-        // use npm semver to select the most recent usable version
-        const version = (0, max_satisfying_1.default)(availableVersions, requiredVersion);
-        if (!version) {
-            throw new Error('No compatible serve version found for required ' + requiredVersion + '. Check your onit config file serve.version value.');
-        }
-        // version found: Load that builder and use it.
-        logger_1.logger.info('Using serve version ' + version);
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const serve = require(path_1.default.join(versionsDir, `./${version}/index.js`));
+        // load a serve based on required version
+        const serve = (0, loadVersionDir_1.loadVersionDir)(versionsDir, requiredVersion, 'serve');
         // autoset the hardcoded params
         /*
         if (Array.isArray(onitConfigFile.json.serve.params)) {
             params.push(...onitConfigFile.json.serve.params);
         }*/
-        await serve.start(onitConfigFile, version, argv);
+        await serve.required.start(onitConfigFile, serve.version, argv);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }
     catch (e) {
@@ -72,7 +63,7 @@ const exec = async (argv) => {
             logger_1.logger.error(e.message);
         }
         // print out stack trace only in verbose mode
-        logger_1.logger.verbose(JSON.stringify((_c = e.stack) !== null && _c !== void 0 ? _c : e, null, 4));
+        logger_1.logger.verbose(JSON.stringify((_d = e.stack) !== null && _d !== void 0 ? _d : e, null, 4));
         throw new types_1.StringError('Serve aborted');
     }
 };
