@@ -12,6 +12,7 @@ const AzureTranslator_1 = require("./AzureTranslator");
 const path_1 = require("path");
 const supportedTranslationProviders_1 = require("./supportedTranslationProviders");
 const GoogleTranslator_1 = require("./GoogleTranslator");
+const lodash_1 = __importDefault(require("lodash"));
 /**
  * Some translators does not handle very well "%s". This fixes them.
  *
@@ -30,7 +31,7 @@ function fixPercentS(str) {
  * @param translator
  * @returns array of new OnitLabelConfig.
  */
-async function translateLabelSet(labels, languageCodes, translator) {
+async function translateLabelSet(labels, languageCodes, translator, translate) {
     const finalLabelSet = [];
     // group them by page+label
     const groups = labels.reduce((acc, item) => {
@@ -58,6 +59,16 @@ async function translateLabelSet(labels, languageCodes, translator) {
         // no entry avilable??
         if (!original)
             continue;
+        // dont translate the skipped ones
+        if (isSkipped(original, translate)) {
+            missingLanguages.forEach(langCode => {
+                const newLabel = Object.assign({}, original);
+                newLabel.language = langCode;
+                finalLabelSet.push(newLabel);
+            });
+            continue;
+        }
+        original = replaceSynonm(original, translate);
         logger_1.logger.log(`Translating <${original.text}> to ${missingLanguages.join(', ')}`);
         // launch the trnslator function
         // this will translate text in the missing languages
@@ -88,37 +99,57 @@ function buildSortKey(v) {
  * @param translate
  * @returns
  */
-function replaceSynonm(labels, translate) {
-    if (!(translate === null || translate === void 0 ? void 0 : translate.synomns))
-        return labels;
-    labels.forEach(l => {
-        const pieces = l.text.split(' ').map(p => {
-            var _a;
-            const s = (_a = translate.synomns) === null || _a === void 0 ? void 0 : _a.find(s => s.word === p);
-            if (!s)
-                return p;
-            return s.syn;
-        });
-        l.text = pieces.join(' ');
+function replaceSynonm(label, translate) {
+    label = lodash_1.default.cloneDeep(label);
+    // yup. Hardcoded synonms.
+    // These are here to be retrocompatible with another tool used before.
+    const synonmsFromConfigFile = ((translate === null || translate === void 0 ? void 0 : translate.synomns) && Array.isArray(translate.synomns)) ? translate === null || translate === void 0 ? void 0 : translate.synomns : [];
+    const synonms = [...synonmsFromConfigFile,
+        { 'word': 'collo', 'syn': 'pacco' },
+        { 'word': 'colli', 'syn': 'pacchi' },
+        { 'word': 'bolla', 'syn': 'bolletta' },
+        { 'word': 'bolle', 'syn': 'bollette' },
+        { 'word': 'mezzo', 'syn': 'veicolo' },
+        { 'word': 'mezzi', 'syn': 'veicoli' },
+        { 'word': 'ritiro', 'syn': 'raccolta' },
+        { 'word': 'ritiri', 'syn': 'raccolte' },
+        { 'word': 'errore', 'syn': 'error' } // or it will translated as "mitake"
+    ];
+    const pieces = label.text.split(' ').map(p => {
+        const s = synonms.find(s => s.word.toLowerCase() === p.toLowerCase());
+        if (!s)
+            return p;
+        // trie to maintain upper/lowecase chars
+        if (lodash_1.default.upperFirst(p) === p)
+            return lodash_1.default.upperFirst(s.syn);
+        if (lodash_1.default.lowerCase(p) === p)
+            return lodash_1.default.lowerCase(s.syn);
+        if (lodash_1.default.upperCase(p) === p)
+            return lodash_1.default.upperCase(s.syn);
+        return s.syn;
     });
-    return labels;
+    label.text = pieces.join(' ');
+    return label;
 }
 /**
- * Filter out from labels array the ones whose text matches one of the "skip" string from translate config.
  *
  * @param labels
  * @param translate
  * @returns
  */
-function removeSkipped(labels, translate) {
-    if (!(translate === null || translate === void 0 ? void 0 : translate.skip))
-        return labels;
-    if (translate.skip.length === 0)
-        return labels;
-    return labels.filter(l => {
-        var _a;
-        return !((_a = translate.skip) === null || _a === void 0 ? void 0 : _a.includes(l.text));
-    });
+function isSkipped(label, translate) {
+    const skipFromConfigFile = ((translate === null || translate === void 0 ? void 0 : translate.skip) && Array.isArray(translate === null || translate === void 0 ? void 0 : translate.skip)) ? translate.skip : [];
+    // hardcoded values just to be compatible with a previous used tool
+    const skip = [
+        ...skipFromConfigFile,
+        'Error',
+        'Errore',
+        'Alert',
+        'Nz',
+        'CC'
+    ];
+    const lcSkip = skip.map(s => s.toLowerCase());
+    return lcSkip.includes(label.text.toLowerCase());
 }
 /**
  * Create  translator class instance
@@ -146,11 +177,9 @@ function createTranslatorInstance(serviceConfig) {
  */
 async function processFile(file, onitConfigFile, translator, languageCodes) {
     logger_1.logger.log('Processing ' + file.filename);
-    let srcLabels = file.content.labels;
-    srcLabels = replaceSynonm(srcLabels, onitConfigFile.json.translate);
-    srcLabels = removeSkipped(srcLabels, onitConfigFile.json.translate);
+    const srcLabels = file.content.labels;
     // launch translation on this file label set
-    const labels = await translateLabelSet(srcLabels, languageCodes, translator);
+    const labels = await translateLabelSet(srcLabels, languageCodes, translator, onitConfigFile.json.translate);
     // do we have new translations??
     if (labels.length > 0) {
         // yes, add them to file              
@@ -175,7 +204,7 @@ async function processFile(file, onitConfigFile, translator, languageCodes) {
 async function translate(onitConfigFile, serviceConfig) {
     var _a, _b;
     // get the languages to translate to. A minimal default set is used
-    const languageCodes = (_b = (_a = onitConfigFile.json.translate) === null || _a === void 0 ? void 0 : _a.languages) !== null && _b !== void 0 ? _b : ['it_IT', 'en_GB'];
+    const languageCodes = (_b = (_a = onitConfigFile.json.translate) === null || _a === void 0 ? void 0 : _a.languages) !== null && _b !== void 0 ? _b : ['en_GB', 'de_DE', 'fr_FR', 'es_ES'];
     const dir = (0, path_1.dirname)(onitConfigFile.sources[0]);
     // et all the labels files and their content
     const files = await (0, scanLabelsFiles_1.scanLabelsFiles)(dir);
