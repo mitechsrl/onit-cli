@@ -66,7 +66,7 @@ export async function runBuild(
     for (const _key of Object.keys(frontendEngines)){
 
         const key = _key as keyof OnitConfigFileEngineFrontend;
-        if (!frontendEngines[key]) return;
+        if (!frontendEngines[key]) continue;
 
         switch(key){
         case 'nextjs': {
@@ -87,7 +87,7 @@ export async function runBuild(
     for (const _key of Object.keys(backendEngines)){
 
         const key = _key as keyof OnitConfigFileEngineBackend;
-        if (!backendEngines[key]) return;
+        if (!backendEngines[key]) continue;
 
         switch(key){
         case 'lb4': {

@@ -60,7 +60,7 @@ async function runBuild(cwdPackageJson, buildTarget, onitConfigFile) {
     for (const _key of Object.keys(frontendEngines)) {
         const key = _key;
         if (!frontendEngines[key])
-            return;
+            continue;
         switch (key) {
             case 'nextjs': {
                 //launch nextjs build
@@ -79,7 +79,7 @@ async function runBuild(cwdPackageJson, buildTarget, onitConfigFile) {
     for (const _key of Object.keys(backendEngines)) {
         const key = _key;
         if (!backendEngines[key])
-            return;
+            continue;
         switch (key) {
             case 'lb4': {
                 await (0, tsc_1.runTsc)(onitConfigFile, cwdPackageJson);
