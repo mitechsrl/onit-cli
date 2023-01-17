@@ -26,10 +26,11 @@ OTHER DEALINGS IN THE SOFTWARE.
 import yargs from 'yargs';
 import { logger } from '../../lib/logger';
 import { onitFileLoader } from '../../lib/onitFileLoader';
-import { CommandExecFunction } from '../../types';
+import { CommandExecFunction, StringError } from '../../types';
 import fs from 'fs';
 import path from 'path';
 import maxSatisfying from 'semver/ranges/max-satisfying';
+import { loadVersionDir } from '../../lib/loadVersionDir';
 
 const exec: CommandExecFunction = async (argv: yargs.ArgumentsCamelCase<unknown>) => {
 
@@ -45,36 +46,29 @@ const exec: CommandExecFunction = async (argv: yargs.ArgumentsCamelCase<unknown>
         }
 
         // lock to the required builder version or get the most recent one
-        const requiredVersion = onitConfigFile.json.serve.version ?? '*';
+        const requiredVersion = onitConfigFile.json.serve.version ?? onitConfigFile.json.version ?? '*';
 
         // get a list of the available versions (each dir describe one version)
         const versionsDir = path.join(__dirname, './_versions');
-        const availableVersions = fs.readdirSync(versionsDir);
-
-        // use npm semver to select the most recent usable version
-        const version = maxSatisfying(availableVersions, requiredVersion);
-        if (!version){
-            throw new Error('No compatible serve version found for required ' + requiredVersion + '. Check your onit config file serve.version value.');
-        }
-
-        // version found: Load that builder and use it.
-        logger.info('Using serve version ' + version);
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const serve = require(path.join(versionsDir, `./${version}/index.js`));
-
+        // load a serve based on required version
+        const serve = loadVersionDir(versionsDir, requiredVersion, 'serve');
+    
         // autoset the hardcoded params
         /*
         if (Array.isArray(onitConfigFile.json.serve.params)) {
             params.push(...onitConfigFile.json.serve.params);
         }*/
 
-        await serve.start(onitConfigFile, version, argv);
+        await serve.required.start(onitConfigFile, serve.version, argv);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
         logger.log('');
-        logger.verbose(e.message);
-        logger.error('Serve aborted');
-        throw e;
+        if (e.message){
+            logger.error(e.message);
+        }
+        // print out stack trace only in verbose mode
+        logger.verbose(JSON.stringify(e.stack ?? e, null, 4));
+        throw new StringError('Serve aborted');
     }
 };
 

@@ -10,7 +10,7 @@ export type OnitConfigFileServeOnFirstTscCompilationSuccess = {
 };
 
 export type OnitConfigFileServe = {
-    // serve version
+    // serve version. Optional, if omited <parent>.version is checked 
     version?:string,
     // optional hsrdcode params
     params?: string[],
@@ -78,7 +78,7 @@ export type OnitConfigFileBuildTarget = {
     afterSteps?:OnitConfigFileBuildExtraStep[]
 };
 export type OnitConfigFileBuild = {
-    // serve version
+    // serve version. Optional, if omited <parent>.version is checked 
     version?:string,
     targets?: { [k:string]:OnitConfigFileBuildTarget }
 };
@@ -109,6 +109,9 @@ export type OnitConfigFileEngine = {
 export type OnitConfigFile = {
 
     json: {
+        // serve&build version. Optional, if omitted '*' is used
+        version?:string,
+
         // is this a onit component?
         component?: boolean,
         // copy files after tsc

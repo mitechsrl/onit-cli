@@ -7,6 +7,7 @@ import { Translator } from './Translator';
 import { dirname }from 'path';
 import { supportedTranslationProviders } from './supportedTranslationProviders';
 import { GoogleTranslator } from './GoogleTranslator';
+import _ from 'lodash';
 
 type OnitLabelConfig = {
     'language': string,
@@ -34,7 +35,12 @@ function fixPercentS(str:string){
  * @param translator 
  * @returns array of new OnitLabelConfig. 
  */
-async function translateLabelSet(labels: OnitLabelConfig[], languageCodes: string[], translator: Translator): Promise<OnitLabelConfig[]>{
+async function translateLabelSet(
+    labels: OnitLabelConfig[], 
+    languageCodes: string[], 
+    translator: Translator,
+    translate?: OnitConfigFileTranslate
+): Promise<OnitLabelConfig[]>{
     
     const finalLabelSet: OnitLabelConfig[] = [];
 
@@ -62,6 +68,18 @@ async function translateLabelSet(labels: OnitLabelConfig[], languageCodes: strin
         if (!original) original = group[0];
         // no entry avilable??
         if (!original) continue;
+        
+        // dont translate the skipped ones
+        if (isSkipped(original, translate)){
+            missingLanguages.forEach(langCode => {
+                const newLabel = Object.assign({}, original);
+                newLabel.language = langCode;
+                finalLabelSet.push(newLabel);
+            });
+            continue;
+        }
+        
+        original = replaceSynonm(original, translate);
 
         logger.log(`Translating <${original.text}> to ${missingLanguages.join(', ')}`);
 
@@ -99,34 +117,62 @@ function buildSortKey(v: OnitLabelConfig) {
  * @param translate 
  * @returns 
  */
-function replaceSynonm(labels: OnitLabelConfig[], translate?: OnitConfigFileTranslate){
-    if (!translate?.synomns) return labels;
+function replaceSynonm(label: OnitLabelConfig, translate?: OnitConfigFileTranslate){
+    label = _.cloneDeep(label);
+    // yup. Hardcoded synonms.
+    // These are here to be retrocompatible with another tool used before.
+    const synonmsFromConfigFile = (translate?.synomns && Array.isArray(translate.synomns)) ? translate?.synomns : [];
+    const synonms = [...synonmsFromConfigFile,
+        { 'word':'collo','syn':'pacco' },
+        { 'word':'colli','syn':'pacchi' },
+        { 'word':'bolla','syn':'bolletta' },
+        { 'word':'bolle','syn':'bollette' },
+        { 'word':'mezzo','syn':'veicolo' },
+        { 'word':'mezzi','syn':'veicoli' },
+        { 'word':'ritiro','syn':'raccolta' },
+        { 'word':'ritiri','syn':'raccolte' },
+        { 'word':'errore', 'syn':'error' } // or it will translated as "mitake"
+    ];
     
-    labels.forEach(l => {
-        const pieces = l.text.split(' ').map(p => {
-            const s = translate.synomns?.find(s => s.word === p);
-            if (!s) return p;
-            return s.syn;
-        });
-        l.text = pieces.join(' ');
+    const pieces = label.text.split(' ').map(p => {
+        const s = synonms.find(s => s.word.toLowerCase() === p.toLowerCase());
+        if (!s) return p;
+
+        // trie to maintain upper/lowecase chars
+        if (_.upperFirst(p) === p) return _.upperFirst(s.syn);
+        if (_.lowerCase(p) === p) return _.lowerCase(s.syn);
+        if (_.upperCase(p) === p) return _.upperCase(s.syn);
+
+        return s.syn;
     });
-    return labels;
+    label.text = pieces.join(' ');
+    
+    return label;
 }
 
 /**
- * Filter out from labels array the ones whose text matches one of the "skip" string from translate config.
  * 
  * @param labels 
  * @param translate 
  * @returns 
  */
-function removeSkipped(labels: OnitLabelConfig[], translate?: OnitConfigFileTranslate){
-    if (!translate?.skip) return labels;
-    if (translate.skip.length === 0) return labels;
+function isSkipped(label: OnitLabelConfig, translate?: OnitConfigFileTranslate){
 
-    return labels.filter(l => {
-        return !(translate.skip?.includes(l.text));
-    });
+    const skipFromConfigFile = (translate?.skip && Array.isArray(translate?.skip)) ? translate.skip: [];
+
+    // hardcoded values just to be compatible with a previous used tool
+    const skip = [
+        ...skipFromConfigFile,
+        'Error',
+        'Errore',
+        'Alert',
+        'Nz',
+        'CC'
+    ];
+
+    const lcSkip = skip.map(s => s.toLowerCase());
+    return lcSkip.includes(label.text.toLowerCase());
+    
 }
 
 /**
@@ -156,13 +202,10 @@ function createTranslatorInstance(serviceConfig: GenericObject){
  */
 async function processFile(file: LabelFileInfo, onitConfigFile: OnitConfigFile, translator: Translator, languageCodes: string[]){
     logger.log('Processing '+file.filename);
-    let srcLabels = file.content.labels;
-
-    srcLabels = replaceSynonm(srcLabels, onitConfigFile.json.translate);
-    srcLabels = removeSkipped(srcLabels, onitConfigFile.json.translate);
+    const srcLabels = file.content.labels;
 
     // launch translation on this file label set
-    const labels = await translateLabelSet(srcLabels, languageCodes, translator);
+    const labels = await translateLabelSet(srcLabels, languageCodes, translator, onitConfigFile.json.translate);
 
     // do we have new translations??
     if (labels.length>0){
@@ -190,7 +233,7 @@ async function processFile(file: LabelFileInfo, onitConfigFile: OnitConfigFile, 
  */
 export async function translate(onitConfigFile: OnitConfigFile, serviceConfig: GenericObject){
     // get the languages to translate to. A minimal default set is used
-    const languageCodes = onitConfigFile.json.translate?.languages ?? ['it_IT','en_GB'];
+    const languageCodes = onitConfigFile.json.translate?.languages ?? ['en_GB','de_DE','fr_FR','es_ES'];
     const dir = dirname(onitConfigFile.sources[0]);
     // et all the labels files and their content
     const files = await scanLabelsFiles(dir);

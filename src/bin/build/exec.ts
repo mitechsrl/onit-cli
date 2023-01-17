@@ -30,6 +30,7 @@ import { CommandExecFunction } from '../../types';
 import fs from 'fs';
 import path from 'path';
 import maxSatisfying from 'semver/ranges/max-satisfying';
+import { loadVersionDir } from '../../lib/loadVersionDir';
 
 const exec: CommandExecFunction = async (argv: yargs.ArgumentsCamelCase<unknown>) => {
 
@@ -45,22 +46,12 @@ const exec: CommandExecFunction = async (argv: yargs.ArgumentsCamelCase<unknown>
             throw new Error('Build is not available. Check your onit config file at <build> property.');
         }
         // lock to the required builder version or get the most recent one
-        const requiredVersion = onitConfigFile.json.build.version ?? '*';
+        const requiredVersion = onitConfigFile.json.build.version ?? onitConfigFile.json.version ?? '*';
 
         // get a list of the available versions (each dir describe one version)
-        const availableVersions = fs.readdirSync(path.join(__dirname, './_versions'));
-
-        // use npm semver to select the most recent usable version
-        const version = maxSatisfying(availableVersions, requiredVersion);
-
-        if (!version){
-            throw new Error('No compatible build version found for required ' + requiredVersion + '. Check your onit config file build.version value.');
-        }
-
-        // version found: Load that builder and use it.
-        logger.info('Using build version ' + version);
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const build = require(path.join(__dirname, './_versions/' + version + '/index.js'));
+        const versionsDir = path.join(__dirname, './_versions');
+        // load a serve based on required version
+        const build = loadVersionDir(versionsDir, requiredVersion, 'serve');
 
         // autoset the hardcoded params
         /*
@@ -68,7 +59,7 @@ const exec: CommandExecFunction = async (argv: yargs.ArgumentsCamelCase<unknown>
             params.push(...onitConfigFile.json.build.params);
         }*/
 
-        await build.default(onitConfigFile, argv);
+        await build.required.default(onitConfigFile, argv);
     } catch (e) {
         logger.error('Build aborted');
         throw e;

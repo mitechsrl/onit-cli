@@ -77,6 +77,7 @@ export declare type OnitConfigFileEngine = {
 };
 export declare type OnitConfigFile = {
     json: {
+        version?: string;
         component?: boolean;
         copyFiles?: OnitConfigFileCopyFile;
         reactPaths?: string[];

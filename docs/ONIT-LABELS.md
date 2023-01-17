@@ -41,7 +41,7 @@ The translation tool needs a configuration object in your **onit.config.js file*
         skip: [
             'Error'
         ],
-        // destination language codes
-        languages:['de_DE','fr_FR']
+        // destination language codes. Default to ['en_GB','de_DE','fr_FR','es_ES']
+        languages: ['de_DE','fr_FR']
     }
 }
