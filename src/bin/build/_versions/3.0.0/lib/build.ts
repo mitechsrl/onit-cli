@@ -82,7 +82,7 @@ export async function runBuild(
         }
     }
 
-    // launch backend server build. We need to selectthe correct engine based on project config
+    // launch backend server build. We need to select the correct engine based on project config
     const backendEngines = getConfigFileBackendEngine(onitConfigFile);
     for (const _key of Object.keys(backendEngines)){
 

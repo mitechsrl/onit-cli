@@ -14,6 +14,7 @@ exports.cli = yargs_1.default.scriptName('onit')
     .option('h', { alias: 'help' })
     // THose are global parameters valid everywhere
     .option('verbose', { describe: 'Enable verbose log', type: 'boolean' })
+    .option('nerd', { hidden: true })
     .option('log-to-file', { describe: 'Save output to log file', type: 'boolean' })
     .version(false)
     .command('$0', '', (yargs) => {

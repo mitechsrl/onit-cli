@@ -4,5 +4,7 @@ export declare const cli: yargs.Argv<{
 } & {
     verbose: boolean | undefined;
 } & {
+    nerd: unknown;
+} & {
     "log-to-file": boolean | undefined;
 }>;

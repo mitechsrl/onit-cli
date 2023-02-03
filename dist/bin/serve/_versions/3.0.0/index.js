@@ -154,7 +154,7 @@ async function start(onitConfigFile, version, argv) {
         // launch all parallelPromises together
         await Promise.all(parallelPromises.map(p => p()));
     };
-    // launche the serve helper functin
+    // launch the serve helper functin
     await _s();
     // shutdown pm2 if needed
     if (launchedCount > 0) {
@@ -164,7 +164,7 @@ async function start(onitConfigFile, version, argv) {
     // bye!
     logger_1.logger.success('Exiting serve, bye! :wave:');
     // eslint-disable-next-line no-process-exit
-    process.exit(0);
+    // process.exit(0);
 }
 exports.start = start;
 //# sourceMappingURL=index.js.map

@@ -100,8 +100,8 @@ async function tscWatchAndRun(onitConfigFile, cwdPackageJson, argv) {
             const onFilesCopied = () => {
                 logger_1.logger.info('Files scan & copy completed');
                 if (exitAfterTsc) {
-                    // eslint-disable-next-line no-process-exit
-                    process.exit(0);
+                    resolve();
+                    return;
                 }
                 const _subProcesses = lodash_1.default.get(onitConfigFile, 'json.serve.onFirstTscCompilationSuccess', []);
                 _subProcesses.forEach(sp => {
@@ -127,8 +127,8 @@ async function tscWatchAndRun(onitConfigFile, cwdPackageJson, argv) {
         watch.on('compile_errors', () => {
             logger_1.logger.log('Compilation errors');
             if (exitAfterTsc) {
-                // eslint-disable-next-line no-process-exit
-                process.exit(-1);
+                resolve();
+                return;
             }
         });
         // start the watcher. adding --noClear because it's annoying that tsc clear the console

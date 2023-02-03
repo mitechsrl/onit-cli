@@ -104,8 +104,8 @@ export async function tscWatchAndRun(onitConfigFile: OnitConfigFile, cwdPackageJ
                 logger.info('Files scan & copy completed');
 
                 if (exitAfterTsc) {
-                    // eslint-disable-next-line no-process-exit
-                    process.exit(0);
+                    resolve();
+                    return;
                 }
                 const _subProcesses: OnitConfigFileServeOnFirstTscCompilationSuccess[] = _.get(onitConfigFile, 'json.serve.onFirstTscCompilationSuccess', []);
                 _subProcesses.forEach(sp => {
@@ -136,8 +136,8 @@ export async function tscWatchAndRun(onitConfigFile: OnitConfigFile, cwdPackageJ
         watch.on('compile_errors', () => {
             logger.log('Compilation errors');
             if (exitAfterTsc) {
-                // eslint-disable-next-line no-process-exit
-                process.exit(-1);
+                resolve();
+                return;
             }
         });
 

@@ -26,6 +26,7 @@ import yargs from 'yargs';
 import fs from 'fs';
 import { closeOutputRedirection, setupOutputRedirection } from './lib/outputRedirection';
 import { npmVersionCheck } from './lib/npm';
+import { isNerd, yourScriptHasBeenTerminated } from './lib/nerd';
 
 // generic check for log to file.
 const redirectOutput = process.argv.find(p => p === '--log-to-file');
@@ -85,6 +86,7 @@ function recourseRegisterCommand(parentYargs: yargs.Argv, commandConfig: ScanCom
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             .catch((e:any) => {
                 hadError = true;
+                console.error('sssssssssssssss')
                 errorHandler(e, argv);
                 
             })
@@ -92,6 +94,9 @@ function recourseRegisterCommand(parentYargs: yargs.Argv, commandConfig: ScanCom
                 if (redirectOutput) return closeOutputRedirection();
             })
             .then(() => {
+                if (isNerd){
+                    yourScriptHasBeenTerminated();
+                }
                 process.exit(hadError ? -1: 0);
             });
     });

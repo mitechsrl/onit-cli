@@ -26,6 +26,7 @@ const main_1 = require("./bin/main");
 const fs_1 = __importDefault(require("fs"));
 const outputRedirection_1 = require("./lib/outputRedirection");
 const npm_1 = require("./lib/npm");
+const nerd_1 = require("./lib/nerd");
 // generic check for log to file.
 const redirectOutput = process.argv.find(p => p === '--log-to-file');
 function recourseRegisterCommand(parentYargs, commandConfig) {
@@ -77,6 +78,7 @@ function recourseRegisterCommand(parentYargs, commandConfig) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             .catch((e) => {
             hadError = true;
+            console.error('sssssssssssssss');
             (0, errorHandler_1.errorHandler)(e, argv);
         })
             .then(() => {
@@ -84,6 +86,9 @@ function recourseRegisterCommand(parentYargs, commandConfig) {
                 return (0, outputRedirection_1.closeOutputRedirection)();
         })
             .then(() => {
+            if (nerd_1.isNerd) {
+                (0, nerd_1.yourScriptHasBeenTerminated)();
+            }
             process.exit(hadError ? -1 : 0);
         });
     });

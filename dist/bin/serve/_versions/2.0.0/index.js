@@ -106,9 +106,9 @@ async function start(onitConfigFile, version, argv) {
         await (0, pm2_1.pm2stop)();
     }
     // bye!
-    logger_1.logger.error('Exiting serve, bye! :wave:');
+    logger_1.logger.success('Exiting serve, bye! :wave:');
     // eslint-disable-next-line no-process-exit
-    process.exit(0);
+    // process.exit(0);
 }
 exports.start = start;
 //# sourceMappingURL=index.js.map
