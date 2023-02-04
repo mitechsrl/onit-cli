@@ -14,7 +14,7 @@ exports.isNerd = process.argv.find((p) => p == '--nerd');
  */
 function yourScriptHasBeenTerminated() {
     console.log('  ');
-    console.log('                   <((((((\\\\');
+    console.log('                   <((((((\\\\\\\\');
     console.log('                   /       . }\\');
     console.log('                   ;--..--.__|}');
     console.log('(\\                 \'--/\\--\'   )');

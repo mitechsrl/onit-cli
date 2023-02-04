@@ -13,7 +13,7 @@ export const isNerd = process.argv.find((p:string) => p == '--nerd');
  */
 export function yourScriptHasBeenTerminated(){
     console.log('  ');
-    console.log('                   <((((((\\\\');
+    console.log('                   <((((((\\\\\\\\');
     console.log('                   /       . }\\');
     console.log('                   ;--..--.__|}');
     console.log('(\\                 \'--/\\--\'   )');
