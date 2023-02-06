@@ -78,7 +78,6 @@ function recourseRegisterCommand(parentYargs, commandConfig) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             .catch((e) => {
             hadError = true;
-            console.error('sssssssssssssss');
             (0, errorHandler_1.errorHandler)(e, argv);
         })
             .then(() => {

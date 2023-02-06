@@ -86,9 +86,7 @@ function recourseRegisterCommand(parentYargs: yargs.Argv, commandConfig: ScanCom
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             .catch((e:any) => {
                 hadError = true;
-                console.error('sssssssssssssss')
                 errorHandler(e, argv);
-                
             })
             .then(() => {
                 if (redirectOutput) return closeOutputRedirection();
