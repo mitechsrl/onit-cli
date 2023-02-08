@@ -1,7 +1,7 @@
 {
     "name": "@mitech/onit-cli",
     "description": "Onit dev tool CLI",
-    "version": "3.0.0-beta.0",
+    "version": "3.0.0-beta.1",
     "main": "./dist/index.js",
     "engines": {
         "node": ">=14.0.0"
@@ -23,7 +23,7 @@
         "test": "run-s build mocha",
         "build": "run-s clean tsc scan-commands copy-files",
         "start": "node ./dist/index.js",
-        "prepublishOnly":"run-s clean build"
+        "prepublishOnly":"run-s build"
     },
     "author": "Mitech Srl.",
     "license": "MIT",
