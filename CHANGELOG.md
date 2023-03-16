@@ -1,5 +1,5 @@
 ## 3.0.0
-- BREAKING: **Full rewrite in typescript**. Now the parameter parser engine is [yargs](https://www.npmjs.com/package/yargs), which means some commands might have slightly different parameters now. Single letter params are unchanged, but multi letter params (like "exit") now needs to be called with **double** dashes
+- BREAKING: **Full rewrite in typescript**. Now the parameter parser engine is [yargs](https://www.npmjs.com/package/yargs), which means some commands might have slightly different parameters now. Single letter params are unchanged, but multi letter params (like "exit") now needs to be called with **double** dashes. For automatic scripts retrocompatibility, "-exit", "-watch" and "-debug" are still accepted. A non blocking warning will be displayed. 
 - Updated **onit doc** for better output. The custom onit tag now does not have anymore the onit prefix to better fit the naming of jsdoc tags
 - Added **onit labels translate** utility with support to Google translate and Azure translate
 - Added V3.0.0 serve & build with support to [nextjs](https://nextjs.org/)

@@ -82,7 +82,9 @@ Vedi https://semver.org/lang/it/
 }
 ```
 
-**mode** specifica se la build deve essere **production** oppure **development**. Le logiche di build nei due casi sono le stesse, ma le logiche di versionamento sono diverse, in particolare con **development** il sistema propone un versionamento più dinamico che non interferisce con le versioni di produzione già pubblicate. Vedi la sezione **version** per info aggiuntive.
+**mode** specifica se la build deve essere uno tra **production**, **uat**, **beta**, **test**.
+Production crea una build di rpoduzione, mentre uat, beta, test producono versioni versioni non produzione. I tre tag differiscono solo nelle logiche di versionamento.
+Vedi la sezione **version** per info aggiuntive.
 
 **version** abilita la gestione della versione del pacchetto in fase du build. La gestione viene abilitata se **version.propose** valuta true, e in caso affermativo, mostra **prima** del build un menu a selezione che permette all'utente la selezione della versione da applicare prima della compilazione (in questo modo si elimina la necessità di aumentare manualmente la versione in package.json prima o dopo il build).
 
@@ -92,7 +94,7 @@ Nel caso di **production** il menu presenta le seguenti voci:
 - Incrementa a X.Y.Z: propone la versione **patch** successiva a quella trovata in package.json. Se selezionata, scrive in automatico la nuova versione in package.json e package-lock.json
 - Build precedente a X.Y.Z, incrementa a X.Y.Z': legge, se esiste, il package.json nella directory di build e propone la versione **patch** successiva a quella trovata.
 
-In caso di **development**, le voci presentae sono le stesse ma la versione successiva è calcolata con logica **prerelease** e **beta**. Vedi https://www.npmjs.com/package/semver, sezione increment
+In caso di **uat**, **beta** e **test** le voci presentae sono le stesse ma la versione successiva è calcolata con logica **prerelease** e **beta**. Vedi https://www.npmjs.com/package/semver, sezione increment
 
 **additional** rappresenta un comando shell che può essere eseguito per aggiungere una voce di menu alla lista precedente. Il comando deve mandare in output una delle seguenti informazioni:
 - singola stringa della versione attuale **NON** incrementata
