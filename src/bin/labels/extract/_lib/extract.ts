@@ -24,42 +24,59 @@ OTHER DEALINGS IN THE SOFTWARE.
 */
 
 import fs from 'fs';
+import path from 'path';
 import { GenericObject } from '../../../../types';
+import { glob } from 'glob';
 
 export async function scanLabals(filename:string){
 
-    const fileContent = fs.readFileSync(filename).toString();
-
-    // const regex = /i18n\(([^\)]+)\)/g;
-    const regex = /i18n\(([^)]+)\)/g;
-
-    let m;
     let labels: GenericObject[] = [];
+    
+    let files:string[] = [];
 
-    while ((m = regex.exec(fileContent)) !== null) {
-    // This is necessary to avoid infinite loops with zero-width matches
-        if (m.index === regex.lastIndex) {
-            regex.lastIndex++;
-        }
-
-        // The result can be accessed through the `m`-variable.
-        m.forEach((match, groupIndex) => {
-        // console.log(`Found match, group ${groupIndex}: ${match}`);
-            if (groupIndex > 0) {
-                labels.push({
-                    language: 'it_IT',
-                    label: match.replace(/'/g, '').replace(/"/g, ''),
-                    text: match.replace(/'/g, '').replace(/"/g, ''),
-                    page: 'CHANGE_ME'
-                });
-            }
-        });
+    const stat = fs.statSync(filename);
+    if (stat.isDirectory()){
+        files = await glob('./**/*.*', { cwd: filename });
+        files = files.map(_f => path.join(filename,_f));
+    }else{
+        files.push(filename);
     }
+
+    files.forEach(f =>{
+        const stat = fs.statSync(f);
+        if (stat.isDirectory()) return;
+
+        const fileContent = fs.readFileSync(f).toString();
+
+        // const regex = /i18n\(([^\)]+)\)/g;
+        const regex = /i18n\(([^)]+)\)/g;
+
+        let m;
+
+        while ((m = regex.exec(fileContent)) !== null) {
+        // This is necessary to avoid infinite loops with zero-width matches
+            if (m.index === regex.lastIndex) {
+                regex.lastIndex++;
+            }
+
+            // The result can be accessed through the `m`-variable.
+            m.forEach((match, groupIndex) => {
+            // console.log(`Found match, group ${groupIndex}: ${match}`);
+                if (groupIndex > 0) {
+                    labels.push({
+                        language: 'it_IT',
+                        label: match.replace(/'/g, '').replace(/"/g, ''),
+                        text: match.replace(/'/g, '').replace(/"/g, ''),
+                        page: 'CHANGE_ME'
+                    });
+                }
+            });
+        }
+    });
 
     labels = labels.filter(function (item1, pos) {
         return labels.findIndex(item2 => item1.label === item2.label) === pos;
     });
 
     console.log(JSON.stringify(labels, null, 4));
-
 }

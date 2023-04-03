@@ -29,30 +29,46 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.scanLabals = void 0;
 const fs_1 = __importDefault(require("fs"));
+const path_1 = __importDefault(require("path"));
+const glob_1 = require("glob");
 async function scanLabals(filename) {
-    const fileContent = fs_1.default.readFileSync(filename).toString();
-    // const regex = /i18n\(([^\)]+)\)/g;
-    const regex = /i18n\(([^)]+)\)/g;
-    let m;
     let labels = [];
-    while ((m = regex.exec(fileContent)) !== null) {
-        // This is necessary to avoid infinite loops with zero-width matches
-        if (m.index === regex.lastIndex) {
-            regex.lastIndex++;
-        }
-        // The result can be accessed through the `m`-variable.
-        m.forEach((match, groupIndex) => {
-            // console.log(`Found match, group ${groupIndex}: ${match}`);
-            if (groupIndex > 0) {
-                labels.push({
-                    language: 'it_IT',
-                    label: match.replace(/'/g, '').replace(/"/g, ''),
-                    text: match.replace(/'/g, '').replace(/"/g, ''),
-                    page: 'CHANGE_ME'
-                });
-            }
-        });
+    let files = [];
+    const stat = fs_1.default.statSync(filename);
+    if (stat.isDirectory()) {
+        files = await (0, glob_1.glob)('./**/*.*', { cwd: filename });
+        files = files.map(_f => path_1.default.join(filename, _f));
     }
+    else {
+        files.push(filename);
+    }
+    files.forEach(f => {
+        const stat = fs_1.default.statSync(f);
+        if (stat.isDirectory())
+            return;
+        const fileContent = fs_1.default.readFileSync(f).toString();
+        // const regex = /i18n\(([^\)]+)\)/g;
+        const regex = /i18n\(([^)]+)\)/g;
+        let m;
+        while ((m = regex.exec(fileContent)) !== null) {
+            // This is necessary to avoid infinite loops with zero-width matches
+            if (m.index === regex.lastIndex) {
+                regex.lastIndex++;
+            }
+            // The result can be accessed through the `m`-variable.
+            m.forEach((match, groupIndex) => {
+                // console.log(`Found match, group ${groupIndex}: ${match}`);
+                if (groupIndex > 0) {
+                    labels.push({
+                        language: 'it_IT',
+                        label: match.replace(/'/g, '').replace(/"/g, ''),
+                        text: match.replace(/'/g, '').replace(/"/g, ''),
+                        page: 'CHANGE_ME'
+                    });
+                }
+            });
+        }
+    });
     labels = labels.filter(function (item1, pos) {
         return labels.findIndex(item2 => item1.label === item2.label) === pos;
     });
