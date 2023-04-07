@@ -38,8 +38,20 @@ import { removeUnwantedFiles } from './_lib/removeUnwantedFiles';
 import { fixOnitConfig } from './_lib/fixOnitConfig';
 import { replaceInFile } from './_lib/replaceInFile';
 
+const nameMatch = /^(@[a-zA-Z0-9-_]+\/){0,1}([a-zA-Z0-9-_]+)$/g;
+function stringToComponentClassName(appName: string){
+    let componentClassName = upperFirst(camelCase(appName.replace(nameMatch, '$2'))) ;
+    if (!componentClassName.match(/^([Oo]nit)(.*)$/)){
+        componentClassName = 'Onit'+upperFirst(componentClassName);
+    }
+    if (!componentClassName.match(/^(.*)([Cc]omponent)$/)){
+        componentClassName = componentClassName+'Component';
+    }
+    return componentClassName;
+}
+
 const exec: CommandExecFunction = async (argv: yargs.ArgumentsCamelCase<unknown>) => {
-    const nameMatch = /^(@[a-zA-Z0-9-_]+\/){0,1}([a-zA-Z0-9-_]+)$/g;
+    
     const answers = await inquirer.prompt([
         {
             type: 'input',
@@ -58,11 +70,12 @@ const exec: CommandExecFunction = async (argv: yargs.ArgumentsCamelCase<unknown>
             name: 'componentClassName',
             message: 'Component class name',
             default: (answers: GenericObject) => {
-                return 'Onit' + upperFirst(camelCase(answers.appName.replace(nameMatch, '$2'))) + 'Component';
+                return stringToComponentClassName(answers.appName);
             },
             validate: (v) => {
-                if (!v.match(/^[a-zA-Z0-9-_]+$/g)) {
-                    return Promise.reject(new Error('Invalid format. Avoid spaces and special chars. Please change it and continue.'));
+                //const _v = stringToComponentClassName(v);
+                if (!v.match(/^([Oo]nit)[a-zA-Z0-9-_]+([Cc]omponent)$/)) {
+                    return Promise.reject(new Error('Invalid format. Avoid spaces and special chars, use the format Onit[NAME]Component Please change it and continue.'));
                 }
                 return true;
             }
@@ -73,41 +86,26 @@ const exec: CommandExecFunction = async (argv: yargs.ArgumentsCamelCase<unknown>
             message: 'Database name for local serve',
             default: (answers: GenericObject) => {
                 return snakeCase(answers.appName.replace(nameMatch, '$2')).replace(/_/g, '-');
+            },
+            validate: (v) => {
+                if (!v.match(/^[a-zA-Z0-9-_]+$/)) {
+                    return Promise.reject(new Error('Invalid format. Avoid spaces and special chars. Please change it and continue.'));
+                }
+                return true;
             }
         }
     ]);
 
     answers.appDescription = answers.appExtendedName;
-
-    // Ensure some names starts with "Onit"
-    if (answers.componentClassName.toLowerCase().startsWith('onit')) {
-        answers.componentClassNameShortCamelCase = camelCase(answers.componentClassName.substring(4));
-        answers.componentClassName = upperFirst(camelCase(answers.componentClassName));
-    } else {
-        answers.componentClassNameShortCamelCase = camelCase(answers.componentClassName);
-        answers.componentClassName = 'Onit' + upperFirst(camelCase(answers.componentClassName));
-    }
-
-    // Ensure some names ends in "Component"
-    if (answers.componentClassName.match(/^(.+)([Cc]omponent)$/gi)) {
-        answers.componentClassName = answers.componentClassName.replace(/^(.+)([Cc]omponent)$/gi, '$1Component');
-    } else {
-        answers.componentClassName += 'Component';
-    }
-    if (answers.componentClassNameShortCamelCase.match(/^(.+)([Cc]omponent)$/gi)) {
-        answers.componentClassNameShortCamelCase = answers.componentClassNameShortCamelCase.replace(/^(.+)([Cc]omponent)$/gi, '$1Component');
-    } else {
-        answers.componentClassNameShortCamelCase += 'Component';
-    }
-
+    answers.componentClassNameShortCamelCase = camelCase(answers.componentClassName.substring(4));
     answers.componentNameExport = snakeCase(answers.componentClassName).toUpperCase();
 
     console.warn('Component name: ' + answers.componentClassName);
 
     // check target directory
     answers.appNameWithoutScope = answers.appName.replace(/^@[^/]+\//, '');
-    console.warn('Name without scope: ' + answers.appNameWithoutScope);
-
+    console.warn('Name without scope: '+ answers.appNameWithoutScope);
+    
     const directory = join(process.cwd(), './' + answers.appNameWithoutScope);
     if (existsSync(directory)) {
         throw new Error(`Directory ${directory} already exists. Please select another name`);
@@ -143,6 +141,7 @@ const exec: CommandExecFunction = async (argv: yargs.ArgumentsCamelCase<unknown>
     logger.log(' > cd ' + answers.appNameWithoutScope);
     logger.log(' > npm install');
     logger.log(' > onit serve');
+    
 };
 
 export default exec;
