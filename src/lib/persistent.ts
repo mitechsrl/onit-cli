@@ -27,7 +27,7 @@ import path from 'path';
 import { GenericObject } from '../types';
 import os from 'os';
 
-let baseConfigDir = path.join(os.homedir(), './.onit-cli');
+const baseConfigDir = path.join(os.homedir(), './.onit-cli');
 
 export { baseConfigDir };
 
