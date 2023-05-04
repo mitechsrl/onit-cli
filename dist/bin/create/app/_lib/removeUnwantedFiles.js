@@ -13,12 +13,17 @@ async function removeUnwantedFiles(cwd, answers) {
     ];
     for (const file of deleteFiles) {
         const filename = (0, path_1.join)(cwd, file);
-        const stat = (0, fs_1.statSync)(filename);
-        if (stat.isDirectory()) {
-            (0, fs_1.rmSync)(filename, { recursive: true });
+        try {
+            const stat = (0, fs_1.statSync)(filename);
+            if (stat.isDirectory()) {
+                (0, fs_1.rmSync)(filename, { recursive: true });
+            }
+            else {
+                (0, fs_1.unlinkSync)(filename);
+            }
         }
-        else {
-            (0, fs_1.unlinkSync)(filename);
+        catch (e) {
+            console.warn(`[WARNING] Could not delete file "${filename}": not found.`);
         }
     }
     // files to be made empty

@@ -39,9 +39,10 @@ const fixPackageJson_1 = require("./_lib/fixPackageJson");
 const removeUnwantedFiles_1 = require("./_lib/removeUnwantedFiles");
 const fixOnitConfig_1 = require("./_lib/fixOnitConfig");
 const replaceInFile_1 = require("./_lib/replaceInFile");
-const nameMatch = /^(@[a-zA-Z0-9-_]+\/){0,1}([a-zA-Z0-9-_]+)$/g;
+// const nameMatch = /^(@[a-zA-Z0-9-_]+\/){0,1}([a-zA-Z0-9-_]+)$/g;
+const nameMatch = /^(?:@[a-z0-9-*~][a-z0-9-*._~]*\/)?([a-z0-9-~][a-z0-9-._~]*)$/g;
 function stringToComponentClassName(appName) {
-    let componentClassName = (0, lodash_1.upperFirst)((0, lodash_1.camelCase)(appName.replace(nameMatch, '$2')));
+    let componentClassName = (0, lodash_1.upperFirst)((0, lodash_1.camelCase)(appName.replace(nameMatch, '$1')));
     if (!componentClassName.match(/^([Oo]nit)(.*)$/)) {
         componentClassName = 'Onit' + (0, lodash_1.upperFirst)(componentClassName);
     }
@@ -50,15 +51,55 @@ function stringToComponentClassName(appName) {
     }
     return componentClassName;
 }
+const repoChoices = [
+    {
+        name: 'legacy',
+        value: {
+            url: 'https://github.com/mitechsrl/onit-next-example-webcomponent.git',
+            replacer: (answers) => {
+                return [
+                    { find: 'OnitExampleWebComponent', replace: answers.componentClassName },
+                    { find: 'ONIT_EXAMPLE_WEB_COMPONENT', replace: answers.componentNameExport },
+                    { find: 'exampleWebComponent', replace: answers.componentClassNameShortCamelCase },
+                    { find: 'ExampleWebComponent', replace: (0, lodash_1.upperFirst)(answers.componentClassNameShortCamelCase) },
+                    { find: 'Onit example web component', replace: answers.appExtendedName },
+                    { find: 'onit-next-example-webcomponent', replace: answers.appNameWithoutScope }
+                ];
+            }
+        }
+    },
+    {
+        name: 'next',
+        value: {
+            url: 'https://github.com/mitechsrl/onit-nextjs-template.git',
+            replacer: (answers) => {
+                return [
+                    { find: '__APP_NAME', replace: answers.componentClassName },
+                    { find: 'OnitNextJsTemplateComponent', replace: answers.componentClassName },
+                    { find: '__WEB_MOUNT_PATH', replace: answers.componentClassNameShortCamelCase },
+                    { find: '__APP_EXTENDED_NAME', replace: answers.appExtendedName },
+                    { find: 'onit-nextjs-template-package-json-name', replace: answers.appNameWithoutScope }
+                ];
+            }
+        }
+    }
+];
 const exec = async (argv) => {
     const answers = await inquirer_1.default.prompt([
+        {
+            type: 'list',
+            name: 'repo',
+            message: 'App Template repository',
+            choices: repoChoices
+        },
         {
             type: 'input',
             name: 'appName',
             message: 'App name (package.json name)',
             validate: (v) => {
                 if (!v.match(nameMatch)) {
-                    return Promise.reject(new Error('Invalid format. Avoid spaces and special chars. Package scope is allowed. Please change it and continue.'));
+                    const msg = 'Invalid format. Avoid spaces, uppercase letters and special chars. Please follow the standard package.json name rules.';
+                    return Promise.reject(new Error(msg));
                 }
                 return true;
             }
@@ -84,7 +125,7 @@ const exec = async (argv) => {
             name: 'databaseName',
             message: 'Database name for local serve',
             default: (answers) => {
-                return (0, lodash_1.snakeCase)(answers.appName.replace(nameMatch, '$2')).replace(/_/g, '-');
+                return (0, lodash_1.snakeCase)(answers.appName.replace(nameMatch, '$1')).replace(/_/g, '-');
             },
             validate: (v) => {
                 if (!v.match(/^[a-zA-Z0-9-_]+$/)) {
@@ -97,17 +138,17 @@ const exec = async (argv) => {
     answers.appDescription = answers.appExtendedName;
     answers.componentClassNameShortCamelCase = (0, lodash_1.camelCase)(answers.componentClassName.substring(4));
     answers.componentNameExport = (0, lodash_1.snakeCase)(answers.componentClassName).toUpperCase();
-    console.warn('Component name: ' + answers.componentClassName);
+    // console.warn('Component name: ' + answers.componentClassName);
     // check target directory
     answers.appNameWithoutScope = answers.appName.replace(/^@[^/]+\//, '');
-    console.warn('Name without scope: ' + answers.appNameWithoutScope);
+    // console.warn('Name without scope: '+ answers.appNameWithoutScope);
     const directory = (0, path_1.join)(process.cwd(), './' + answers.appNameWithoutScope);
     if ((0, fs_1.existsSync)(directory)) {
         throw new Error(`Directory ${directory} already exists. Please select another name`);
     }
     // target directory does not exists. Good, nothing is going to be overwritten
     logger_1.logger.log('Clone empty project...');
-    await (0, spawn_1.spawn)('git', ['clone', 'https://github.com/mitechsrl/onit-next-example-webcomponent.git', directory]);
+    await (0, spawn_1.spawn)('git', ['clone', answers.repo.url, directory]);
     logger_1.logger.log('Unlinking git repository');
     await (0, git_1.unlinkGitRepo)(directory, answers);
     logger_1.logger.log('Fixing files...');

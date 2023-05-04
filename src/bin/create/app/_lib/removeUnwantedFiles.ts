@@ -13,11 +13,15 @@ export async function removeUnwantedFiles(cwd:string, answers: GenericObject) {
 
     for (const file of deleteFiles) {
         const filename = join(cwd, file);
-        const stat = statSync(filename);
-        if (stat.isDirectory()) {
-            rmSync(filename, { recursive: true });
-        } else {
-            unlinkSync(filename);
+        try {
+            const stat = statSync(filename);
+            if (stat.isDirectory()) {
+                rmSync(filename, { recursive: true });
+            } else {
+                unlinkSync(filename);
+            }
+        } catch (e) {
+            console.warn(`[WARNING] Could not delete file "${filename}": not found.`);
         }
     }
 

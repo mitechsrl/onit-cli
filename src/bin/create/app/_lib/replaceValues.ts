@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { upperFirst } from 'lodash';
 import { readdir } from 'fs/promises';
 import { resolve, join } from 'path';
@@ -18,18 +18,10 @@ async function getFiles(dir:string) {
     return files;
 }
 
-export async function replaceValues(cwd:string, answers:GenericObject) {
+export async function replaceValues(cwd: string, answers: GenericObject) {
     const originalCwd = process.cwd();
     process.chdir(cwd);
-    const replacements = [ // find & replace in files di src
-        // { find: '@mitech/onit-next-example-webcomponent', replace: answers.appName },
-        { find: 'OnitExampleWebComponent', replace: answers.componentClassName }, // nome class ecomponente
-        { find: 'ONIT_EXAMPLE_WEB_COMPONENT', replace: answers.componentNameExport }, // nome componente
-        { find: 'exampleWebComponent', replace: answers.componentClassNameShortCamelCase },
-        { find: 'ExampleWebComponent', replace: upperFirst(answers.componentClassNameShortCamelCase) },
-        { find: 'Onit example web component', replace: answers.appExtendedName },
-        { find: 'onit-next-example-webcomponent', replace: answers.appNameWithoutScope }
-    ];
+    const replacements: GenericObject[] = answers.repo.replacer(answers);
 
     const files = [
         // join(process.cwd(), 'package.json'),
@@ -37,8 +29,18 @@ export async function replaceValues(cwd:string, answers:GenericObject) {
         ...await getFiles(join(process.cwd(), './src'))
     ];
 
+    const nextJsConfig = join(process.cwd(), 'next.config.js');
+    if (existsSync(nextJsConfig)) files.push(nextJsConfig);
+
     files.forEach(file => {
-        let content = readFileSync(file).toString();
+        let content = '';
+        try {
+            content = readFileSync(file).toString();
+        } catch(e) {
+            console.warn(`[WARNING] File "${file}" not found. Skipping find-replace operations for this file...`);
+            return;
+        }
+        
         const original = content;
         replacements.forEach(r => {
             content = content.replace(new RegExp(r.find, 'g'), r.replace);

@@ -38,9 +38,11 @@ import { removeUnwantedFiles } from './_lib/removeUnwantedFiles';
 import { fixOnitConfig } from './_lib/fixOnitConfig';
 import { replaceInFile } from './_lib/replaceInFile';
 
-const nameMatch = /^(@[a-zA-Z0-9-_]+\/){0,1}([a-zA-Z0-9-_]+)$/g;
-function stringToComponentClassName(appName: string){
-    let componentClassName = upperFirst(camelCase(appName.replace(nameMatch, '$2'))) ;
+// const nameMatch = /^(@[a-zA-Z0-9-_]+\/){0,1}([a-zA-Z0-9-_]+)$/g;
+const nameMatch = /^(?:@[a-z0-9-*~][a-z0-9-*._~]*\/)?([a-z0-9-~][a-z0-9-._~]*)$/g;
+
+function stringToComponentClassName(appName: string) {
+    let componentClassName = upperFirst(camelCase(appName.replace(nameMatch, '$1'))) ;
     if (!componentClassName.match(/^([Oo]nit)(.*)$/)){
         componentClassName = 'Onit'+upperFirst(componentClassName);
     }
@@ -50,16 +52,56 @@ function stringToComponentClassName(appName: string){
     return componentClassName;
 }
 
+const repoChoices = [
+    {
+        name: 'legacy',
+        value: {
+            url: 'https://github.com/mitechsrl/onit-next-example-webcomponent.git',
+            replacer: (answers: GenericObject) => {
+                return [ // find & replace in files di src
+                    { find: 'OnitExampleWebComponent', replace: answers.componentClassName }, // nome classe componente
+                    { find: 'ONIT_EXAMPLE_WEB_COMPONENT', replace: answers.componentNameExport }, // nome componente
+                    { find: 'exampleWebComponent', replace: answers.componentClassNameShortCamelCase },
+                    { find: 'ExampleWebComponent', replace: upperFirst(answers.componentClassNameShortCamelCase) },
+                    { find: 'Onit example web component', replace: answers.appExtendedName },
+                    { find: 'onit-next-example-webcomponent', replace: answers.appNameWithoutScope }
+                ];
+            }
+        }
+    },
+    {
+        name: 'next',
+        value: {
+            url: 'https://github.com/mitechsrl/onit-nextjs-template.git',
+            replacer: (answers: GenericObject) => {
+                return [ // find & replace in files di src
+                    { find: '__APP_NAME', replace: answers.componentClassName }, // nome classe componente
+                    { find: 'OnitNextJsTemplateComponent', replace: answers.componentClassName }, // nome classe componente
+                    { find: '__WEB_MOUNT_PATH', replace: answers.componentClassNameShortCamelCase },
+                    { find: '__APP_EXTENDED_NAME', replace: answers.appExtendedName },
+                    { find: 'onit-nextjs-template-package-json-name', replace: answers.appNameWithoutScope }
+                ];
+            }
+        }
+    }
+];
+
 const exec: CommandExecFunction = async (argv: yargs.ArgumentsCamelCase<unknown>) => {
-    
     const answers = await inquirer.prompt([
+        {
+            type: 'list',
+            name: 'repo',
+            message: 'App Template repository',
+            choices: repoChoices
+        },
         {
             type: 'input',
             name: 'appName',
             message: 'App name (package.json name)',
             validate: (v) => {
                 if (!v.match(nameMatch)) {
-                    return Promise.reject(new Error('Invalid format. Avoid spaces and special chars. Package scope is allowed. Please change it and continue.'));
+                    const msg = 'Invalid format. Avoid spaces, uppercase letters and special chars. Please follow the standard package.json name rules.';
+                    return Promise.reject(new Error(msg));
                 }
                 return true;
             }
@@ -85,7 +127,7 @@ const exec: CommandExecFunction = async (argv: yargs.ArgumentsCamelCase<unknown>
             name: 'databaseName',
             message: 'Database name for local serve',
             default: (answers: GenericObject) => {
-                return snakeCase(answers.appName.replace(nameMatch, '$2')).replace(/_/g, '-');
+                return snakeCase(answers.appName.replace(nameMatch, '$1')).replace(/_/g, '-');
             },
             validate: (v) => {
                 if (!v.match(/^[a-zA-Z0-9-_]+$/)) {
@@ -100,11 +142,11 @@ const exec: CommandExecFunction = async (argv: yargs.ArgumentsCamelCase<unknown>
     answers.componentClassNameShortCamelCase = camelCase(answers.componentClassName.substring(4));
     answers.componentNameExport = snakeCase(answers.componentClassName).toUpperCase();
 
-    console.warn('Component name: ' + answers.componentClassName);
+    // console.warn('Component name: ' + answers.componentClassName);
 
     // check target directory
     answers.appNameWithoutScope = answers.appName.replace(/^@[^/]+\//, '');
-    console.warn('Name without scope: '+ answers.appNameWithoutScope);
+    // console.warn('Name without scope: '+ answers.appNameWithoutScope);
     
     const directory = join(process.cwd(), './' + answers.appNameWithoutScope);
     if (existsSync(directory)) {
@@ -112,7 +154,7 @@ const exec: CommandExecFunction = async (argv: yargs.ArgumentsCamelCase<unknown>
     }
     // target directory does not exists. Good, nothing is going to be overwritten
     logger.log('Clone empty project...');
-    await spawn('git', ['clone', 'https://github.com/mitechsrl/onit-next-example-webcomponent.git', directory]);
+    await spawn('git', ['clone', answers.repo.url, directory]);
 
     logger.log('Unlinking git repository');
     await unlinkGitRepo(directory, answers);
