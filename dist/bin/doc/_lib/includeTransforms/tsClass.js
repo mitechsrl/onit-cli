@@ -116,9 +116,9 @@ class GenericClassFileParser {
         if (method.params.length > 0) {
             content.push('#### Params');
             method.params.forEach(param => {
-                content.push(`**${(0, escapeMarkdownChars_1.escapeMarkdownChars)(param.name)}** _${(0, escapeMarkdownChars_1.escapeMarkdownChars)(param.type)}_\n{: .mb-0 }`);
+                content.push(`**${(0, escapeMarkdownChars_1.escapeMarkdownChars)(param.name)}** _${(0, escapeMarkdownChars_1.escapeMarkdownChars)(param.type)}_`);
                 if (param.comment) {
-                    content.push(`${param.comment.trim()}\n{: .mx-3 .my-0 }`);
+                    content.push(`${param.comment.trim()}`);
                 }
             });
         }

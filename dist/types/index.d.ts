@@ -1,6 +1,4 @@
-export declare type GenericObject = {
-    [k: string]: any;
-};
+export * from './genericObject';
 export * from './errors';
 export * from './command';
 export * from './onitConfigFile';

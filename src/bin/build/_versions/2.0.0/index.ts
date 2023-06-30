@@ -96,7 +96,7 @@ export default async function build(onitConfigFile: OnitConfigFile, argv: yargs.
         const list = beforeSteps.map((step, index) => ({
             type: 'confirm',
             name: 'step_' + index,
-            message: 'Eseguire <' + step.name + '>?'
+            message: 'Run <' + step.name + '>?'
         }));
         const answers = await inquirer.prompt(list);
         beforeSteps = beforeSteps.filter((step, index) => answers['step_' + index]);
@@ -109,7 +109,7 @@ export default async function build(onitConfigFile: OnitConfigFile, argv: yargs.
         const list = afterSteps.map((step, index) => ({
             type: 'confirm',
             name: 'step_' + index,
-            message: 'Eseguire <' + step.name + '>?'
+            message: 'Run <' + step.name + '>?'
         }));
         const answers = await inquirer.prompt(list);
         afterSteps = afterSteps.filter((step, index) => answers['step_' + index]);

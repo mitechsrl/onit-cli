@@ -33,6 +33,8 @@ const lodash_1 = __importDefault(require("lodash"));
 const ejs_1 = __importDefault(require("ejs"));
 const path_1 = require("path");
 const yeoman_environment_1 = __importDefault(require("yeoman-environment"));
+const path_2 = __importDefault(require("path"));
+const fs_2 = __importDefault(require("fs"));
 // @loopback-cli is not a library, there's not typings
 // We are just leveraging on some implementation to reuse them
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -53,6 +55,8 @@ class CustomServiceGenerator extends ServiceGenerator {
         // render the model file and writer it out
         const template = (0, fs_1.readFileSync)(this.artifactInfo.defaultTemplate).toString();
         const rendered = ejs_1.default.render(template, data);
+        const dir = path_2.default.dirname(filename);
+        fs_2.default.mkdirSync(dir, { recursive: true });
         (0, fs_1.writeFileSync)(filename, rendered);
     }
     // overwrite the last methos to ask for mixins before effectively scaffolding

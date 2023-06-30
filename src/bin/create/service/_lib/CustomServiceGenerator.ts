@@ -29,6 +29,8 @@ import ejs from 'ejs';
 import { join, resolve } from 'path';
 import { GenericObject } from '../../../../types';
 import yeoman from 'yeoman-environment';
+import path from 'path';
+import fs from 'fs';
 
 // @loopback-cli is not a library, there's not typings
 // We are just leveraging on some implementation to reuse them
@@ -52,6 +54,8 @@ export class CustomServiceGenerator extends ServiceGenerator {
         // render the model file and writer it out
         const template = readFileSync(this.artifactInfo.defaultTemplate).toString();
         const rendered = ejs.render(template, data);
+        const dir = path.dirname(filename);
+        fs.mkdirSync(dir, { recursive:true });
         writeFileSync(filename, rendered);
     }
 

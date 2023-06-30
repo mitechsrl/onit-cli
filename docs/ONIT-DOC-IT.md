@@ -39,8 +39,6 @@ Chapters definisce un albero che identifica la lista di capitoli, i loro figli e
 chapter = {
     title: string, // REQUIRED, titolo del capitolo
     chapter: string // REQUIRED, label utilizzata per indirizzare i blocchi dei commenti,
-    index: object, // OPTIONAL, se valorizzato, crea un file di indice per la voce corrente. Le coppie chiave-valore di object verranno inserite nell'header jackill del file index generato senza subire alterazioni. Il file di index viene automaticamente generto se esistono dei fligli della voce corrente (in base a children)
-    page: object, // OPTIONAL, se valorizzato, crea un file di pagina per la voce corrente. Le coppie chiave-valore di object verranno inserite nell'header jackill del file generato senza subire alterazioni. Il file page viene automaticamente generato se la scansione del progetto rileva dei frammenti di codice-commento per la rispettiva label 
     children: [chapter] // OPTIONAL, eventuali chapter figli
 }
 ```

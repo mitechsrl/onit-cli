@@ -92,7 +92,7 @@ async function build(onitConfigFile, argv) {
         const list = beforeSteps.map((step, index) => ({
             type: 'confirm',
             name: 'step_' + index,
-            message: 'Eseguire <' + step.name + '>?'
+            message: 'Run <' + step.name + '>?'
         }));
         const answers = await inquirer_1.default.prompt(list);
         beforeSteps = beforeSteps.filter((step, index) => answers['step_' + index]);
@@ -104,7 +104,7 @@ async function build(onitConfigFile, argv) {
         const list = afterSteps.map((step, index) => ({
             type: 'confirm',
             name: 'step_' + index,
-            message: 'Eseguire <' + step.name + '>?'
+            message: 'Run <' + step.name + '>?'
         }));
         const answers = await inquirer_1.default.prompt(list);
         afterSteps = afterSteps.filter((step, index) => answers['step_' + index]);

@@ -1,8 +1,10 @@
+import { GenericObject } from './genericObject';
 export declare type OnitDocumentationConfigFileChapter = {
     chapter?: string;
     title?: string;
     index?: {
-        [k: string]: string | undefined;
+        [k: string]: GenericObject | string | undefined;
+        link?: GenericObject;
     };
     page?: {
         [k: string]: string | undefined;

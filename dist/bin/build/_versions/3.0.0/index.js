@@ -35,7 +35,7 @@ const versionManagement_1 = require("../2.0.0/lib/versionManagement");
 const extraStepRuner_1 = require("../2.0.0/lib/extraStepRuner");
 const build_1 = require("./lib/build");
 /**
- * Exportin
+ *
  * @param onitConfigFile
  * @param argv
  * @returns

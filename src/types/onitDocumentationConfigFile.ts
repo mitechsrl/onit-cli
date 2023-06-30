@@ -1,7 +1,9 @@
+import { GenericObject } from './genericObject';
+
 export type OnitDocumentationConfigFileChapter = {
     chapter?: string,
     title?: string,
-    index?: { [k:string]:string|undefined },
+    index?: { [k:string]:GenericObject | string |undefined, link?: GenericObject },
     page?:{ [k:string]:string|undefined },
     children?: OnitDocumentationConfigFileChapter[],
     // index for order based on position in definition file

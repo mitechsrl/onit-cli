@@ -53,7 +53,7 @@ function resolveNextBinImportPath() {
     catch (e) {
         console.log(e);
         if (e.code === 'MODULE_NOT_FOUND')
-            throw new types_1.StringError('Nextjs package not found. Make sure to have it installed as dependencty');
+            throw new types_1.StringError('Nextjs package not found. Make sure to have it installed as dependency');
         throw e;
     }
 }

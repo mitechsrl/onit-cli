@@ -34,6 +34,7 @@ const fs_extra_1 = __importDefault(require("fs-extra"));
 const crypto_1 = __importDefault(require("crypto"));
 const types_1 = require("../../../types");
 const logger_1 = require("../../../lib/logger");
+const lodash_1 = __importDefault(require("lodash"));
 class DocBuilder {
     constructor(configFile, scanTargetDir, blocks, outDir) {
         var _a;
@@ -84,6 +85,9 @@ class DocBuilder {
         });
         return result;
     }
+    convertHtmlTags(str) {
+        return str.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
     generateBlockContentString(block, defaultTitle) {
         var _a;
         let str = '';
@@ -99,7 +103,7 @@ class DocBuilder {
             str += '#### Params\n';
             block.params.forEach(param => {
                 str += '**' + param.name + '**\n';
-                str += param.description;
+                str += this.convertHtmlTags(param.description);
                 str += '\n\n';
             });
         }
@@ -108,13 +112,13 @@ class DocBuilder {
             str += '#### Props\n';
             block.props.forEach(prop => {
                 str += '**' + prop.name + '**\n';
-                str += prop.description;
+                str += this.convertHtmlTags(prop.description);
                 str += '\n\n';
             });
         }
         if (block.returns) {
             str += '#### Returns\n';
-            str += block.returns;
+            str += this.convertHtmlTags(block.returns);
             str += '\n\n';
         }
         const chapterPath = this.findChapterPath((_a = this.configFile.chapters) !== null && _a !== void 0 ? _a : [], block.chapter, []);
@@ -192,7 +196,9 @@ class DocBuilder {
      */
     buildChapterFileContent(chapterConfig) {
         var _a;
+        console.time('abba');
         const blocksByChapter = this.blocks.filter(b => b.chapter === chapterConfig.chapter);
+        console.timeEnd('abba');
         // add extracted blocks markdown
         if (blocksByChapter.length > 0) {
             const defaultTitle = (_a = chapterConfig.title) !== null && _a !== void 0 ? _a : '';
@@ -204,7 +210,7 @@ class DocBuilder {
         return '';
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    reduceJekillHeader(acc, e) {
+    reduceHeader(acc, e) {
         if (typeof e === 'string')
             acc = acc + '\n' + e;
         if (Array.isArray(e))
@@ -212,13 +218,15 @@ class DocBuilder {
         return acc.trim();
     }
     createFinalFileContent(header, content = '') {
-        const jekillHeader = [
+        const h = [
             '---',
-            ['layout', 'page'],
             ...Object.entries(header || {}),
             '---'
-        ].reduce(this.reduceJekillHeader, '');
-        return jekillHeader + content;
+        ].reduce(this.reduceHeader, '');
+        return h + '\n\n' + content;
+    }
+    toId(file) {
+        return path_1.default.relative(this.outDir, file).replace(/\\/g, '/').replace(/(\.[a-zA-Z0-9]+)$/, '');
     }
     /**
      *
@@ -226,81 +234,49 @@ class DocBuilder {
      * @param {*} parent
      * @param {*} grandparent
      */
-    recurseBuildChapterFiles(chapters, parent, grandparent) {
+    recurseBuildChapterFiles(chapters, parents) {
+        const sidebarJson = [];
         chapters.forEach(chapterConfig => {
-            var _a;
-            // calculate the destination directory
+            let sidebarJsonItem = {};
+            // calculate the output file destination directory
             const fileDir = path_1.default.join(this.outDir, this.chapterPathToMarkdownFilename([
-                grandparent || {},
-                parent || {},
+                ...parents,
                 chapterConfig
             ]));
             // ensure the directory exists
             this.writeCallbacks.push(() => fs_1.default.mkdirSync(fileDir, { recursive: true }));
-            // automatically add index in case of "children chapters"
-            if ((chapterConfig.children || []).length > 0) {
-                chapterConfig.index = chapterConfig.index || {};
-                chapterConfig.index.has_children = 'true';
-            }
-            // this chapter defines a index configuration. Add the 'index.md' file
-            if (chapterConfig.index) {
-                chapterConfig.index.title = chapterConfig.title;
-                // setup hierarchy references
-                if (parent)
-                    chapterConfig.index.parent = parent.title;
-                if (grandparent)
-                    chapterConfig.index.grand_parent = grandparent.title;
-                // create the index content
-                // FIXME: trasporta buildContent
-                const chapterFileContent = this.buildChapterFileContent(chapterConfig);
-                // write the file out
-                const headerData = chapterConfig.index || {};
-                headerData.nav_order = chapterConfig.chapterIndexNumber;
-                const finalFileContent = this.createFinalFileContent(headerData, '\n\n\n' + chapterFileContent);
-                const fileFullPath = path_1.default.join(fileDir, 'index.md');
-                logger_1.logger.log('Generating content of ' + fileFullPath);
-                this.writeCallbacks.push(() => fs_1.default.writeFileSync(fileFullPath, finalFileContent));
-            }
-            // do not add page content for indexes
-            if (!chapterConfig.index) {
-                // automatically add a page if we have some blocks for it
-                const blocksByChapter = this.blocks.filter(b => b.chapter === chapterConfig.chapter);
-                if (blocksByChapter.length > 0) {
-                    chapterConfig.page = chapterConfig.page || {};
-                }
-                // create the page config
-                if (chapterConfig.page) {
-                    chapterConfig.page.title = chapterConfig.title;
-                    // setup hierarchy references
-                    if (parent)
-                        chapterConfig.page.parent = parent.title;
-                    if (grandparent)
-                        chapterConfig.page.grand_parent = grandparent.title;
-                    // create the page content
-                    // FIXME: trasporta buildContent
-                    const generatedFileContent = this.buildChapterFileContent(chapterConfig);
-                    // h4 must not appear on file toc
-                    const regex = /^(####.+)$/gm;
-                    const subst = '$1\n{: .no_toc}\n';
-                    const chapterFileContent = '1. TOC\n{:toc}\n---\n' + generatedFileContent.replace(regex, subst);
-                    // write the file out
-                    const fileFullPath = path_1.default.join(fileDir, ((_a = chapterConfig.title) === null || _a === void 0 ? void 0 : _a.replace(/[^a-zA-Z0-9]/g, '-')) + '.md');
-                    const headerData = chapterConfig.page || {};
-                    headerData.nav_order = chapterConfig.chapterIndexNumber;
-                    const finalFileContent = this.createFinalFileContent(headerData, '\n\n\n' + chapterFileContent);
-                    logger_1.logger.log('Generating content of ' + fileFullPath);
-                    this.writeCallbacks.push(() => fs_1.default.writeFileSync(fileFullPath, finalFileContent));
-                }
-            }
+            // Generate the file. Calling index for easier addressing later
+            const indexFileFullPath = path_1.default.join(fileDir, 'index.md');
+            logger_1.logger.log('Generating content of ' + indexFileFullPath);
+            const indexContent = this.createFinalFileContent({
+                title: chapterConfig.title
+            }, this.buildChapterFileContent(chapterConfig));
+            this.writeCallbacks.push(() => fs_1.default.writeFileSync(indexFileFullPath, indexContent));
             // recurse on children
             if (chapterConfig.children) {
-                this.recurseBuildChapterFiles(chapterConfig.children, chapterConfig, parent);
+                sidebarJsonItem = {
+                    type: 'category',
+                    label: chapterConfig.title,
+                    items: [
+                        this.toId(indexFileFullPath),
+                        ...this.recurseBuildChapterFiles(chapterConfig.children, [...parents, chapterConfig])
+                    ]
+                };
             }
+            else {
+                sidebarJsonItem = {
+                    type: 'doc',
+                    label: chapterConfig.title,
+                    id: this.toId(indexFileFullPath)
+                };
+            }
+            sidebarJson.push(sidebarJsonItem);
         });
+        return sidebarJson;
     }
     /**
      * Process a string and resolve image links.
-     * Links follow the stndard markdown config: https://www.markdownguide.org/basic-syntax/#images
+     * Links follow the standard markdown config: https://www.markdownguide.org/basic-syntax/#images
      *
      * Images are copy&pasted into dst directory and comment links updated to the new path
      *
@@ -320,14 +296,14 @@ class DocBuilder {
             const text = m[1];
             const srcFilename = path_1.default.join(path_1.default.dirname(blockSourceFile), m[2]);
             const ext = path_1.default.extname(srcFilename);
-            const dstPath = path_1.default.join(this.outDir, './images/');
+            const dstPath = path_1.default.posix.join(this.outDir, 'images');
             const hashDstFilename = crypto_1.default.createHash('md5').update(srcFilename).digest('hex') + ext;
             const dstFilename = path_1.default.join(dstPath, hashDstFilename);
             // FIXME: questo url è hardcodato, non va bene. Occorre calcolarlo a partire da srcPath (con ../ etc)
             const markdownDst = [
                 ...Array(chapterDepth).fill('..'),
-                path_1.default.join('images/', hashDstFilename)
-            ].join(path_1.default.sep);
+                path_1.default.posix.join('images', hashDstFilename)
+            ].join('/');
             const replace = '![' + text + '](' + markdownDst + ')';
             sourceString = sourceString.replace(found, replace);
             this.writeCallbacks.push(() => {
@@ -350,7 +326,7 @@ class DocBuilder {
      * @returns
      */
     chapterPathToMarkdownFilename(chapterPath) {
-        return chapterPath.map(p => p.chapter).filter(p => !!p).join(path_1.default.sep);
+        return chapterPath.map(p => p.chapter).filter(p => !!p).map(p => lodash_1.default.camelCase(p)).join(path_1.default.sep);
     }
     /**
      *
@@ -497,20 +473,19 @@ class DocBuilder {
                 continue;
             }
             let linkChapterFilename = null;
-            if (!linkChapterPath[linkChapterPath.length - 1].children) {
+            /*if (!linkChapterPath[linkChapterPath.length - 1].children) {
                 const referenceTitle = (linkChapterPath[linkChapterPath.length - 1].title || '').replace(/ /g, '-');
                 linkChapterFilename = [
                     ...Array(chapterDepth).fill('..'),
-                    this.chapterPathToMarkdownFilename(linkChapterPath),
+                    this.chapterPathToMarkdownFilename(linkChapterPath)+anchor,
                     referenceTitle + '.html' + anchor
-                ].join(path_1.default.sep);
-            }
-            else {
-                linkChapterFilename = [
-                    ...Array(chapterDepth).fill('..'),
-                    this.chapterPathToMarkdownFilename(linkChapterPath) + anchor,
-                ].join(path_1.default.sep);
-            }
+                ].join(path.sep);
+            } else {*/
+            linkChapterFilename = [
+                ...Array(chapterDepth).fill('..'),
+                this.chapterPathToMarkdownFilename(linkChapterPath) + '/' + anchor
+            ].join(path_1.default.posix.sep);
+            // }
             if (!text)
                 text = (_b = linkChapterPath[linkChapterPath.length - 1].title) !== null && _b !== void 0 ? _b : '';
             const replace = '[' + text + '](' + linkChapterFilename + ')';
@@ -534,12 +509,21 @@ class DocBuilder {
             }
         });
         logger_1.logger.log('Building output files...');
-        this.recurseBuildChapterFiles((_a = this.configFile.chapters) !== null && _a !== void 0 ? _a : []);
+        const sidebarJson = this.recurseBuildChapterFiles((_a = this.configFile.chapters) !== null && _a !== void 0 ? _a : [], []);
+        // ensure the directory exists
+        this.writeCallbacks.push(() => fs_1.default.writeFileSync(path_1.default.join(this.outDir, 'sidebars.js'), `
+              const sidebars = {               
+                mainSidebar: ${JSON.stringify(sidebarJson, null, 2)}
+              }
+              
+              module.exports = sidebars;
+            `));
     }
     /**
      * Write out data. This basically call all the writeCallbacks.
      */
     write() {
+        logger_1.logger.log('Writing data....');
         // Ensure we have the target dir empty
         fs_extra_1.default.removeSync(this.outDir);
         fs_1.default.mkdirSync(this.outDir, { recursive: true });

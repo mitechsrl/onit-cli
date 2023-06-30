@@ -34,7 +34,7 @@ import yargs from 'yargs';
 import { runBuild } from './lib/build';
 
 /**
- * Exportin
+ * 
  * @param onitConfigFile 
  * @param argv 
  * @returns 

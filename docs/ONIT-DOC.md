@@ -41,8 +41,6 @@ A single *chapter* object is an object defined as follows:
 chapter = {
     title: string, // REQUIRED, chapter title
     chapter: string // REQUIRED, chaper label, used to link a block comment to this specific object,
-    index: object, // OPTIONAL, if defined, create a index file for the current object. This is a key-value object whose properties-values are added to jeckill index file without alterations. The index file is automaically added if this object includes the children property.
-    page: object, // OPTIONAL, if defined, create a page file for the current object.  This is a key-value object whose properties-values are added to jeckill index file without alterations. The page file is automatically added if the project scan finds comment blocks matching this object chapter label. 
     children: [chapter] // OPTIONAL, Array of children chapters definitions. 
 }
 ```
@@ -179,7 +177,6 @@ const config = {
         {
             chapter:'LABEL3', 
             title:'title', 
-            index: { nav_order: 1 }
             children: [
                 {chapter:'LABEL4', title:'title'}
             ]

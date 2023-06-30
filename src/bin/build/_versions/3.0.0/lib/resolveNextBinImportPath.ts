@@ -48,7 +48,7 @@ export function resolveNextBinImportPath() {
     } catch (e: any) {
         console.log(e);
         if (e.code === 'MODULE_NOT_FOUND')
-            throw new StringError('Nextjs package not found. Make sure to have it installed as dependencty');
+            throw new StringError('Nextjs package not found. Make sure to have it installed as dependency');
         throw e;
     }
 }

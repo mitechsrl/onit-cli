@@ -153,9 +153,9 @@ export default class GenericClassFileParser {
         if (method.params.length > 0) {
             content.push('#### Params');
             method.params.forEach(param => {
-                content.push(`**${escapeMarkdownChars(param.name)}** _${escapeMarkdownChars(param.type)}_\n{: .mb-0 }`);
+                content.push(`**${escapeMarkdownChars(param.name)}** _${escapeMarkdownChars(param.type)}_`);
                 if (param.comment) {
-                    content.push(`${param.comment.trim()}\n{: .mx-3 .my-0 }`);
+                    content.push(`${param.comment.trim()}`);
                 }
             });
         }

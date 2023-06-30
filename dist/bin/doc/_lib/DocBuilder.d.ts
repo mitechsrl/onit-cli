@@ -15,6 +15,7 @@ export declare class DocBuilder {
      * @returns
      */
     private generateAutomaticLinksLabels;
+    private convertHtmlTags;
     private generateBlockContentString;
     /**
      * Teplace the [@src filePath transformFunction] with the content of filepath.
@@ -33,8 +34,9 @@ export declare class DocBuilder {
      * @returns The file content
      */
     private buildChapterFileContent;
-    private reduceJekillHeader;
+    private reduceHeader;
     private createFinalFileContent;
+    private toId;
     /**
      *
      * @param {*} chapters
@@ -44,7 +46,7 @@ export declare class DocBuilder {
     private recurseBuildChapterFiles;
     /**
      * Process a string and resolve image links.
-     * Links follow the stndard markdown config: https://www.markdownguide.org/basic-syntax/#images
+     * Links follow the standard markdown config: https://www.markdownguide.org/basic-syntax/#images
      *
      * Images are copy&pasted into dst directory and comment links updated to the new path
      *
