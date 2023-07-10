@@ -13,12 +13,13 @@ Il file contiene una serie di istruzioni per il lancio del progetto in ambiente 
     copyFiles: {} // copia files arbitrari
     engines: {} // engines config
     serve: {
-        nodeArgs: ['string'], // Array di aromenti da passare al processo node
-        environment: {} // oggetto iniettato in environment app
+        nodeArgs: ['string'], // Array of node arguments to be passed o the served subprocess
+        environment: {} // Env variables to be attached to the served process
         main: "./path/to/js", // string, main js file to launch
-        componentsScanDirs: ['string'] //directories to be scanned for components
+        componentsScanDirs: ['string'] // directories to be scanned for components
+        'pm2-dev-ecosystem': [] // Array of pm2 app definitions. Launches them at serve, closes themon exit
     },
-    'pm2-dev-ecosystem': Array di apps pm2
+    
 }
 ```
 
@@ -29,6 +30,7 @@ In caso component sia settato a true, il serve avvia onit direttamente dalle dip
 Nel caso sia settato a false, si assume che la cartella corrente contenga onit, pertanto il sistema lancia direttamente il file js iniziale di onit.
 
 ### link
+:warning: Deprecato e rimosso con serve V3
 
 ```
 [
@@ -50,7 +52,7 @@ Vedi [COPY-FILES.md](COPY-FILES.md) per info su copia files in fase di serve
 ### Engines
 Vedi [ENGINES.md](ENGINES.md) per info engines
 
-### Environment
+### serve.environment
 
 Oggetto strutturato come 
 ```
@@ -64,7 +66,7 @@ Oggetto strutturato come
 Questo oggetto viene iniettato automaticamente nel **process.env** dell'istanza di onit lanciata.
 **someValue** può essere di qualsiasi tipo, gli ogetti nel caso vengono stringificati prima di essere passati nel process.env (Process.env suporta dolo stringhe) 
 
-### pm2-dev-ecosystem
+### serve.pm2-dev-ecosystem
 Array di app pm2. Vedi [pm2 ecosystem](https://pm2.keymetrics.io/docs/usage/application-declaration/) per maggiorni info.
 
 Al serve, onit-cli lancia in automatico le app specificate in questo array.
