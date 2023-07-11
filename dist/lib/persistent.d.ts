@@ -1,5 +1,5 @@
 import { GenericObject } from '../types';
-declare let baseConfigDir: string;
+declare const baseConfigDir: string;
 export { baseConfigDir };
 /**
  * Get the persistent file for a specified key

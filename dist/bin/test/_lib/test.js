@@ -64,9 +64,12 @@ async function startTest(onitConfigFile, testTarget, argv) {
             logger_1.logger.info('Cleaning project build...');
             await (0, spawn_1.spawn)(npm_1.npmExecutable, ['run', 'clean'], true);
             logger_1.logger.info('Building project...');
-            const buildResult = await (0, spawn_1.spawn)(onitCliExecutable, ['serve', '-t', '-exit'], true);
-            if (buildResult.exitCode !== 0)
+            const buildTscResult = await (0, spawn_1.spawn)(onitCliExecutable, ['serve', '-t', '--exit'], true);
+            if (buildTscResult.exitCode !== 0)
                 throw new types_1.StringError('Tsc build failed. Aborting test');
+            const buildFrontendResult = await (0, spawn_1.spawn)(onitCliExecutable, ['serve', '-w', '--exit'], true);
+            if (buildFrontendResult.exitCode !== 0)
+                throw new types_1.StringError('Frontend build failed. Aborting test');
         }
         let testEnvironment = {
             env: testTarget.environment

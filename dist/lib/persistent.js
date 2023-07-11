@@ -31,7 +31,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const os_1 = __importDefault(require("os"));
-let baseConfigDir = path_1.default.join(os_1.default.homedir(), './.onit-cli');
+const baseConfigDir = path_1.default.join(os_1.default.homedir(), './.onit-cli');
 exports.baseConfigDir = baseConfigDir;
 /**
  * Check existence of dir for a gven key.

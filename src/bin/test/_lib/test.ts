@@ -65,8 +65,10 @@ export async function startTest(onitConfigFile: OnitConfigFile, testTarget: Onit
             logger.info('Cleaning project build...');
             await spawn(npmExecutable, ['run', 'clean'], true);
             logger.info('Building project...');
-            const buildResult = await spawn(onitCliExecutable, ['serve', '-t', '-exit'], true);
-            if (buildResult.exitCode !== 0) throw new StringError('Tsc build failed. Aborting test');
+            const buildTscResult = await spawn(onitCliExecutable, ['serve', '-t', '--exit'], true);
+            if (buildTscResult.exitCode !== 0) throw new StringError('Tsc build failed. Aborting test');
+            const buildFrontendResult = await spawn(onitCliExecutable, ['serve', '-w', '--exit'], true);
+            if (buildFrontendResult.exitCode !== 0) throw new StringError('Frontend build failed. Aborting test');
         }
 
         let testEnvironment: GenericObject = {
