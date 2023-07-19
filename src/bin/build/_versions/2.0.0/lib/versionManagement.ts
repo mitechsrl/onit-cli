@@ -75,6 +75,8 @@ export async function promptVersion(buildTarget:OnitConfigFileBuildTarget, vars:
     }
 
     let version = null;
+    if (!cwdPackageJson.version) throw new Error('No version field in package.json');
+    
     if (versionManagement && (versionManagement.propose !== false)) {
         const list = [{
             type: 'list',

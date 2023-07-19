@@ -57,6 +57,20 @@ async function runBuild(cwdPackageJson, buildTarget, onitConfigFile) {
     // launch frontend build. We need to select the correct engine based on project config
     // Eventually multiple engines are launched
     const frontendEngines = (0, onitConfigFileEngines_1.getConfigFileFrontendEngine)(onitConfigFile);
+    // launch backend server build. We need to select the correct engine based on project config
+    const backendEngines = (0, onitConfigFileEngines_1.getConfigFileBackendEngine)(onitConfigFile);
+    for (const _key of Object.keys(backendEngines)) {
+        const key = _key;
+        if (!backendEngines[key])
+            continue;
+        switch (key) {
+            case 'lb4': {
+                // Only lb4 now supported.
+                await (0, tsc_1.runTsc)(onitConfigFile, cwdPackageJson);
+                break;
+            }
+        }
+    }
     for (const _key of Object.keys(frontendEngines)) {
         const key = _key;
         if (!frontendEngines[key])
@@ -70,19 +84,6 @@ async function runBuild(cwdPackageJson, buildTarget, onitConfigFile) {
             case 'onit-webpack': {
                 // launch webpack build
                 await (0, webpack_1.runWebpack)('./dist-fe', onitConfigFile, buildMode);
-                break;
-            }
-        }
-    }
-    // launch backend server build. We need to select the correct engine based on project config
-    const backendEngines = (0, onitConfigFileEngines_1.getConfigFileBackendEngine)(onitConfigFile);
-    for (const _key of Object.keys(backendEngines)) {
-        const key = _key;
-        if (!backendEngines[key])
-            continue;
-        switch (key) {
-            case 'lb4': {
-                await (0, tsc_1.runTsc)(onitConfigFile, cwdPackageJson);
                 break;
             }
         }

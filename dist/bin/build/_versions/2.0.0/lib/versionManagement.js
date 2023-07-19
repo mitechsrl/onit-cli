@@ -76,6 +76,8 @@ async function promptVersion(buildTarget, vars, cwdPackageJson) {
         default: throw new Error('Unknown build mode ' + buildTarget.mode + '. Use one from: production, uat, beta, test.');
     }
     let version = null;
+    if (!cwdPackageJson.version)
+        throw new Error('No version field in package.json');
     if (versionManagement && (versionManagement.propose !== false)) {
         const list = [{
                 type: 'list',

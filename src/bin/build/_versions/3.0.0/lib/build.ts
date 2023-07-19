@@ -58,11 +58,27 @@ export async function runBuild(
     
     // clean the build directory
     await runClean(onitConfigFile, cwdPackageJson);
-
+    
     // launch frontend build. We need to select the correct engine based on project config
     // Eventually multiple engines are launched
     const frontendEngines = getConfigFileFrontendEngine(onitConfigFile);
 
+    // launch backend server build. We need to select the correct engine based on project config
+    const backendEngines = getConfigFileBackendEngine(onitConfigFile);
+    for (const _key of Object.keys(backendEngines)){
+    
+        const key = _key as keyof OnitConfigFileEngineBackend;
+        if (!backendEngines[key]) continue;
+    
+        switch(key){
+        case 'lb4': {
+            // Only lb4 now supported.
+            await runTsc(onitConfigFile, cwdPackageJson);
+            break;
+        }
+        }
+    }
+    
     for (const _key of Object.keys(frontendEngines)){
 
         const key = _key as keyof OnitConfigFileEngineFrontend;
@@ -81,21 +97,6 @@ export async function runBuild(
         }
         }
     }
-
-    // launch backend server build. We need to select the correct engine based on project config
-    const backendEngines = getConfigFileBackendEngine(onitConfigFile);
-    for (const _key of Object.keys(backendEngines)){
-
-        const key = _key as keyof OnitConfigFileEngineBackend;
-        if (!backendEngines[key]) continue;
-
-        switch(key){
-        case 'lb4': {
-            await runTsc(onitConfigFile, cwdPackageJson);
-            break;
-        }
-        }
-    }
-
+        
     logger.info(':muscle: Build completed');
 }

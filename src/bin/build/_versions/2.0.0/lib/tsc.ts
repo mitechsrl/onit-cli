@@ -55,5 +55,5 @@ export async function runTsc(onitConfigFile: OnitConfigFile, cwdPackageJson: Gen
         });
     });
 
-    logger.log('[TSC] Tsc build finished');
+    logger.info('[TSC] Tsc build completed!');
 }
