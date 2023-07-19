@@ -52,7 +52,7 @@ async function runTsc(onitConfigFile, cwdPackageJson) {
             resolve(null);
         });
     });
-    logger_1.logger.log('[TSC] Tsc build finished');
+    logger_1.logger.info('[TSC] Tsc build completed!');
 }
 exports.runTsc = runTsc;
 //# sourceMappingURL=tsc.js.map
