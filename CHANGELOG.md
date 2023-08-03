@@ -1,3 +1,7 @@
+## 3.0.2
+- Fixed env for nextjs build
+- Added 'shutdown' signal to stop the underlaying onit node process (before there was only 'rs')
+
 ## 3.0.1
 - Fixed test build which fail when nextjs frontend is used
 - Changed order of build: backend first, then frontend

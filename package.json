@@ -1,7 +1,7 @@
 {
     "name": "@mitech/onit-cli",
     "description": "Onit dev tool CLI",
-    "version": "3.0.1",
+    "version": "3.0.2",
     "main": "./dist/index.js",
     "engines": {
         "node": ">=14.0.0"
