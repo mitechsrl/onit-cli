@@ -81,7 +81,8 @@ export function getMainExecutableFilePath (onitConfigFile: OnitConfigFile, serve
 }
 
 export type SpawnNodeProcessResult = {
-    kill: (cb: () => void) => void
+    kill: (cb: () => void) => void,
+    getProcess: () => ChildProcessWithoutNullStreams | null,
 };
 
 /**
@@ -115,7 +116,7 @@ export function spawnNodeProcess (
     logger.info('Spawn node process: node ' + finalParams.join(' '));
 
     const _spawnOptions: GenericObject = Object.assign(spawnOptions, {
-        stdio: ['pipe', process.stdout, process.stderr],
+        stdio: ['pipe', process.stdout, process.stderr, 'ipc'],
         env: env
     });
 
@@ -134,6 +135,7 @@ export function spawnNodeProcess (
     });
 
     return {
+        getProcess: ()=> proc,
         kill: (cb: ()=> void) => {
             if (proc) {
                 // we have a previous process. Set the proper cb and kill it.

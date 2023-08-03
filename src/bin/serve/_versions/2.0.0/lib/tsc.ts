@@ -34,6 +34,8 @@ import { copyExtraFiles } from '../../../../build/_versions/2.0.0/lib/copyExtraF
 import TscWatchClient from 'tsc-watch/client';
 import { join, dirname } from 'path';
 import { existsSync } from 'fs';
+import os from 'os';
+
 const subProcesses: SpawnSubprocessResult[]= [];
 
 export async function tscWatchAndRun(onitConfigFile: OnitConfigFile, cwdPackageJson: GenericObject, argv: yargs.ArgumentsCamelCase<unknown>): Promise<void>{
@@ -93,6 +95,16 @@ export async function tscWatchAndRun(onitConfigFile: OnitConfigFile, cwdPackageJ
             if (line.trim() === 'rs') {
                 logger.log('Launch or reload');
                 launchOrReload();
+            }
+
+            // Fake a shutdown signal. On win, a message is sent (Using process IPC), on linux, SIGINT is used
+            // NOTE: on win, the same method as of pm2 shutdown-with-message is used (https://pm2.keymetrics.io/docs/usage/signals-clean-restart/)
+            if (line.trim() === 'shutdown') {
+                if (os.platform() === 'win32'){
+                    nodeProcess?.getProcess()?.send('shutdown');
+                }else{
+                    nodeProcess?.getProcess()?.kill('SIGINT');
+                }
             }
         });
 

@@ -100,7 +100,7 @@ function spawnNodeProcess(onitConfigFile, serveConfig, cwdPackageJson, argv, nod
     const finalParams = [...nodeParams, ...paramsFromOnitConfigFile, mainJsFile];
     logger_1.logger.info('Spawn node process: node ' + finalParams.join(' '));
     const _spawnOptions = Object.assign(spawnOptions, {
-        stdio: ['pipe', process.stdout, process.stderr],
+        stdio: ['pipe', process.stdout, process.stderr, 'ipc'],
         env: env
     });
     // finally launch the node process
@@ -117,6 +117,7 @@ function spawnNodeProcess(onitConfigFile, serveConfig, cwdPackageJson, argv, nod
         proc = null;
     });
     return {
+        getProcess: () => proc,
         kill: (cb) => {
             if (proc) {
                 // we have a previous process. Set the proper cb and kill it.

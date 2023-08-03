@@ -1,5 +1,7 @@
+/// <reference types="node" />
 import { GenericObject, OnitConfigFile, OnitConfigFileServe } from '../../../../../types';
 import yargs from 'yargs';
+import { ChildProcessWithoutNullStreams } from 'child_process';
 /**
  *
  * @param {*} onitConfigFile
@@ -17,6 +19,7 @@ export declare function buildEnvironment(onitConfigFile: OnitConfigFile, serveCo
 export declare function getMainExecutableFilePath(onitConfigFile: OnitConfigFile, serveConfig: OnitConfigFileServe): string | undefined;
 export declare type SpawnNodeProcessResult = {
     kill: (cb: () => void) => void;
+    getProcess: () => ChildProcessWithoutNullStreams | null;
 };
 /**
  * Spawn a node process for the app

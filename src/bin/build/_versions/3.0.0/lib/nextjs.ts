@@ -33,6 +33,7 @@ export async function nextJsBuild (
     onitConfigFile: OnitConfigFile,
     cwdPackageJson: GenericObject,
     buildMode: string,  //'prduction'|'development',
+    env?: GenericObject, // Values to add to env when spawning cli 
     argv?: yargs.ArgumentsCamelCase<unknown>) {
 
     // we just automatize the "next build" command. Checking for binary to be launched (will throw eventually)
@@ -46,15 +47,17 @@ export async function nextJsBuild (
     const dir = path.join(onitConfigFile.sources[0],'../');
     let nextjsDir = path.join(dir,nextDirectory);
     nextjsDir = path.relative(dir, nextjsDir);
-
+    
+    const _env = Object.assign({}, env, {
+        // Nextjs might complain about this for these reasons: https://nextjs.org/docs/messages/non-standard-node-env
+        // Ignoring them now, this command is explicitly run in some specific mode
+        NODE_ENV: buildMode
+    });
+    
     // binary found. Spawn it!
     return new Promise((resolve, reject) => {
         const ls = spawn('node', [binPath, 'build', nextjsDir], {
-            env: {
-                // Nextjs complain about this for these reasons: https://nextjs.org/docs/messages/non-standard-node-env
-                // Ignoring them now, this command is explicitly run in dev mode
-                NODE_ENV: buildMode
-            },
+            env: _env,
             // ignore stdin, stdout & stderr just print out to the current cli session output 
             stdio: ['ignore', 'inherit', 'inherit']
         });

@@ -97,8 +97,9 @@ async function start(onitConfigFile, version, argv) {
                         //    It happens only if exit is not set, (which will have caused cause the tsc compiler to exit before launching node)
                         if (isFrontendRunOnly || exit) {
                             serialPromises.push(() => {
+                                var _a, _b;
                                 logger_1.logger.log('Serving nextjs...');
-                                return (0, nextjs_1.nextJsBuild)(onitConfigFile, cwdPackageJson, 'development', argv);
+                                return (0, nextjs_1.nextJsBuild)(onitConfigFile, cwdPackageJson, 'development', (_b = (_a = onitConfigFile.json.serve) === null || _a === void 0 ? void 0 : _a.environment) !== null && _b !== void 0 ? _b : {}, argv);
                             });
                         }
                         break;

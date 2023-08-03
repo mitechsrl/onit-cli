@@ -38,6 +38,7 @@ const copyExtraFiles_1 = require("../../../../build/_versions/2.0.0/lib/copyExtr
 const client_1 = __importDefault(require("tsc-watch/client"));
 const path_1 = require("path");
 const fs_1 = require("fs");
+const os_1 = __importDefault(require("os"));
 const subProcesses = [];
 async function tscWatchAndRun(onitConfigFile, cwdPackageJson, argv) {
     const tsConfigFile = ['./tsconfig.json', './tsconfig.js'].map(f => {
@@ -88,10 +89,20 @@ async function tscWatchAndRun(onitConfigFile, cwdPackageJson, argv) {
         // eslint-disable-next-line @typescript-eslint/no-empty-function
         let onSuccess = () => { };
         rl.on('line', (line) => {
+            var _a, _b;
             // manual app restart
             if (line.trim() === 'rs') {
                 logger_1.logger.log('Launch or reload');
                 launchOrReload();
+            }
+            // Fake a shutdown signal. On win, a message is sent (Using process IPC), on linux, SIGINT is used
+            if (line.trim() === 'shutdown') {
+                if (os_1.default.platform() === 'win32') {
+                    (_a = nodeProcess === null || nodeProcess === void 0 ? void 0 : nodeProcess.getProcess()) === null || _a === void 0 ? void 0 : _a.send('shutdown');
+                }
+                else {
+                    (_b = nodeProcess === null || nodeProcess === void 0 ? void 0 : nodeProcess.getProcess()) === null || _b === void 0 ? void 0 : _b.kill('SIGINT');
+                }
             }
         });
         watch.on('first_success', () => {

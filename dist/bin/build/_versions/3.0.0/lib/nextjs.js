@@ -32,6 +32,7 @@ const child_process_1 = require("child_process");
 const resolveNextBinImportPath_1 = require("./resolveNextBinImportPath");
 const path_1 = __importDefault(require("path"));
 async function nextJsBuild(onitConfigFile, cwdPackageJson, buildMode, //'prduction'|'development',
+env, // Values to add to env when spawning cli 
 argv) {
     // we just automatize the "next build" command. Checking for binary to be launched (will throw eventually)
     const binPath = (0, resolveNextBinImportPath_1.resolveNextBinImportPath)();
@@ -42,14 +43,15 @@ argv) {
     const dir = path_1.default.join(onitConfigFile.sources[0], '../');
     let nextjsDir = path_1.default.join(dir, nextDirectory);
     nextjsDir = path_1.default.relative(dir, nextjsDir);
+    const _env = Object.assign({}, env, {
+        // Nextjs might complain about this for these reasons: https://nextjs.org/docs/messages/non-standard-node-env
+        // Ignoring them now, this command is explicitly run in some specific mode
+        NODE_ENV: buildMode
+    });
     // binary found. Spawn it!
     return new Promise((resolve, reject) => {
         const ls = (0, child_process_1.spawn)('node', [binPath, 'build', nextjsDir], {
-            env: {
-                // Nextjs complain about this for these reasons: https://nextjs.org/docs/messages/non-standard-node-env
-                // Ignoring them now, this command is explicitly run in dev mode
-                NODE_ENV: buildMode
-            },
+            env: _env,
             // ignore stdin, stdout & stderr just print out to the current cli session output 
             stdio: ['ignore', 'inherit', 'inherit']
         });

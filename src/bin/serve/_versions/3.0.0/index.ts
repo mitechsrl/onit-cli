@@ -31,7 +31,6 @@ import semver from 'semver';
 import { logger } from '../../../../lib/logger';
 import { pm2start, pm2stop } from '../2.0.0//lib/pm2';
 import { tscWatchAndRun } from '../2.0.0/lib/tsc';
-
 import { webpackDevBuildAndWatch } from '../2.0.0/lib/webpack';
 import { getConfigFileBackendEngine, getConfigFileFrontendEngine } from '../../../../lib/onitConfigFileEngines';
 import { nextJsBuild } from '../../../build/_versions/3.0.0/lib/nextjs';
@@ -105,7 +104,7 @@ export async function start(onitConfigFile: OnitConfigFile, version:string, argv
                     if (isFrontendRunOnly || exit){
                         serialPromises.push(() => {
                             logger.log('Serving nextjs...');
-                            return nextJsBuild(onitConfigFile, cwdPackageJson, 'development', argv);
+                            return nextJsBuild(onitConfigFile, cwdPackageJson, 'development', onitConfigFile.json.serve?.environment ?? {}, argv);
                         });
                     }
                     break;
