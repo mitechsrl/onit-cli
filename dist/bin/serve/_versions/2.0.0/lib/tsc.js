@@ -96,6 +96,7 @@ async function tscWatchAndRun(onitConfigFile, cwdPackageJson, argv) {
                 launchOrReload();
             }
             // Fake a shutdown signal. On win, a message is sent (Using process IPC), on linux, SIGINT is used
+            // NOTE: on win, the same method as of pm2 shutdown-with-message is used (https://pm2.keymetrics.io/docs/usage/signals-clean-restart/)
             if (line.trim() === 'shutdown') {
                 if (os_1.default.platform() === 'win32') {
                     (_a = nodeProcess === null || nodeProcess === void 0 ? void 0 : nodeProcess.getProcess()) === null || _a === void 0 ? void 0 : _a.send('shutdown');
