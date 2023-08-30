@@ -38,12 +38,21 @@ type PersistentUpdate = {
     update: boolean,
     lastCheck: string
 };
-// after some time (3 minutes), just check for newer versions and show a info in the console
+// after some time (1 minutes), just check for newer versions and show a info in the console
 // This is just for a reminder, doesn't do anything else.
 export function npmVersionCheck() {
 
     const updateStatus = getPersistent('update') as PersistentUpdate;
     if (updateStatus?.update) {
+        
+        if (packageJson.version === updateStatus.newversion){
+            // first run after update. The flag is still true, we need to reset it.
+            updateStatus.update = false;
+            setPersistent('update', updateStatus);
+            return;
+        }
+
+        // still not updated
         logger.warn('[ONIT-CLI UPDATE] A new version of onit-cli is available. Current: ' + packageJson.version + ', newer: ' + updateStatus.newversion + '. Install with <npm install -g ' + packageJson.name + '>');
     }
 

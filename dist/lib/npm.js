@@ -42,6 +42,13 @@ exports.npxExecutable = os_1.default.platform() === 'win32' ? 'npx.cmd' : 'npx';
 function npmVersionCheck() {
     const updateStatus = (0, persistent_1.getPersistent)('update');
     if (updateStatus === null || updateStatus === void 0 ? void 0 : updateStatus.update) {
+        if (packageJson_1.packageJson.version === updateStatus.newversion) {
+            // first run after update. The flag is still true, we need to reset it.
+            updateStatus.update = false;
+            (0, persistent_1.setPersistent)('update', updateStatus);
+            return;
+        }
+        // still not updated
         logger_1.logger.warn('[ONIT-CLI UPDATE] A new version of onit-cli is available. Current: ' + packageJson_1.packageJson.version + ', newer: ' + updateStatus.newversion + '. Install with <npm install -g ' + packageJson_1.packageJson.name + '>');
     }
     // check for npm registry updates. Do it once each hour to prevent too many calls
