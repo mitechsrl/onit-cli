@@ -1,3 +1,7 @@
+## 3.0.3
+- Fixed minor typos
+- Added some verbosity on errored test runs
+
 ## 3.0.2
 - Fixed env for nextjs build
 - Added 'shutdown' signal to stop the underlaying onit node process (before there was only 'rs')
