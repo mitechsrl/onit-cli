@@ -151,7 +151,9 @@ export async function startTest(onitConfigFile: OnitConfigFile, testTarget: Onit
         }
     } catch (e) {
         logger.error('Catched error');
-        throw e;
+        logger.error(e);
+        logger.error('Test Failed!');
+        return;
     }
 
     logger.info('Test success!');

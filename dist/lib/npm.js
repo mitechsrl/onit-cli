@@ -37,7 +37,7 @@ const gt_1 = __importDefault(require("semver/functions/gt"));
 // windows being windows... it wants the .cmd extension!
 exports.npmExecutable = os_1.default.platform() === 'win32' ? 'npm.cmd' : 'npm';
 exports.npxExecutable = os_1.default.platform() === 'win32' ? 'npx.cmd' : 'npx';
-// after some time (3 minutes), just check for newer versions and show a info in the console
+// after some time (1 minutes), just check for newer versions and show a info in the console
 // This is just for a reminder, doesn't do anything else.
 function npmVersionCheck() {
     const updateStatus = (0, persistent_1.getPersistent)('update');

@@ -24,6 +24,21 @@ const config = {
                 type: 'string',
                 description: 'Quick grep override. Replaces the one provided from config file'
             }
+        },
+        {
+            name: 'd',
+            config: {
+                alias: 'debug',
+                type: 'boolean',
+                description: 'Start node process with --inspect'
+            }
+        },
+        {
+            name: 'preserve-symlinks',
+            config: {
+                type: 'boolean',
+                description: 'Same as node --preserve-symlinks. Valid when launching app with debug flag'
+            }
         }]
 };
 exports.default = config;

@@ -144,7 +144,9 @@ async function startTest(onitConfigFile, testTarget, argv) {
     }
     catch (e) {
         logger_1.logger.error('Catched error');
-        throw e;
+        logger_1.logger.error(e);
+        logger_1.logger.error('Test Failed!');
+        return;
     }
     logger_1.logger.info('Test success!');
 }

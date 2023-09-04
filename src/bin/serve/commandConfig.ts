@@ -87,7 +87,7 @@ const config: Command = {
             config: {
                 alias: 'debug',
                 type:'boolean',
-                description: 'Start node process with --inspact' 
+                description: 'Start node process with --inspect' 
             } 
         },
         {
