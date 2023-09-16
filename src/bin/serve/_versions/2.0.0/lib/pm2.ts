@@ -31,30 +31,62 @@ import { spawn as _spawn } from 'child_process';
 import { logger } from '../../../../../lib/logger';
 import os from 'os';
 
-// windows being windows... it wants the .cmd extension!
-const pm2exec = os.platform() === 'win32' ? 'pm2.cmd' : 'pm2';
-
 /**
- * Check for pm2 availability. Launche will be skipped if not available
- * @returns true or false
+ * Uses the 'where' (on windows) or 'which' (on other os) command to search for pm2 executable directory
+ * 
+ * @param expectedCommandEndsWith 
+ * @returns the command path or a nullish value for not found
  */
-async function checkPm2Availability(){
-
-    // Quicker method: check for executable file
-    if (os.platform() === 'win32'){
-        // works on win32
-        return fs.existsSync('C:\\Program Files\\nodejs\\'+pm2exec);
-    }else if (fs.existsSync('/usr/bin/pm2')){
-        // works on any linux/unix based distro
-        return true;
+async function where(expectedCommandEndsWith:string): Promise<string|undefined>{
+    let w = '';
+    switch(os.platform()){
+    case 'win32': w = 'where'; break;
+    case 'linux': w = 'which'; break;
+    // Implement for other os if needed
+    default: return undefined;
     }
     
-    // fallback slower method: run pm2 -v command and watch output
-    try{
-        const result = await spawn(pm2exec,['-v'], false);
-        return (result.exitCode === 0) && (result.output.trim().length>0);
-    }catch(e){
-        return false;
+    // Check with where command
+    const v = await spawn(w,['pm2'],false);
+    // Not found
+    if (v.exitCode !== 0) return undefined;
+    // found, just store the bin path for future uses to be sure
+    return v.output.split('\n').map(v => v.trim()).find(v =>v.endsWith(expectedCommandEndsWith));
+}
+
+/**
+ * Check for pm2 bin path.
+ * @returns string or undefined
+ */
+async function getPm2BinPath(){
+
+    switch(os.platform()){
+    case 'win32': {
+        // Fastest method: standard install dir check
+        const winPm2Base = 'C:\\Program Files\\nodejs\\pm2.cmd';
+        if(fs.existsSync(winPm2Base)){
+            return winPm2Base;
+        }
+
+        // Check with where command
+        return where('pm2.cmd');
+    }
+    case 'linux': {
+        // check for other os (linux)
+        const linuxPm2Base = '/usr/bin/pm2';
+        // Fastest method: standard install dir check
+        if (fs.existsSync(linuxPm2Base)){
+            return linuxPm2Base;
+        }
+        // Check with where command
+        return where('pm2');
+    }
+
+    // Implement for other os if needed
+    default: {
+        logger.warn('Pm2 availability check not implemented for '+os.platform()+'. Skip pm2 management.');
+        return undefined;
+    }
     }
 }
 
@@ -63,7 +95,12 @@ async function checkPm2Availability(){
  * The process is detached so this cli can stop immediately without waiting for pm2 stop.
  */
 export async function pm2stop() {
-    const subprocess = _spawn(pm2exec, ['stop', 'all'], {
+    const pm2BinPath = await getPm2BinPath();
+    if (!pm2BinPath) {
+        logger.warn('Pm2 stop not available. Pm2 executable not found');
+        return;
+    }
+    const subprocess = _spawn(pm2BinPath, ['stop', 'all'], {
         detached: true,
         stdio: 'ignore'
     });
@@ -77,6 +114,12 @@ export async function pm2stop() {
  * @returns The number of app launched
  */
 export async function pm2start(onitConfigFile: OnitConfigFile): Promise<number> {
+
+    const pm2BinPath = await getPm2BinPath();
+    if (!pm2BinPath){
+        logger.warn('PM2 is not installed. Apps launch as defined in <pm2-dev-ecosystem> will be skipped');
+        return 0;
+    }
 
     // preparo ecosystem file temporaneo
     const pm2Ecosystem: GenericObject = (onitConfigFile.json.serve || {})['pm2-dev-ecosystem'] ?? { apps: [] };
@@ -101,18 +144,13 @@ export async function pm2start(onitConfigFile: OnitConfigFile): Promise<number> 
         return 0;
     }
 
-    if (!await checkPm2Availability()){
-        logger.warn('PM2 is not installed. Apps launch as defined in <pm2-dev-ecosystem> will be skipped');
-        return 0;
-    }
-
     const temporaryEcosystemFile = onitConfigFile.sources[0] + '-pm2-ecosystem.json';
     fs.writeFileSync(temporaryEcosystemFile, JSON.stringify(pm2Ecosystem, null, 4));
 
     // rimuovo ecosystem caricato in precedenza prima di rilanciare tutto
-    await spawn(pm2exec, ['delete', 'all'], false);
+    await spawn(pm2BinPath, ['delete', 'all'], false);
 
     // pm2 delete all fatto. ora lancio ecosystem attuale
-    await spawn(pm2exec, ['start', temporaryEcosystemFile], true);
+    await spawn(pm2BinPath, ['start', temporaryEcosystemFile], true);
     return pm2Ecosystem.apps.length;
 }

@@ -84,20 +84,6 @@ module.exports = {
                     useNewUrlParser: true
                 }
             }
-        },
-        // pm2 ecosystem to be launched before serving the app
-        'pm2-dev-ecosystem': {
-            apps: [
-                {
-                    name: 'some-app',
-                    script: 'index.js',
-                    watch: false,
-                    max_memory_restart: '512M',
-                    cwd: './some-app/',
-                    exec_mode: 'fork',
-                    shutdown_with_message: true
-                }
-            ]
         }
     },
 

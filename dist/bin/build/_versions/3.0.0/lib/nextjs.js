@@ -46,6 +46,10 @@ argv) {
     const _env = Object.assign({}, env, {
         // Nextjs might complain about this for these reasons: https://nextjs.org/docs/messages/non-standard-node-env
         // Ignoring them now, this command is explicitly run in some specific mode
+        // 06-09-2023: 'production' usabile solo con 'next build'
+        //             'development' usabile solo con 'next dev'
+        //             Ad oggi next non supporta l'uso di modalità diverse da 'production' con 'next build'.
+        //             Ci teniamo il warning.
         NODE_ENV: buildMode
     });
     // binary found. Spawn it!
