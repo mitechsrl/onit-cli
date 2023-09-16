@@ -43,7 +43,7 @@ La configurazione tipica esportata rappresenta una voce di alias. In questo modo
     // this is a standard webpack config json
     resolve: {
         alias: {
-            MitownReactComponents: path.resolve(__dirname, './client/components/react')
+            ReactComponents: path.resolve(__dirname, './client/components/react')
         }
     }
 }
@@ -52,7 +52,7 @@ La configurazione tipica esportata rappresenta una voce di alias. In questo modo
 I componenti dipendenti da questo, possono utilizzare il seguente codice per importare componenti react da altri pacchetti
 
 ```
-import component from 'MitownReactComponents\component.jsx'
+import component from 'ReactComponents\component.jsx'
 ```
 
 ##### Build version

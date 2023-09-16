@@ -25,7 +25,7 @@ Il file contiene una serie di istruzioni per il lancio del progetto in ambiente 
 
 ### Component
 
-Con questa modalità, la directory corrente rappresenta un componente aggiuntivo di mitown.
+Con questa modalità, la directory corrente rappresenta un componente aggiuntivo di onit.
 In caso component sia settato a true, il serve avvia onit direttamente dalle dipendenze in node_modules.
 Nel caso sia settato a false, si assume che la cartella corrente contenga onit, pertanto il sistema lancia direttamente il file js iniziale di onit.
 

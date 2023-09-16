@@ -194,7 +194,7 @@ async function webpackConfigFactory(context, config, packageJson) {
                     inject: false,
                     // the output filename is just the entry point. Make sure you have unique identified entry points
                     filename: entryPoint.toLowerCase() + '.chunks.ejs',
-                    // this will make the public path by package: dist/mitown, dist/mit-ask etc...
+                    // this will make the public path by package: dist/onit-next, dist/onit-ui etc...
                     publicPath: '/dist-fe' + packagePublishPath,
                     // this particular instance will add (js chunk files) dependencies for this entrypoint
                     chunks: [entryPoint]
