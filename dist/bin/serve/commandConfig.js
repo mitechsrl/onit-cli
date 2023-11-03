@@ -22,28 +22,28 @@ const config = {
             name: 'n',
             config: {
                 type: 'boolean',
-                description: 'Esegui solo il processo node (Necessita di tsc eseguito almeno una volta)'
+                description: 'Run node only (Requires backend build launched at least once)'
             }
         },
         {
             name: 'minimize',
             config: {
                 type: 'boolean',
-                description: 'Abbinato a -w, esegue build minificata'
+                description: 'Used with -w, run minified dev build'
             }
         },
         {
             name: 'prod',
             config: {
                 type: 'boolean',
-                description: 'Abbinato a -w, esegue build con flag production anzichè development'
+                description: 'Used with -w, run build using production mode rather than development'
             }
         },
         {
             name: 'exit',
             config: {
                 type: 'boolean',
-                description: 'Used with -t or -w, exit after the fuirs successfull build'
+                description: 'Used with -t or -w, exit after the first successfull build'
             }
         },
         {
