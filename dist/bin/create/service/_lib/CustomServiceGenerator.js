@@ -33,6 +33,7 @@ const lodash_1 = __importDefault(require("lodash"));
 const ejs_1 = __importDefault(require("ejs"));
 const path_1 = require("path");
 const yeoman_environment_1 = __importDefault(require("yeoman-environment"));
+const fs_2 = __importDefault(require("fs"));
 // @loopback-cli is not a library, there's not typings
 // We are just leveraging on some implementation to reuse them
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -71,9 +72,14 @@ class CustomServiceGenerator extends ServiceGenerator {
         if (!this.artifactInfo.name.toLowerCase().startsWith('onit')) {
             this.artifactInfo.name = 'Onit' + lodash_1.default.upperFirst(this.artifactInfo.name);
         }
+        // Remove final service if any...will be set automatically
+        if (this.artifactInfo.name.toLowerCase().endsWith('service')) {
+            this.artifactInfo.name = this.artifactInfo.name.substring(0, this.artifactInfo.name.length - 7);
+        }
         this.artifactInfo.className = utils.toClassName(this.artifactInfo.name);
         this.artifactInfo.className = lodash_1.default.upperFirst(lodash_1.default.camelCase(this.artifactInfo.className));
         this.artifactInfo.classNameCapitalServiceName = lodash_1.default.snakeCase(this.artifactInfo.className).toUpperCase();
+        fs_2.default.mkdirSync(this.artifactInfo.outDir, { recursive: true });
         await super.scaffold();
         // add the reference to index.ts file
         const kebabCaseFilename = utils.toFileName(this.artifactInfo.className);

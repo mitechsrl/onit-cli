@@ -61,7 +61,7 @@ async function loadJs(filename: string): Promise<GenericObject> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
         throw new ParseError(
-            error.message + '\nStack:'+error.stack.split('\n').slice(0, 3).join('\n'),
+            'Load of '+filename+' failed with error:\nStack:'+error.stack.split('\n').slice(0, 3).join('\n'),
             filename);
     }
 }

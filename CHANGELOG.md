@@ -1,3 +1,7 @@
+
+- Fixed pm2 availability check
+- Added support for **engines.frontend = false** to disable frontend builds
+
 ## 3.0.3
 - Fixed minor typos
 - Added some verbosity on errored test runs

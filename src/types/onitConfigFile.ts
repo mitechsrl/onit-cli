@@ -101,7 +101,7 @@ export type OnitConfigFileEngineFrontend = { [k in 'onit-webpack' | 'nextjs' ]?:
 export type OnitConfigFileEngineBackend = { [k in 'lb4']?: boolean | GenericObject };
 
 export type OnitConfigFileEngine = {
-    frontend?: OnitConfigFileEngineFrontend,
+    frontend?: false | OnitConfigFileEngineFrontend,
     backend?: OnitConfigFileEngineBackend
 
 };

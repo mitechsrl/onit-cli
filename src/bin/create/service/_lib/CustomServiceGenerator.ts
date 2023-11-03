@@ -29,6 +29,7 @@ import ejs from 'ejs';
 import { join, resolve } from 'path';
 import { GenericObject } from '../../../../types';
 import yeoman from 'yeoman-environment';
+import fs from 'fs';
 
 // @loopback-cli is not a library, there's not typings
 // We are just leveraging on some implementation to reuse them
@@ -73,14 +74,23 @@ export class CustomServiceGenerator extends ServiceGenerator {
         if (!this.artifactInfo.name.toLowerCase().startsWith('onit')) {
             this.artifactInfo.name = 'Onit' + _.upperFirst(this.artifactInfo.name);
         }
+        // Remove final service if any...will be set automatically
+        if (this.artifactInfo.name.toLowerCase().endsWith('service')) {
+            this.artifactInfo.name = this.artifactInfo.name.substring(0, this.artifactInfo.name.length-7);
+        }
+
         this.artifactInfo.className = utils.toClassName(this.artifactInfo.name);
         this.artifactInfo.className = _.upperFirst(_.camelCase(this.artifactInfo.className));
+        
         this.artifactInfo.classNameCapitalServiceName = _.snakeCase(this.artifactInfo.className).toUpperCase();
 
+        fs.mkdirSync(this.artifactInfo.outDir, { recursive:true });
+        
         await super.scaffold();
-
+        
         // add the reference to index.ts file
         const kebabCaseFilename = utils.toFileName(this.artifactInfo.className);
+        
         await relationUtils.addExportController(
             this,
             resolve(this.artifactInfo.outDir, 'index.ts'),

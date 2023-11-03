@@ -62,7 +62,7 @@ async function loadJs(filename) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }
     catch (error) {
-        throw new types_1.ParseError(error.message + '\nStack:' + error.stack.split('\n').slice(0, 3).join('\n'), filename);
+        throw new types_1.ParseError('Load of ' + filename + ' failed with error:\nStack:' + error.stack.split('\n').slice(0, 3).join('\n'), filename);
     }
 }
 // try to load a file. Throw a customized error in case of failure

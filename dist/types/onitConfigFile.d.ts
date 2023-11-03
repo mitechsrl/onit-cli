@@ -72,7 +72,7 @@ export declare type OnitConfigFileEngineBackend = {
     [k in 'lb4']?: boolean | GenericObject;
 };
 export declare type OnitConfigFileEngine = {
-    frontend?: OnitConfigFileEngineFrontend;
+    frontend?: false | OnitConfigFileEngineFrontend;
     backend?: OnitConfigFileEngineBackend;
 };
 export declare type OnitConfigFile = {

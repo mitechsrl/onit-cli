@@ -19,6 +19,10 @@ function checkObject(_obj: GenericObject){
 export function getConfigFileFrontendEngine(onitConfigFile: OnitConfigFile): OnitConfigFileEngineFrontend {
     const engines = onitConfigFile.json.engines;
     if (engines) checkObject(engines);
+    
+    // Fallback case: false will make the cli to skip frontend compilation
+    if (engines?.frontend === false) return {};
+
     const _obj = (engines?.frontend) ? engines.frontend : { 'onit-webpack':true };
     checkObject(_obj);
     return _obj;

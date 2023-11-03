@@ -21,6 +21,9 @@ function getConfigFileFrontendEngine(onitConfigFile) {
     const engines = onitConfigFile.json.engines;
     if (engines)
         checkObject(engines);
+    // Fallback case: false will make the cli to skip frontend compilation
+    if ((engines === null || engines === void 0 ? void 0 : engines.frontend) === false)
+        return {};
     const _obj = (engines === null || engines === void 0 ? void 0 : engines.frontend) ? engines.frontend : { 'onit-webpack': true };
     checkObject(_obj);
     return _obj;
