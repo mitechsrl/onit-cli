@@ -23,9 +23,9 @@ module.exports = {
     // set component as true for onit extension components
     component: true,
 
-    // For lb4 based onit, both serve and build V2 are required.
+    // For lb4 based onit, both serve and build V3 are required.
     // For specific serve or build versions, set serve.version or build.version
-    version: '2.0.0',
+    version: '^3.0.0',
 
     /**
      * Tsc does not manage other files than the .ts ones. We need to copy some other files to make things work.
@@ -48,14 +48,18 @@ module.exports = {
      * Select th engines to be run
     */
     engines: {
+        // backend engines. Only lb4 is available currently. Set te engine to false to disable backend builds
+        // defaults to {'lb4':true}
         backend: {
-            // on backend only lb4 is available currently. If omiteed, 'lb4:true' is used as default
             'lb4': true, 
         }
+        // frontend engines. You can also set this value to false to disable frontend builds. 
+        // Multiple engines can be set at once.
+        // defaults to {'onit-webpack':true}
         frontend: {
-            // on frontend onit-webpack defines the legacy mode, where nexjs defines to use the nextjs engine.
-            // Defaults to 'onit-webpack'. Multiple engines can be set at once.
+            // legacy mode (custom webpack + file structure).
             'onit-webpack':true,
+            // nextjs-based frontends
             'nextjs':true
         }
     }
@@ -70,7 +74,7 @@ module.exports = {
         // main file to launch for serve. Defaults to onit index file
         // main:'',
         
-        // node main process arguments
+        // node main process arguments. Passed as-is to node process
         // nodeArgs: []
         
         // env variables for the node process to be launched
