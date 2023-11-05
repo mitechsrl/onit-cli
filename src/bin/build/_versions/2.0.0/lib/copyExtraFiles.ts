@@ -39,6 +39,7 @@ export async function copyExtraFiles(onitConfigFile: OnitConfigFile){
          * @param {*} onReady callback called after the initial scan has completed
          */
         start: (onReady: () => void) => {
+
             if (copyFiles && copyFiles.from && copyFiles.glob && copyFiles.glob.length > 0) {
                 const to = copyFiles.to || path.join(process.cwd(), './dist');
                 const srcPath = path.join(process.cwd(), copyFiles.from);
@@ -50,14 +51,32 @@ export async function copyExtraFiles(onitConfigFile: OnitConfigFile){
                 // NOTE: the add will be triggered at any start, so when this function is launched,
                 // a fisto copy of all the files will be triggered.
                 // subsequential copies are performed on change.
-                const addChange = async (filePath: string) => {
+                const addChange = (filePath: string) => {
                     const srcFileFullPath = path.join(process.cwd(), filePath);
                     const dstFileFullPath = srcFileFullPath.replace(srcPath, dstPath);
                     const _p = path.dirname(dstFileFullPath);
                     if (!fs.existsSync(_p)){
-                        await fs.promises.mkdir(_p, { recursive: true });
+                        fs.mkdirSync(_p, { recursive: true });
                     }
-                    await fs.promises.copyFile(srcFileFullPath, dstFileFullPath, fs.constants.COPYFILE_FICLONE);
+
+                    let copy = true;
+                    try{
+                        // Try to not copy files if they are already there and save up time
+                        const statDst = fs.statSync(dstFileFullPath);
+                        const statSrc = fs.statSync(srcFileFullPath);
+                        // Do not copy if filesize is the same and last modified time is the same
+                        if ((statSrc.mtime === statDst.mtime) && (statSrc.size == statDst.size)){
+                            copy = false;
+                        }
+                    }catch(e){
+                        // Checks failed. To be sure, fallback to "copy=true"
+                        copy = true;
+                    }
+                    
+                    if (!copy)return;
+                
+                    fs.copyFileSync(srcFileFullPath, dstFileFullPath, fs.constants.COPYFILE_FICLONE);
+                    
                 };
                 watcher.on('add', addChange);
                 watcher.on('change', addChange);

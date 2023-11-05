@@ -49,14 +49,30 @@ async function copyExtraFiles(onitConfigFile) {
                 // NOTE: the add will be triggered at any start, so when this function is launched,
                 // a fisto copy of all the files will be triggered.
                 // subsequential copies are performed on change.
-                const addChange = async (filePath) => {
+                const addChange = (filePath) => {
                     const srcFileFullPath = path_1.default.join(process.cwd(), filePath);
                     const dstFileFullPath = srcFileFullPath.replace(srcPath, dstPath);
                     const _p = path_1.default.dirname(dstFileFullPath);
                     if (!fs_1.default.existsSync(_p)) {
-                        await fs_1.default.promises.mkdir(_p, { recursive: true });
+                        fs_1.default.mkdirSync(_p, { recursive: true });
                     }
-                    await fs_1.default.promises.copyFile(srcFileFullPath, dstFileFullPath, fs_1.default.constants.COPYFILE_FICLONE);
+                    let copy = true;
+                    try {
+                        // Try to not copy files if they are already there and save up time
+                        const statDst = fs_1.default.statSync(dstFileFullPath);
+                        const statSrc = fs_1.default.statSync(srcFileFullPath);
+                        // Do not copy if filesize is the same and last modified time is the same
+                        if ((statSrc.mtime === statDst.mtime) && (statSrc.size == statDst.size)) {
+                            copy = false;
+                        }
+                    }
+                    catch (e) {
+                        // Checks failed. To be sure, fallback to "copy=true"
+                        copy = true;
+                    }
+                    if (!copy)
+                        return;
+                    fs_1.default.copyFileSync(srcFileFullPath, dstFileFullPath, fs_1.default.constants.COPYFILE_FICLONE);
                 };
                 watcher.on('add', addChange);
                 watcher.on('change', addChange);
