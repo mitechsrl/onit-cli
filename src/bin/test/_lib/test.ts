@@ -46,7 +46,7 @@ const onitCliExecutable = os.platform()=== 'win32' ? 'onit.cmd' : 'onit';
  * @param testTarget Test config
  * @param argv  cli params
  */
-export async function startTest(onitConfigFile: OnitConfigFile, testTarget: OnitConfigFileTestTarget, argv: yargs.ArgumentsCamelCase<unknown>){
+export async function startTest(onitConfigFile: OnitConfigFile, testTarget: OnitConfigFileTestTarget, argv: yargs.ArgumentsCamelCase<unknown>): Promise<number>{
     try {
         const doNotRebuild = argv['no-rebuild'];
         if (doNotRebuild) {
@@ -153,8 +153,9 @@ export async function startTest(onitConfigFile: OnitConfigFile, testTarget: Onit
         logger.error('Catched error');
         logger.error(e);
         logger.error('Test Failed!');
-        return;
+        return -1;
     }
 
     logger.info('Test success!');
+    return 0;
 }

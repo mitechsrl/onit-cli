@@ -7,4 +7,4 @@ import yargs from 'yargs';
  * @param testTarget Test config
  * @param argv  cli params
  */
-export declare function startTest(onitConfigFile: OnitConfigFile, testTarget: OnitConfigFileTestTarget, argv: yargs.ArgumentsCamelCase<unknown>): Promise<void>;
+export declare function startTest(onitConfigFile: OnitConfigFile, testTarget: OnitConfigFileTestTarget, argv: yargs.ArgumentsCamelCase<unknown>): Promise<number>;

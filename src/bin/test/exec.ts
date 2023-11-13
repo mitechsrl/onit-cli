@@ -53,8 +53,11 @@ const exec: CommandExecFunction = async (argv: yargs.ArgumentsCamelCase<unknown>
     }
 
     // launch test
-    await startTest(onitConfigFile, testTarget, argv);
-   
+    const returnCode = await startTest(onitConfigFile, testTarget, argv);
+
+    // Just a fallback: onit might keep the process appended for internal events, but we 
+    // wont to exit now. Just exit, discart everything else
+    process.exit(returnCode);
 };
 
 export default exec;

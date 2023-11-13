@@ -146,9 +146,10 @@ async function startTest(onitConfigFile, testTarget, argv) {
         logger_1.logger.error('Catched error');
         logger_1.logger.error(e);
         logger_1.logger.error('Test Failed!');
-        return;
+        return -1;
     }
     logger_1.logger.info('Test success!');
+    return 0;
 }
 exports.startTest = startTest;
 //# sourceMappingURL=test.js.map

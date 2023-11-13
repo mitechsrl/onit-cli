@@ -46,7 +46,10 @@ const exec = async (argv) => {
         testTarget.grep = overrideMatchTag;
     }
     // launch test
-    await (0, test_1.startTest)(onitConfigFile, testTarget, argv);
+    const returnCode = await (0, test_1.startTest)(onitConfigFile, testTarget, argv);
+    // Just a fallback: onit might keep the process appended for internal events, but we 
+    // wont to exit now. Just exit, discart everything else
+    process.exit(returnCode);
 };
 exports.default = exec;
 //# sourceMappingURL=exec.js.map
