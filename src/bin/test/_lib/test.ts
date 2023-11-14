@@ -46,7 +46,10 @@ const onitCliExecutable = os.platform()=== 'win32' ? 'onit.cmd' : 'onit';
  * @param testTarget Test config
  * @param argv  cli params
  */
-export async function startTest(onitConfigFile: OnitConfigFile, testTarget: OnitConfigFileTestTarget, argv: yargs.ArgumentsCamelCase<unknown>): Promise<number>{
+export async function startTest(
+    onitConfigFile: OnitConfigFile, 
+    testTarget: OnitConfigFileTestTarget, 
+    argv: yargs.ArgumentsCamelCase<unknown>): Promise<number>{
     try {
         const doNotRebuild = argv['no-rebuild'];
         if (doNotRebuild) {
@@ -130,9 +133,10 @@ export async function startTest(onitConfigFile: OnitConfigFile, testTarget: Onit
         const mochaResult = await runMocha(testTarget, Mocha, testCaseFiles);
 
         if (onitInstance) {
-        // stop the onit process
+            // stop the onit process
             logger.log('Stopping onit...');
             await onitInstance.stop();
+            console.log('Stop executed');
         }
 
         // tests are finished. Run the shutdown script if any

@@ -126,6 +126,7 @@ async function startTest(onitConfigFile, testTarget, argv) {
             // stop the onit process
             logger_1.logger.log('Stopping onit...');
             await onitInstance.stop();
+            console.log('Stop executed');
         }
         // tests are finished. Run the shutdown script if any
         if (requires.shutdown) {

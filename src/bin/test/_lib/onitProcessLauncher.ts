@@ -26,11 +26,18 @@ export async function onitProcessLauncher(onitConfigFile: OnitConfigFile, testTa
         // callback to stop onit
         stop: () => {
             return new Promise(resolve => {
-                onitInstance.lbApp.onStop(() => {
-                    setTimeout(() => {
+                // Debouncer for timeout
+                let _timeout: NodeJS.Timeout | null = null;
+                const resolveTimer = (n: number) => {
+                    if (_timeout!==null) clearTimeout(_timeout);
+                    _timeout = setTimeout(() => {
+                        _timeout = null;
                         resolve(null);
-                    }, 2000);
-                });
+                    }, n);
+                };
+
+                onitInstance.lbApp.onStop(() => { resolveTimer(2000); });
+                resolveTimer(5000); // Still forcefully resolve if nothing happens
                 onitInstance.stop(false);
             });
         }
