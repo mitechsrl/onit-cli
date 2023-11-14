@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const config = {
-    description: 'Dev Run/serve utility. Lancia il progetto in ambiente di sviluppo',
+    description: 'Development run/serve utility',
     exec: './exec',
     params: [
         {

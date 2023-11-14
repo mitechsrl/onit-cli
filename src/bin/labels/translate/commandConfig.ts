@@ -27,7 +27,7 @@ import { Command } from '../../../types';
 
 const config: Command = {
 
-    description: 'Labels translation tool',
+    description: 'Translation tool',
     longHelp: 'Process the labels files and translate it using popular cloud services',
     exec: './exec',
     params: []

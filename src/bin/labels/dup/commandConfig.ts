@@ -27,7 +27,7 @@ import { Command } from '../../../types';
 
 const config: Command = {
 
-    description: 'Labels duplication detector',
+    description: 'Duplicated labels scanner',
     longHelp: 'Check labels json files to find duplicates.\n'+
     'In place changes are applied to ensure no duplicates exists both in the same file and across multiple files',
 

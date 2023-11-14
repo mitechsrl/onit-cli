@@ -2,7 +2,7 @@ import { Command } from '../../types';
 
 const config: Command = {
 
-    description: 'Dev Run/serve utility. Lancia il progetto in ambiente di sviluppo',
+    description: 'Development run/serve utility',
     exec: './exec',
     params: [
         {

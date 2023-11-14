@@ -25,7 +25,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 */
 Object.defineProperty(exports, "__esModule", { value: true });
 const config = {
-    description: 'Labels translation tool',
+    description: 'Translation tool',
     longHelp: 'Process the labels files and translate it using popular cloud services',
     exec: './exec',
     params: []

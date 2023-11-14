@@ -24,60 +24,18 @@ OTHER DEALINGS IN THE SOFTWARE.
 */
 
 import os from 'os';
-import { spawn } from './spawn';
-import { getPersistent, setPersistent } from './persistent';
-import { logger } from './logger';
 import { packageJson } from './packageJson';
-import gt from 'semver/functions/gt';
+import updateNotifier from 'simple-update-notifier';
+
 // windows being windows... it wants the .cmd extension!
 export const npmExecutable = os.platform() === 'win32' ? 'npm.cmd' : 'npm';
 export const npxExecutable = os.platform() === 'win32' ? 'npx.cmd' : 'npx';
 
-type PersistentUpdate = {
-    newversion: string,
-    update: boolean,
-    lastCheck: string
-};
-// after some time (1 minutes), just check for newer versions and show a info in the console
-// This is just for a reminder, doesn't do anything else.
-export function npmVersionCheck() {
-
-    const updateStatus = getPersistent('update') as PersistentUpdate;
-    if (updateStatus?.update) {
-        
-        if (packageJson.version === updateStatus.newversion){
-            // first run after update. The flag is still true, we need to reset it.
-            updateStatus.update = false;
-            setPersistent('update', updateStatus);
-            return;
-        }
-
-        // still not updated
-        logger.warn('[ONIT-CLI UPDATE] A new version of onit-cli is available. Current: ' + packageJson.version + ', newer: ' + updateStatus.newversion + '. Install with <npm install -g ' + packageJson.name + '>');
-    }
-
-    // check for npm registry updates. Do it once each hour to prevent too many calls
-    if ((!updateStatus?.lastCheck) || (((new Date().getTime() - new Date(updateStatus.lastCheck).getTime()) / 1000) > 3600)) {
-        const t = setTimeout(() => {
-            const npmParams = ['view', packageJson.name, '--registry=https://registry.npmjs.org/', 'version'];
-            spawn(npmExecutable, npmParams, false, { shell: true, cwd: __dirname })
-                .then(status => {
-                    status.output = status.output.trim();
-                    updateStatus.update = gt(status.output, packageJson.version);
-                    if (updateStatus.update) {
-                        updateStatus.newversion = status.output;
-                    } else {
-                        updateStatus.newversion = packageJson.version;
-                    }
-
-                    updateStatus.lastCheck = new Date().toISOString();
-                    setPersistent('update', updateStatus);
-                })
-                .catch(() => { /** ignore any error. Just don't annoy the user and ignore everything. */});
-        }, 60*1000);
-
-        // detach this timer to it's own life, otherwise it might "block" the main event loop
-        // and prevent this cli from exiting when commands finish
-        t.unref();
-    }
+/**
+ * Check for newer versions and show a info in the console
+ * This is just for a reminder, doesn't do anything else.
+ * Check is performed once a day
+ */
+export async function npmVersionCheck() {
+    await updateNotifier({ pkg: packageJson, updateCheckInterval: 1000 * 60 * 60 * 24 });
 }

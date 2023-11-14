@@ -110,7 +110,8 @@ function recourseRegisterCommand(parentYargs: yargs.Argv, commandConfig: ScanCom
 // Se vuoi ripristinare lo scan ad ogni boot, sostituisci la promise con la riga
 // scanCommands(path.join(__dirname, './bin'), '');
 
-fs.promises.readFile(path.join(__dirname,'./commands.json'))
+npmVersionCheck()
+    .then(() => fs.promises.readFile(path.join(__dirname,'./commands.json')))
     .then((content: Buffer) => {
         const commands = JSON.parse(content.toString()) as ScanCommandResult[];
 
@@ -120,7 +121,6 @@ fs.promises.readFile(path.join(__dirname,'./commands.json'))
         });
 
         // launch async check for new version
-        npmVersionCheck();
         
         return cli.parse();
     })

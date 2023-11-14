@@ -37,7 +37,7 @@ async function onitProcessLauncher(onitConfigFile, testTarget) {
                     }, n);
                 };
                 onitInstance.lbApp.onStop(() => { resolveTimer(2000); });
-                resolveTimer(10000); // Still forcefully resolve if nothing happens
+                resolveTimer(5000); // Still forcefully resolve if nothing happens
                 onitInstance.stop(false);
             });
         }

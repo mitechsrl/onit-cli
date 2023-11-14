@@ -101,7 +101,8 @@ function recourseRegisterCommand(parentYargs, commandConfig) {
 // Questo rende l'avvio piu leggero e piu veloce.
 // Se vuoi ripristinare lo scan ad ogni boot, sostituisci la promise con la riga
 // scanCommands(path.join(__dirname, './bin'), '');
-fs_1.default.promises.readFile(path_1.default.join(__dirname, './commands.json'))
+(0, npm_1.npmVersionCheck)()
+    .then(() => fs_1.default.promises.readFile(path_1.default.join(__dirname, './commands.json')))
     .then((content) => {
     const commands = JSON.parse(content.toString());
     // step 2: monta i comandi
@@ -109,7 +110,6 @@ fs_1.default.promises.readFile(path_1.default.join(__dirname, './commands.json')
         recourseRegisterCommand(main_1.cli, commandConfig);
     });
     // launch async check for new version
-    (0, npm_1.npmVersionCheck)();
     return main_1.cli.parse();
 })
     .catch(errorHandler_1.errorHandler);
