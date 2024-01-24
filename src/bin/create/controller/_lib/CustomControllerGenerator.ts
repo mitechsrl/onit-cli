@@ -23,7 +23,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { readFileSync, writeFileSync, existsSync, mkdirSync} from 'fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
 import ejs from 'ejs';
 import { join, resolve } from 'path';
 import { GenericObject } from '../../../../types';

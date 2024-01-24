@@ -2,7 +2,7 @@ import { Count, Filter, FilterExcludingWhere, repository, Where } from '@loopbac
 import { param, requestBody } from '@loopback/rest';
 import { <%= modelName %> } from '../../models';
 import { <%= repositoryName %> } from '../../repositories';
-import { onitApi } from '<%= importPath %>/lib/decorators/rest';
+import { onitApi } from '../../lib/decorators/rest';
 import { createSpec, createRequestBodySpec, countSpec, findSpec, updateAllSpec, 
     updateAllRequestBodySpec, findByIdSpec, updateByIdSpec, updateByIdRequestBodySpec,
     replaceByIdSpec, deleteByIdSpec
@@ -103,7 +103,7 @@ export class <%= className %>Controller {
     }
 
     @onitApi({
-        method: 'del',
+        method: 'delete',
         path: '<%= httpPathName %>/{id}',
         authenticate: true,
         spec: deleteByIdSpec
