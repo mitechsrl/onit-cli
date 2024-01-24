@@ -77,7 +77,7 @@ export class CustomControllerGenerator extends ControllerGenerator {
         // onit-next has different import path
         artifactInfo.importPath = '@mitech/onit-next/dist';
         if (existsSync(join(process.cwd(), './src/types/onitMixin.ts'))) {
-            artifactInfo.importPath = '..';
+            artifactInfo.importPath = '../..';
         }
 
         // render the files and write them out

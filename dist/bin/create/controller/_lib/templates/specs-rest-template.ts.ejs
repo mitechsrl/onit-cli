@@ -1,6 +1,7 @@
 import { RequestBodyObject, OperationObject } from 'openapi3-ts';
-import { <%= modelName %> } from '../models';
+import { <%= modelName %> } from '../../models';
 import { getModelSchemaRef } from '@loopback/openapi-v3';
+import { CountSchema } from '@loopback/repository';
 
 export const createSpec: OperationObject = {
     responses: {
