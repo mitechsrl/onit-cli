@@ -34,6 +34,7 @@ const spawn_1 = require("../../../../../lib/spawn");
 const child_process_1 = require("child_process");
 const logger_1 = require("../../../../../lib/logger");
 const os_1 = __importDefault(require("os"));
+const path_1 = __importDefault(require("path"));
 /**
  * Uses the 'where' (on windows) or 'which' (on other os) command to search for pm2 executable directory
  *
@@ -139,10 +140,11 @@ async function pm2start(onitConfigFile) {
     });
     // c'è qualche app da lanciare?
     if (pm2Ecosystem.apps.length === 0) {
-        logger_1.logger.log('No PM2 apps to be launched. Skipping step.');
+        logger_1.logger.log('No PM2 apps to be launched.');
         return 0;
     }
-    const temporaryEcosystemFile = onitConfigFile.sources[0] + '-pm2-ecosystem.json';
+    // Temporary ecosystem file is put somewhere temporarily
+    const temporaryEcosystemFile = path_1.default.join(os_1.default.tmpdir(), 'onit-cli-temp-pm2-ecosystem.json');
     fs_1.default.writeFileSync(temporaryEcosystemFile, JSON.stringify(pm2Ecosystem, null, 4));
     // rimuovo ecosystem caricato in precedenza prima di rilanciare tutto
     await (0, spawn_1.spawn)(pm2BinPath, ['delete', 'all'], false);

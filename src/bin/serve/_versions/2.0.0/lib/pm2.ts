@@ -30,6 +30,7 @@ import { GenericObject, OnitConfigFile } from '../../../../../types';
 import { spawn as _spawn } from 'child_process';
 import { logger } from '../../../../../lib/logger';
 import os from 'os';
+import path from 'path';
 
 /**
  * Uses the 'where' (on windows) or 'which' (on other os) command to search for pm2 executable directory
@@ -140,11 +141,12 @@ export async function pm2start(onitConfigFile: OnitConfigFile): Promise<number> 
 
     // c'è qualche app da lanciare?
     if (pm2Ecosystem.apps.length === 0) {
-        logger.log('No PM2 apps to be launched. Skipping step.');
+        logger.log('No PM2 apps to be launched.');
         return 0;
     }
-
-    const temporaryEcosystemFile = onitConfigFile.sources[0] + '-pm2-ecosystem.json';
+    
+    // Temporary ecosystem file is put somewhere temporarily
+    const temporaryEcosystemFile = path.join(os.tmpdir(), 'onit-cli-temp-pm2-ecosystem.json');
     fs.writeFileSync(temporaryEcosystemFile, JSON.stringify(pm2Ecosystem, null, 4));
 
     // rimuovo ecosystem caricato in precedenza prima di rilanciare tutto
