@@ -54,7 +54,7 @@ function stringToComponentClassName(appName: string) {
 
 const repoChoices = [
     {
-        name: 'legacy',
+        name: 'onit-next-example-webcomponent',
         value: {
             url: 'https://github.com/mitechsrl/onit-next-example-webcomponent.git',
             replacer: (answers: GenericObject) => {
@@ -65,21 +65,6 @@ const repoChoices = [
                     { find: 'ExampleWebComponent', replace: upperFirst(answers.componentClassNameShortCamelCase) },
                     { find: 'Onit example web component', replace: answers.appExtendedName },
                     { find: 'onit-next-example-webcomponent', replace: answers.appNameWithoutScope }
-                ];
-            }
-        }
-    },
-    {
-        name: 'next',
-        value: {
-            url: 'https://github.com/mitechsrl/onit-nextjs-template.git',
-            replacer: (answers: GenericObject) => {
-                return [ // find & replace in files di src
-                    { find: '__APP_NAME', replace: answers.componentClassName }, // nome classe componente
-                    { find: 'OnitNextJsTemplateComponent', replace: answers.componentClassName }, // nome classe componente
-                    { find: '__WEB_MOUNT_PATH', replace: answers.componentClassNameShortCamelCase },
-                    { find: '__APP_EXTENDED_NAME', replace: answers.appExtendedName },
-                    { find: 'onit-nextjs-template-package-json-name', replace: answers.appNameWithoutScope }
                 ];
             }
         }
