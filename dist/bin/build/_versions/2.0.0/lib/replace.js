@@ -28,33 +28,34 @@ exports.replace = void 0;
 function replace(obj, vars) {
     const stringReplace = function (v) {
         // eslint-disable-next-line no-constant-condition
-        while (true) {
-            let found = false;
-            Object.keys(vars).forEach(variable => {
+        Object.keys(vars).forEach(variable => {
+            // eslint-disable-next-line no-constant-condition
+            while (true) {
                 const _v = v.replace(variable, vars[variable]);
-                found = found || _v !== v;
+                const changes = _v !== v;
                 v = _v;
-            });
-            if (!found)
-                break;
-        }
+                if (!changes)
+                    break;
+            }
+        });
         return v;
     };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const _replace = function (obj) {
+        if (typeof obj === 'string')
+            return stringReplace(obj);
         if (Array.isArray(obj))
-            obj.forEach(o => _replace(o));
+            return obj.map(o => _replace(o));
         if (obj && typeof obj === 'object') {
-            Object.keys(obj).forEach(k => {
-                if (typeof obj[k] === 'string') {
-                    obj[k] = stringReplace(obj[k]);
-                    return;
-                }
-                _replace(obj[k]);
-            });
+            return Object.keys(obj).reduce((acc, k) => {
+                acc[k] = _replace(obj[k]);
+                return acc;
+            }, {});
         }
+        // Don't know what to do. Just return the obj
+        return obj;
     };
-    _replace(obj);
-    return obj;
+    return _replace(obj);
 }
 exports.replace = replace;
 //# sourceMappingURL=replace.js.map
