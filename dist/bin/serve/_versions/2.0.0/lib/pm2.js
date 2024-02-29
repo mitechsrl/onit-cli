@@ -54,7 +54,7 @@ async function where(expectedCommandEndsWith) {
         default: return undefined;
     }
     // Check with where command
-    const v = await (0, spawn_1.spawn)(w, ['pm2'], false);
+    const v = await (0, spawn_1.spawn)(w, ['pm2'], { print: false });
     // Not found
     if (v.exitCode !== 0)
         return undefined;
@@ -147,9 +147,9 @@ async function pm2start(onitConfigFile) {
     const temporaryEcosystemFile = path_1.default.join(os_1.default.tmpdir(), 'onit-cli-temp-pm2-ecosystem.json');
     fs_1.default.writeFileSync(temporaryEcosystemFile, JSON.stringify(pm2Ecosystem, null, 4));
     // rimuovo ecosystem caricato in precedenza prima di rilanciare tutto
-    await (0, spawn_1.spawn)(pm2BinPath, ['delete', 'all'], false);
+    await (0, spawn_1.spawn)(pm2BinPath, ['delete', 'all'], { print: false });
     // pm2 delete all fatto. ora lancio ecosystem attuale
-    await (0, spawn_1.spawn)(pm2BinPath, ['start', temporaryEcosystemFile], true);
+    await (0, spawn_1.spawn)(pm2BinPath, ['start', temporaryEcosystemFile]);
     return pm2Ecosystem.apps.length;
 }
 exports.pm2start = pm2start;

@@ -4,33 +4,32 @@ Run project tests
 
 ### onit.config.[js|json]
 
-
 Il file onit.config.js definisce una nuova sezione "test" nel quale contiene la configurazione da lanciare al comando **onit test**:
-
 
 ```js
 
-	test: {
-		"nomeSet":{ 
-		
-			// Si possono inserire qui i parametri del serve, per configurare il lancio di onit.
-			"environment":{} // environment onit
-			
-			// parametri specifici del test
-			"startup":"someFile.js",
-			"beforeTest":"someFile2.js"
-			"testFilesDirectories":["./src/test/cases", "../../onit-next/dist/test/cases"], // array di stirng 
-			"shutdown":"pathToFile.js"
-			"launchOnit":true,
-			// Inserire le proprietà come voluto da mocha. Vedi lista di proprietà: https://mochajs.org/api/mocha,
-			// Vengono passate direttamente a mocha. Vedi "Proprietà specifiche mocha" per info.
-			"grep":"*", // https://mochajs.org/api/mocha#grep
-			"timeout": "10s", //https://mochajs.org/api/mocha#timeout
-		}
-	}
+ test: {
+  "nomeSet":{ 
+  
+   // Si possono inserire qui i parametri del serve, per configurare il lancio di onit.
+   "environment":{} // environment onit
+   
+   // parametri specifici del test
+   "startup":"someFile.js",
+   "beforeTest":"someFile2.js"
+   "testFilesDirectories":["./src/test/cases", "../../onit-next/dist/test/cases"], // array di stirng 
+   "shutdown":"pathToFile.js"
+   "launchOnit":true,
+   // Inserire le proprietà come voluto da mocha. Vedi lista di proprietà: https://mochajs.org/api/mocha,
+   // Vengono passate direttamente a mocha. Vedi "Proprietà specifiche mocha" per info.
+   "grep":"*", // https://mochajs.org/api/mocha#grep
+   "timeout": "10s", //https://mochajs.org/api/mocha#timeout
+  }
+ }
 ```
 
 **NomeSet** definisce cosa caricare per l'esecuzione del test. In fase di avvio, onit-cli chiede quale set utilizzare sulla falsariga di onit build.
+
 1. Viene lanciato, se esiste, file di startup, che ha il compito di preparare l'ambiente per i test successivi (prima del lanciodi onit)
 2. Opzionalmene, viene lanciato onit con la configurazione environment specificata,
 3. Viene lanciato, se esiste, file beforeTest, che ha il compito di preparare l'ambiente per i test successivi. (dopo il lancio di onit)
@@ -40,7 +39,6 @@ Il file onit.config.js definisce una nuova sezione "test" nel quale contiene la 
 Ogni pacchetto dovrebbe definire i propri test, ma può richiamare files js da altri pacchetti.
 
 Esempio: onit-prodocu non ha particolare codice da testare ad ora, ma può essere usato come entry point per i test. Esso definisce le fasi e quali test eseguire riferendosi a files js di altri pacchetti (onit-material-certificates ad esempio)
-
 
 ### File startup
 
@@ -57,12 +55,11 @@ import { cloneMongoDb, StartupFunction, TestEnvironment, checkMongoDbsAvailable 
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const startup: StartupFunction<any> = async (testEnv: TestEnvironment<any>): Promise<TestEnvironment<any>>=> {
-	// deleteMongodb(...); se richiesto
-	// cloneMongoDb(...); se richiesto
+ // deleteMongodb(...); se richiesto
+ // cloneMongoDb(...); se richiesto
 }
 ```
-	
-	
+ 
 ### File beforeTest
 
 Il file startup implementa una parte dell'avvio della fase. Viene chiamato DOPO l'avvio di onit, pertanto si ha a disposizione una istanza onit per interazioni.
@@ -71,14 +68,13 @@ Potrebbe esistere quindi un pacchetto **@mitech/onit-test-engine** che mantiene 
 
 NOTA: la ipotetica funzione helper di avvio onit deve lanciare onit con environment definito nel set. Deve anche ritornare l'istanza dell'applicazione per poter poi successivamente accedere direttamente a repo/controller/services
 
-
 ```ts
 import { ExpressServer } from '@loopback/rest';
 import { BeforeTestFunction, TestEnvironment } from '@mitech/onit-dev-tools';
 
 export const beforeTest: BeforeTestFunction<ExpressServer> = async (testEnv: TestEnvironment<ExpressServer>): Promise<TestEnvironment<ExpressServer>>=> {
-	// cleanDb(); se richiesto
-	// loadDbinSomeWay() se richiesto
+ // cleanDb(); se richiesto
+ // loadDbinSomeWay() se richiesto
 }
 ```
 
@@ -91,16 +87,16 @@ import { ShutdownFunction, TestEnvironment, MochaResult, deleteMongoDb } from '@
 import { ExpressServer } from '../server';
 
 export const shutdown: ShutdownFunction<ExpressServer> = async (testEnv: TestEnvironment<ExpressServer>, mochaResult: MochaResult): Promise<void>=> {
-	// cleanDb(); se richiesto
-	// shutdownOnit(testEnvironment.onit) // se richiesto
+ // cleanDb(); se richiesto
+ // shutdownOnit(testEnvironment.onit) // se richiesto
 }
 ```
 
-
 ### testFilesDirectories
+
 Array di directories dalle quali caricare i files dei test da eseguire.
 
-I singoli elementi di quetso array seguono il formato glob: https://www.npmjs.com/package/glob
+I singoli elementi di quetso array seguono il formato glob: <https://www.npmjs.com/package/glob>
 Il file dovrebbe avere una struttura di questo tipo:
 
 ```ts
@@ -109,13 +105,13 @@ Il file dovrebbe avere una struttura di questo tipo:
 const testEnvironment = getTestEnvironment<ExpressServer>() 
 
 describe('nomeTest',() => {
-	
-	it('should seturn some value #myTag1 #myTag2', async function () {
-		const service = await testEnvironment.onit.get('services.someName');
-		const result = await service.someFunction();
+ 
+ it('should seturn some value #myTag1 #myTag2', async function () {
+  const service = await testEnvironment.onit.get('services.someName');
+  const result = await service.someFunction();
         assert.equal(result, 'expecting this string as result');
     });
-	
+ 
 }) // 
 ```
 
@@ -131,7 +127,7 @@ Utile per esecuzione unit test indipendenti da runtime.
 
 All'interno del json di configurazione è possibile inserire qualsiasi proprietà attesa da mocha.
 
-Vedi api mocha https://mochajs.org/api/mocha per lista completa.
+Vedi api mocha <https://mochajs.org/api/mocha> per lista completa.
 
 Alcuni parametri degni di nota:
 
@@ -150,10 +146,11 @@ Esempio: dati i nomi
   "Funzione che ritorna xyz #b.c.d"
   
 La funzione grep accetta in input una regex, pertanto:
+
 - specificando ".\*" si vanno ad eseguire tutti i test
 - con "a.\+" si eseguono i test per nomi **a, a.b, a.b.c** e così via.
   
-Vedi grep per info: 
+Vedi grep per info:
 
 **timeout** ([Vedi doc mocha](https://mochajs.org/api/mocha#timeout))
 

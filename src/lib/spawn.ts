@@ -23,13 +23,15 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { spawn as _spawn, SpawnOptionsWithoutStdio } from 'child_process';
-import { logger } from './logger';
+import { spawn as _spawn, SpawnOptionsWithStdioTuple, StdioNull,StdioPipe, SpawnOptionsWithoutStdio } from 'child_process';
+import { GenericObject } from '../types';
 
 export type SpawnResult = {
     exitCode: number,
     output: string
 };
+
+export type SpawnOptions = { print?:boolean } & (SpawnOptionsWithoutStdio | SpawnOptionsWithStdioTuple<StdioNull|StdioPipe, StdioNull|StdioPipe, StdioNull|StdioPipe>);
 
 /**
  * Process spawn helper. Proxy method to child_process.spawn to promisifize it and apply some custom logic
@@ -40,22 +42,25 @@ export type SpawnResult = {
  * @param options SpawnOptionsWithoutStdio object. See node child_process docs
  * @returns SpawnResult object {exitCode:number, output:stirng}
  */
-export async function spawn(cmd: string, params?: string[], print?: boolean, options?: SpawnOptionsWithoutStdio ): Promise<SpawnResult> {
+export async function spawn(
+    cmd: string, 
+    params: string[], 
+    options?: SpawnOptions ): Promise<SpawnResult> {
     return new Promise((resolve, reject) => {
-        const proc = _spawn(cmd, params ?? [], options);
+        const proc = _spawn(cmd, params ?? [], options as GenericObject);
 
         let _data = Buffer.from('');
-        proc.stdout.on('data', (data) => {
+        proc.stdout?.on('data', (data) => {
             _data = Buffer.concat([_data, data]);
-            if (print !== false) { 
-                logger.rawLog(data.toString());
+            if (options?.print !== false) { 
+                process.stdout.write(data);
             }
         });
 
-        proc.stderr.on('data', (data) => {
+        proc.stderr?.on('data', (data) => {
             _data = Buffer.concat([_data, data]);
-            if (print !== false) { 
-                logger.rawLog(data.toString()); 
+            if (options?.print !== false) { 
+                process.stderr.write(data);
             }
         });
 

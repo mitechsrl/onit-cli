@@ -38,7 +38,7 @@ async function createLink (configFile: string, l: OnitConfigFileLink) {
     if (!l.target) {
         // providing just the "link" property uses the standard npm link
         logger.log('Eseguo <npm link ' + l.link + '>');
-        await spawn(npmExecutable, ['link', l.link], true, { shell: true });
+        await spawn(npmExecutable, ['link', l.link], { shell: true });
     } else {
         // providing target will make this utility to create the link to the target directory
         logger.log('Creo symlink ' + l.link + ' verso ' + l.target);

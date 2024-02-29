@@ -41,7 +41,7 @@ async function createLink(configFile, l) {
     if (!l.target) {
         // providing just the "link" property uses the standard npm link
         logger_1.logger.log('Eseguo <npm link ' + l.link + '>');
-        await (0, spawn_1.spawn)(npm_1.npmExecutable, ['link', l.link], true, { shell: true });
+        await (0, spawn_1.spawn)(npm_1.npmExecutable, ['link', l.link], { shell: true });
     }
     else {
         // providing target will make this utility to create the link to the target directory

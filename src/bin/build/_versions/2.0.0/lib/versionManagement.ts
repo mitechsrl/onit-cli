@@ -106,8 +106,9 @@ export async function promptVersion(buildTarget:OnitConfigFileBuildTarget, vars:
         if (versionManagement.additional) {
             const _additional = replace(versionManagement.additional, vars);
             console.log('Eseguo versionManagement additional: ' + _additional.cmd);
-            let val = await spawn(_additional.cmd, [], false, {
+            let val = await spawn(_additional.cmd, [], {
                 shell: true,
+                print: false,
                 cwd: process.cwd()
             });
             if (val.exitCode === 0) {

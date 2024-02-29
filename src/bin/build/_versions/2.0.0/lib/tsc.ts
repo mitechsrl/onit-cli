@@ -36,9 +36,9 @@ export async function runTsc(onitConfigFile: OnitConfigFile, cwdPackageJson: Gen
     // the default implementation of 'npm run build' for loopback 4 projects)
     let r = null;
     if (typeof (cwdPackageJson.scripts || {}).build === 'string') {
-        r = await spawn(npmExecutable, ['run', 'build'], true, { shell: true });
+        r = await spawn(npmExecutable, ['run', 'build'], { shell: true });
     } else {
-        r = await spawn(npxExecutable, ['lb-tsc'], true, { shell: true });
+        r = await spawn(npxExecutable, ['lb-tsc'], { shell: true });
     }
 
     // TODO: verificare se cambia qualcosa da powershell ad altre shells

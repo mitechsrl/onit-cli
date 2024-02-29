@@ -104,8 +104,9 @@ async function promptVersion(buildTarget, vars, cwdPackageJson) {
         if (versionManagement.additional) {
             const _additional = (0, replace_1.replace)(versionManagement.additional, vars);
             console.log('Eseguo versionManagement additional: ' + _additional.cmd);
-            let val = await (0, spawn_1.spawn)(_additional.cmd, [], false, {
+            let val = await (0, spawn_1.spawn)(_additional.cmd, [], {
                 shell: true,
+                print: false,
                 cwd: process.cwd()
             });
             if (val.exitCode === 0) {

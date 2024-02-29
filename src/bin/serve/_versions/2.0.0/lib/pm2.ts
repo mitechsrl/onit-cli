@@ -48,7 +48,7 @@ async function where(expectedCommandEndsWith:string): Promise<string|undefined>{
     }
     
     // Check with where command
-    const v = await spawn(w,['pm2'],false);
+    const v = await spawn(w,['pm2'],{ print: false });
     // Not found
     if (v.exitCode !== 0) return undefined;
     // found, just store the bin path for future uses to be sure
@@ -150,9 +150,9 @@ export async function pm2start(onitConfigFile: OnitConfigFile): Promise<number> 
     fs.writeFileSync(temporaryEcosystemFile, JSON.stringify(pm2Ecosystem, null, 4));
 
     // rimuovo ecosystem caricato in precedenza prima di rilanciare tutto
-    await spawn(pm2BinPath, ['delete', 'all'], false);
+    await spawn(pm2BinPath, ['delete', 'all'], { print: false });
 
     // pm2 delete all fatto. ora lancio ecosystem attuale
-    await spawn(pm2BinPath, ['start', temporaryEcosystemFile], true);
+    await spawn(pm2BinPath, ['start', temporaryEcosystemFile]);
     return pm2Ecosystem.apps.length;
 }

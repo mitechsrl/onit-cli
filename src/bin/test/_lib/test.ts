@@ -66,11 +66,11 @@ export async function startTest(
 
         if (!doNotRebuild) {
             logger.info('Cleaning project build...');
-            await spawn(npmExecutable, ['run', 'clean'], true);
+            await spawn(npmExecutable, ['run', 'clean']);
             logger.info('Building project...');
-            const buildTscResult = await spawn(onitCliExecutable, ['serve', '-t', '--exit'], true);
+            const buildTscResult = await spawn(onitCliExecutable, ['serve', '-t', '--exit']);
             if (buildTscResult.exitCode !== 0) throw new StringError('Tsc build failed. Aborting test');
-            const buildFrontendResult = await spawn(onitCliExecutable, ['serve', '-w', '--exit'], true);
+            const buildFrontendResult = await spawn(onitCliExecutable, ['serve', '-w', '--exit']);
             if (buildFrontendResult.exitCode !== 0) throw new StringError('Frontend build failed. Aborting test');
         }
 

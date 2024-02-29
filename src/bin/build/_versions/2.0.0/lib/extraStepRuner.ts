@@ -47,13 +47,14 @@ export async function extraStepRunner(step: OnitConfigFileBuildExtraStep, vars: 
         // const params = (Array.isArray(step.cmd) && (step.cmd.length > 1)) ? [step.cmd[1]] : [];
         for (const cmd of step.cmd) {
             logger.log('Running <' + cmd + '>');
-            const result = await spawn(cmd, [], true, {
+            const result = await spawn(cmd, [], {
                 // This allows to run command on windows without adding '.cmd' or '.bat'. See
                 // https://nodejs.org/api/child_process.html#child_process_spawning_bat_and_cmd_files_on_windows
                 shell: true,
-
                 // NOTE: this is inherithed from the current process(which already did the cwd!)
-                cwd: process.cwd()
+                cwd: process.cwd(),
+                // Inherith stdio from the current process, we don't need to process the output
+                stdio: ['ignore','inherit','inherit']
             });
 
             if (result.exitCode !== 0) {

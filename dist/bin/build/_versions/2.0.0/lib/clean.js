@@ -32,6 +32,7 @@ const logger_1 = require("../../../../../lib/logger");
 const fs_extra_1 = __importDefault(require("fs-extra"));
 const fs_1 = __importDefault(require("fs"));
 const spawn_1 = require("../../../../../lib/spawn");
+const npm_1 = require("../../../../../lib/npm");
 /**
  * Ensure path does not exist
  * @param {*} localPath
@@ -64,7 +65,7 @@ async function runClean(onitConfigFile, cwdPackageJson) {
     logger_1.logger.info('[CLEAN] Cleaning directory...');
     // if defined, launch the clean script
     if ((cwdPackageJson.scripts || {}).clean) {
-        await (0, spawn_1.spawn)('npm', ['run', 'clean'], true, {
+        await (0, spawn_1.spawn)(npm_1.npmExecutable, ['run', 'clean'], {
             shell: true,
             cwd: process.cwd()
         });

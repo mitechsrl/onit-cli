@@ -26,7 +26,6 @@ OTHER DEALINGS IN THE SOFTWARE.
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.spawn = void 0;
 const child_process_1 = require("child_process");
-const logger_1 = require("./logger");
 /**
  * Process spawn helper. Proxy method to child_process.spawn to promisifize it and apply some custom logic
  *
@@ -36,20 +35,21 @@ const logger_1 = require("./logger");
  * @param options SpawnOptionsWithoutStdio object. See node child_process docs
  * @returns SpawnResult object {exitCode:number, output:stirng}
  */
-async function spawn(cmd, params, print, options) {
+async function spawn(cmd, params, options) {
     return new Promise((resolve, reject) => {
+        var _a, _b;
         const proc = (0, child_process_1.spawn)(cmd, params !== null && params !== void 0 ? params : [], options);
         let _data = Buffer.from('');
-        proc.stdout.on('data', (data) => {
+        (_a = proc.stdout) === null || _a === void 0 ? void 0 : _a.on('data', (data) => {
             _data = Buffer.concat([_data, data]);
-            if (print !== false) {
-                logger_1.logger.rawLog(data.toString());
+            if ((options === null || options === void 0 ? void 0 : options.print) !== false) {
+                process.stdout.write(data);
             }
         });
-        proc.stderr.on('data', (data) => {
+        (_b = proc.stderr) === null || _b === void 0 ? void 0 : _b.on('data', (data) => {
             _data = Buffer.concat([_data, data]);
-            if (print !== false) {
-                logger_1.logger.rawLog(data.toString());
+            if ((options === null || options === void 0 ? void 0 : options.print) !== false) {
+                process.stderr.write(data);
             }
         });
         proc.on('close', (code) => {
