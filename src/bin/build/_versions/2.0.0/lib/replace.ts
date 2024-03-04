@@ -25,17 +25,19 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 import { GenericObject } from '../../../../../types';
 
-export function replace(obj:GenericObject, vars:GenericObject) {
+export function replace(obj:GenericObject, _vars:GenericObject) {
 
+    // Make sure a order is respected to prevent overlapping names to interfere
+    const vars = Object.entries(_vars).sort((a,b) => a[0] === b[0] ? 0: (a[0]>b[0] ? -1:1));
+    
     const stringReplace = function (v: string) {
         // eslint-disable-next-line no-constant-condition
-        Object.keys(vars).forEach(variable => {
+        vars.forEach(variable => {
             // eslint-disable-next-line no-constant-condition
             while(true){
-                const _v = v.replace(variable, vars[variable]);
-                const changes = _v !== v;
-                v = _v;
-                if (!changes) break;
+                const replaced = v.replace(variable[0], variable[1]);
+                if (v === replaced) break;
+                v = replaced;
             }
         });
         return v;

@@ -80,6 +80,8 @@ async function build(onitConfigFile, argv) {
     // prepare some vars for next steps
     const vars = {
         $_PROJECT_DIR: process.cwd(),
+        // NOTE: fix wrong replacement when one var name is included in another one 
+        $_PACKAGE_NAME_NO_SCOPE: cwdPackageJson.name.replace(/(@.*\/)([^/]+)$/, '$2'),
         $_PACKAGE_NAME: cwdPackageJson.name,
         $_PACKAGE_VERSION: cwdPackageJson.version
     };

@@ -25,17 +25,18 @@ OTHER DEALINGS IN THE SOFTWARE.
 */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.replace = void 0;
-function replace(obj, vars) {
+function replace(obj, _vars) {
+    // Make sure a order is respected to prevent overlapping names to interfere
+    const vars = Object.entries(_vars).sort((a, b) => a[0] === b[0] ? 0 : (a[0] > b[0] ? -1 : 1));
     const stringReplace = function (v) {
         // eslint-disable-next-line no-constant-condition
-        Object.keys(vars).forEach(variable => {
+        vars.forEach(variable => {
             // eslint-disable-next-line no-constant-condition
             while (true) {
-                const _v = v.replace(variable, vars[variable]);
-                const changes = _v !== v;
-                v = _v;
-                if (!changes)
+                const replaced = v.replace(variable[0], variable[1]);
+                if (v === replaced)
                     break;
+                v = replaced;
             }
         });
         return v;
