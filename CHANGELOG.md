@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.1.1
+
+- Bugfix variable replacement in V2 builder
+
 ## 3.1.0
 
 - Added support for **engines.frontend = false** to disable frontend builds
