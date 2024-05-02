@@ -1,7 +1,7 @@
 {
     "name": "@mitech/onit-cli",
     "description": "Onit dev tool CLI",
-    "version": "3.1.1",
+    "version": "3.2.0",
     "main": "./dist/index.js",
     "engines": {
         "node": ">=14.0.0"
@@ -19,6 +19,7 @@
         "copy-files": "copyfiles -u 1 src/**/*.js src/**/*.html src/**/*.ts.ejs src/**/*.ejs src/**/*.conf src/**/*.sh src/**/*.md src/**/*.json dist/",
         "scan-commands": "node ./dist/lib/generateScanResultFile.js",
         "tsc": "tsc",
+        "tsc:watch": "tsc --watch",
         "mocha": "mocha ./dist/test/**/*.js",
         "test": "run-s build mocha",
         "build": "run-s clean tsc scan-commands copy-files",

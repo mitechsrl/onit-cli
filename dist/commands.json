@@ -37,6 +37,11 @@
                 "cmd": "service",
                 "file": "bin/create/service/commandConfig.js",
                 "children": []
+            },
+            {
+                "cmd": "version",
+                "file": "bin/create/version/commandConfig.js",
+                "children": []
             }
         ]
     },

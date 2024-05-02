@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.2.0
+
+- Added `onit create version` command to automate the generation of a new dbinit version
+
 ## 3.1.1
 
 - Bugfix variable replacement in V2 builder

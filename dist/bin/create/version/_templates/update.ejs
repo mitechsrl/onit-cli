@@ -1,0 +1,23 @@
+/*
+// Update file skeleton: import variables from the instructions you want to update, then 
+// use the `update` method to declare the update.
+// See onit-next\src\lib\database\initTs\README.md for more info.
+// Be sure you have declared the 'update' property in your 'declareDbInit()' call
+
+import { someExporedVariable } from './someFile';
+
+someExporedVariable.update({
+    toVersion: '<%= version %>',
+    // This method must return the new record to be updated in the db.
+    // `currentStored` represent the record on db,
+    // `newValue` the data that should be persisted,
+    // `constants`: a series of static values.  
+    onBeforeUpdate: function(currentStored, newValue, constants) {
+        return recordToBeStored
+    },
+});
+
+*/
+
+// Make this file module so tsc does not complain about it.
+export {}
