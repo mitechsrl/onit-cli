@@ -24,13 +24,18 @@ OTHER DEALINGS IN THE SOFTWARE.
 */
 
 import yargs from 'yargs';
-import { CommandExecFunction, GenericObject, StringError } from '../../../types';
+import { CommandExecFunction, StringError } from '../../../types';
 import { join } from 'path';
 import { mkdirSync, existsSync, readFileSync, writeFileSync } from 'fs';
-import inquirer from 'inquirer';
 import ejs from 'ejs';
 import { logger } from '../../../lib/logger';
+import { confirm } from '../../../lib/confirm';
 
+/**
+ * 
+ * @param argv 
+ * @returns 
+ */
 const exec: CommandExecFunction = async (argv: yargs.ArgumentsCamelCase<unknown>) => {
     
     const packageJsonPath= join(process.cwd(), './package.json');
@@ -54,20 +59,32 @@ const exec: CommandExecFunction = async (argv: yargs.ArgumentsCamelCase<unknown>
     const functionParamContent = matched[1];
 
     // indentation
-    const indentation = functionParamContent.trimEnd().replace(functionParamContent.trim(),'').replace('\n','');
+    const indentation = functionParamContent.trimEnd()
+        .replace(functionParamContent.trim(),'')
+        .replace(/\n/g,'')
+        .replace(/\r/g,'');
 
-    // calculate next version
+    // Extract current versions
     const versionMatchRegex = /['"]([0-9]+)\.([0-9]+)\.([0-9a-fA-F]+)['"]([^\n]+)/g;
     let v;
     const versions: { a:string,b:string,c:string, rest:string }[]= []; 
     while(null != (v =versionMatchRegex.exec(functionParamContent))) {
-        versions.push({ a:v[1], b:v[2], c:v[3], rest:v[4] });
+        versions.push({ 
+            a:v[1],
+            b:v[2],
+            c:v[3],
+            rest: v[4] ? v[4].trim().replace(/,$/gm,'').replace(/\n/g,'').replace(/\r/g,''): ''
+        });
     }
+
+    // Sort versions
     versions.sort((a,b)=> {
         const _a = a.a.padStart(6,'0')+a.b.padStart(6,'0')+a.c;
         const _b = b.a.padStart(6,'0')+b.b.padStart(6,'0')+b.c;
         return _a === _b ? 0 : _a < _b ? 1 : -1;
     });
+
+    // Generate new version
     const lastVersion = versions[0];
     const newVersion = { 
         a:lastVersion.a, 
@@ -79,34 +96,29 @@ const exec: CommandExecFunction = async (argv: yargs.ArgumentsCamelCase<unknown>
     versions.reverse();
 
     // Get the text to be placed in function call
-    const newFunctionParamContent = versions.map(v=>`${indentation}'${v.a}.${v.b}.${v.c}'${v.rest}`)
-        .map(v => v.endsWith(',') ? v : (v+','))
-        .join('\n');
-
+    const newFunctionParamContent = versions.map(v=>`'${v.a}.${v.b}.${v.c}'${v.rest}`)
+        .map(v => `${indentation}${v.trim()}`)
+        .filter(v => v.trim().length > 0)
+        .join(',\n');
     fileContent = fileContent.replace(functionParamContent, '\n'+newFunctionParamContent+'\n');
-
+    
+    // write out the file
     writeFileSync(versionsFilePath, fileContent);
 
     logger.log(`Generated version ${newVersion.a}.${newVersion.b}.${newVersion.c}`);
 
     // ask for update file generation
-    const answers = await inquirer.prompt([{
-        type: 'confirm',
-        name: 'confirm',
-        message: 'Generate update file for the new version?'
-    }]);
-
-    if (!answers.confirm) return;
+    if (!await confirm('Generate update file for the new version?')) return;
 
     // render the model file and writer it out
     const template = readFileSync(join(__dirname, './_templates/update.ejs')).toString();
     const versionString = `${newVersion.a}.${newVersion.b}.${newVersion.c}`;
-    
     const updateFilePath = join(process.cwd(), './src/boot/updates');
     const updateFilename = 'update_'+versionString+'.ts';
     mkdirSync(updateFilePath, { recursive: true });
     const rendered = ejs.render(template, { version: versionString });
     writeFileSync(join(updateFilePath,updateFilename), rendered);
+
     logger.log(`Update file ./src/boot/updates/${updateFilename} generated`);
 };
 

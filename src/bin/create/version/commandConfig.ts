@@ -28,7 +28,7 @@ import { Command } from '../../../types';
 const config: Command = {
 
     description: 'Create a dbinit version',
-    longHelp:'Interctive dbinit version creation tool. This tool must be run into a onit-based app directory.',
+    longHelp:'Interactive dbinit version creation tool. This tool updates the ./src/boot/version.ts file of your project and add to it a new db version. This tool must be run into a onit-based app directory.',
     exec: './exec',
     params: [ ]
 };

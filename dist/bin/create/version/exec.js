@@ -30,9 +30,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const types_1 = require("../../../types");
 const path_1 = require("path");
 const fs_1 = require("fs");
-const inquirer_1 = __importDefault(require("inquirer"));
 const ejs_1 = __importDefault(require("ejs"));
 const logger_1 = require("../../../lib/logger");
+const confirm_1 = require("../../../lib/confirm");
+/**
+ *
+ * @param argv
+ * @returns
+ */
 const exec = async (argv) => {
     const packageJsonPath = (0, path_1.join)(process.cwd(), './package.json');
     const versionsFilePath = (0, path_1.join)(process.cwd(), './src/boot/versions.ts');
@@ -51,19 +56,29 @@ const exec = async (argv) => {
         throw new types_1.StringError('Couldn\'t find the assertDbInitVersions function in the file');
     const functionParamContent = matched[1];
     // indentation
-    const indentation = functionParamContent.trimEnd().replace(functionParamContent.trim(), '').replace('\n', '');
-    // calculate next version
+    const indentation = functionParamContent.trimEnd()
+        .replace(functionParamContent.trim(), '')
+        .replace(/\n/g, '')
+        .replace(/\r/g, '');
+    // Extract current versions
     const versionMatchRegex = /['"]([0-9]+)\.([0-9]+)\.([0-9a-fA-F]+)['"]([^\n]+)/g;
     let v;
     const versions = [];
     while (null != (v = versionMatchRegex.exec(functionParamContent))) {
-        versions.push({ a: v[1], b: v[2], c: v[3], rest: v[4] });
+        versions.push({
+            a: v[1],
+            b: v[2],
+            c: v[3],
+            rest: v[4] ? v[4].trim().replace(/,$/gm, '').replace(/\n/g, '').replace(/\r/g, '') : ''
+        });
     }
+    // Sort versions
     versions.sort((a, b) => {
         const _a = a.a.padStart(6, '0') + a.b.padStart(6, '0') + a.c;
         const _b = b.a.padStart(6, '0') + b.b.padStart(6, '0') + b.c;
         return _a === _b ? 0 : _a < _b ? 1 : -1;
     });
+    // Generate new version
     const lastVersion = versions[0];
     const newVersion = {
         a: lastVersion.a,
@@ -74,19 +89,16 @@ const exec = async (argv) => {
     versions.unshift(newVersion);
     versions.reverse();
     // Get the text to be placed in function call
-    const newFunctionParamContent = versions.map(v => `${indentation}'${v.a}.${v.b}.${v.c}'${v.rest}`)
-        .map(v => v.endsWith(',') ? v : (v + ','))
-        .join('\n');
+    const newFunctionParamContent = versions.map(v => `'${v.a}.${v.b}.${v.c}'${v.rest}`)
+        .map(v => `${indentation}${v.trim()}`)
+        .filter(v => v.trim().length > 0)
+        .join(',\n');
     fileContent = fileContent.replace(functionParamContent, '\n' + newFunctionParamContent + '\n');
+    // write out the file
     (0, fs_1.writeFileSync)(versionsFilePath, fileContent);
     logger_1.logger.log(`Generated version ${newVersion.a}.${newVersion.b}.${newVersion.c}`);
     // ask for update file generation
-    const answers = await inquirer_1.default.prompt([{
-            type: 'confirm',
-            name: 'confirm',
-            message: 'Generate update file for the new version?'
-        }]);
-    if (!answers.confirm)
+    if (!await (0, confirm_1.confirm)('Generate update file for the new version?'))
         return;
     // render the model file and writer it out
     const template = (0, fs_1.readFileSync)((0, path_1.join)(__dirname, './_templates/update.ejs')).toString();
