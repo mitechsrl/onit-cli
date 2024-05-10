@@ -90,7 +90,7 @@ const exec: CommandExecFunction = async (argv: yargs.ArgumentsCamelCase<unknown>
         a:lastVersion.a, 
         b:(parseInt(lastVersion.b)+1).toString(), 
         c:new Date().getTime().toString(16),
-        rest: `: 'Version generated at ${new Date().toISOString()} via <onit create version> command'`
+        rest: `: 'Version generated at ${new Date().toISOString()} via <onit create db-version> command'`
     };
     versions.unshift(newVersion);
     versions.reverse();

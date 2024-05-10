@@ -19,6 +19,11 @@
                 "children": []
             },
             {
+                "cmd": "db-version",
+                "file": "bin/create/db-version/commandConfig.js",
+                "children": []
+            },
+            {
                 "cmd": "model",
                 "file": "bin/create/model/commandConfig.js",
                 "children": []
@@ -36,11 +41,6 @@
             {
                 "cmd": "service",
                 "file": "bin/create/service/commandConfig.js",
-                "children": []
-            },
-            {
-                "cmd": "version",
-                "file": "bin/create/version/commandConfig.js",
                 "children": []
             }
         ]
