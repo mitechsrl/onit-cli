@@ -106,6 +106,7 @@ async function start(onitConfigFile, version, argv) {
         await (0, pm2_1.pm2stop)();
     }
     // bye!
+    logger_1.logger.log('Completed at ' + new Date().toLocaleTimeString());
     logger_1.logger.success('Exiting serve, bye! :wave:');
     // eslint-disable-next-line no-process-exit
     // process.exit(0);

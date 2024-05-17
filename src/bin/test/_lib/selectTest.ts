@@ -9,11 +9,19 @@ import { OnitConfigFile, OnitConfigFileTestTarget, StringError } from '../../../
  * @param {*} onitConfigFile
  * @returns
  */
-export async function selectTest(onitConfigFile: OnitConfigFile): Promise<OnitConfigFileTestTarget>{
+export async function selectTest(onitConfigFile: OnitConfigFile, suiteName?:string): Promise<OnitConfigFileTestTarget>{
     // check for buildTargets existence
     const tests = onitConfigFile.json.test || {};
     if (Object.keys(tests).length === 0) {
         throw new StringError('No test defined. You should have the test property in your onit configuration file: ' + onitConfigFile.sources.join(', '));
+    }
+
+    // Manual suite selection
+    if (suiteName) {
+        if (tests[suiteName]) {
+            return tests[suiteName];
+        }
+        throw new StringError('Test suite name not found: ' + suiteName);
     }
 
     // select build target. If only one buildTarget is available, use that one, show a selection prompt otherwise

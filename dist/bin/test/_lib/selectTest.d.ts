@@ -6,4 +6,4 @@ import { OnitConfigFile, OnitConfigFileTestTarget } from '../../../types';
  * @param {*} onitConfigFile
  * @returns
  */
-export declare function selectTest(onitConfigFile: OnitConfigFile): Promise<OnitConfigFileTestTarget>;
+export declare function selectTest(onitConfigFile: OnitConfigFile, suiteName?: string): Promise<OnitConfigFileTestTarget>;

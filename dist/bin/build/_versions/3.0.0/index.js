@@ -138,6 +138,7 @@ async function build(onitConfigFile, argv) {
             await (0, extraStepRuner_1.extraStepRunner)(step, vars);
         }
     }
+    logger_1.logger.log('Completed at ' + new Date().toLocaleTimeString());
 }
 exports.default = build;
 //# sourceMappingURL=index.js.map

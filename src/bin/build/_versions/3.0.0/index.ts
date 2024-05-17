@@ -149,4 +149,6 @@ export default async function build(onitConfigFile: OnitConfigFile, argv: yargs.
             await extraStepRunner(step, vars);
         }
     }
+
+    logger.log('Completed at '+new Date().toLocaleTimeString());
 }

@@ -25,7 +25,14 @@ const config: Command = {
             description: 'Quick grep override. Replaces the one provided from config file'
         }
     },
-
+    {
+        name: 's',
+        config: {
+            alias: 'suite',
+            type:'string',
+            description: 'Name of the test suite for direct launch without user interation. Must match the test full name.' 
+        } 
+    },
     {
         name: 'd',
         config: {

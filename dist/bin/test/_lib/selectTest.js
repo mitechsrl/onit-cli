@@ -14,11 +14,18 @@ const types_1 = require("../../../types");
  * @param {*} onitConfigFile
  * @returns
  */
-async function selectTest(onitConfigFile) {
+async function selectTest(onitConfigFile, suiteName) {
     // check for buildTargets existence
     const tests = onitConfigFile.json.test || {};
     if (Object.keys(tests).length === 0) {
         throw new types_1.StringError('No test defined. You should have the test property in your onit configuration file: ' + onitConfigFile.sources.join(', '));
+    }
+    // Manual suite selection
+    if (suiteName) {
+        if (tests[suiteName]) {
+            return tests[suiteName];
+        }
+        throw new types_1.StringError('Test suite name not found: ' + suiteName);
     }
     // select build target. If only one buildTarget is available, use that one, show a selection prompt otherwise
     let testTarget = {};

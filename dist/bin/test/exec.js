@@ -39,7 +39,7 @@ const exec = async (argv) => {
         throw new types_1.StringError('No test defined. You should have the test property in your onit configuration file: ' + onitConfigFile.sources.join(', '));
     }
     // prompt the user to elect a test set
-    const testTarget = await (0, selectTest_1.selectTest)(onitConfigFile);
+    const testTarget = await (0, selectTest_1.selectTest)(onitConfigFile, argv['suite']);
     // quick replace the tag from testTarget
     const overrideMatchTag = argv.t;
     if (overrideMatchTag) {

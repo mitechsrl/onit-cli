@@ -44,7 +44,7 @@ const exec: CommandExecFunction = async (argv: yargs.ArgumentsCamelCase<unknown>
     }
 
     // prompt the user to elect a test set
-    const testTarget = await selectTest(onitConfigFile);
+    const testTarget = await selectTest(onitConfigFile, argv['suite'] as string|undefined) ;
         
     // quick replace the tag from testTarget
     const overrideMatchTag = argv.t as string | undefined;
