@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.2.1
+
+- Added build and serve complete timestamps
+- Added an option to autoselect the test suite from cli parameter (-s)
+
 ## 3.2.0
 
 - Added `onit create version` command to automate the generation of a new dbinit version
