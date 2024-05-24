@@ -41,8 +41,9 @@ const config: Command = {
             } 
         },
         {
-            name: 'exit',
+            name: 'e',
             config: {
+                alias: 'exit',
                 type:'boolean',
                 description:'Used with -t or -w, exit after the first successfull build' 
             } 

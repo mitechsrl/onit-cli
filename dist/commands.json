@@ -89,6 +89,11 @@
         ]
     },
     {
+        "cmd": "s",
+        "file": "bin/s/commandConfig.js",
+        "children": []
+    },
+    {
         "cmd": "serve",
         "file": "bin/serve/commandConfig.js",
         "children": []
