@@ -1,6 +1,6 @@
 ## Onit build
 
-Permette il build del progetto e la creazione dei files destinati alla pacchettizzazione tramite npm. 
+Permette il build del progetto e la creazione dei files destinati alla pacchettizzazione tramite npm.
 
 ##### onit.config.[js|json]
 
@@ -24,21 +24,24 @@ module.exports = {
 ```
 
 ##### Link
+
 Vedi [link in ONIT-SERVE.md](./ONIT-SERVE.md)
 
 ### Copy files
+
 Vedi [COPY-FILES.md](COPY-FILES.md) per info su copia files in fase di serve
 
 ### Engines
+
 Vedi [ENGINES.md](ENGINES.md) per info engines
 
-##### Export
+#### Export
 
-La sezione export.webpack definisce un oggetto seguente la struttura della configurazione standard di webpack(vedi https://webpack.js.org/configuration/) il quale viene mergiato all'interno della configurazione standard di build. In particolare, questo oggetto rappresenta di fatto una configurazione aggiuntiva che il componente dichiara a webpack.
+La sezione export.webpack definisce un oggetto seguente la struttura della configurazione standard di webpack(vedi <https://webpack.js.org/configuration/>) il quale viene mergiato all'interno della configurazione standard di build. In particolare, questo oggetto rappresenta di fatto una configurazione aggiuntiva che il componente dichiara a webpack.
 
 La configurazione tipica esportata rappresenta una voce di alias. In questo modo, il pacchetto di turno può rendere disponibile i propri componenti react  a chiunque voglia usarli eseguendo un import tramite l'alias definito
 
-```
+```js
 {
     // this is a standard webpack config json
     resolve: {
@@ -51,18 +54,19 @@ La configurazione tipica esportata rappresenta una voce di alias. In questo modo
 
 I componenti dipendenti da questo, possono utilizzare il seguente codice per importare componenti react da altri pacchetti
 
-```
+```ts
 import component from 'ReactComponents\component.jsx'
 ```
 
 ##### Build version
+
 Indica che il progetto richiede una specifica versione del builder di onit-cli. Se omesso usa l'ultima versione disponibile nella onit-cli, altrimenti risolve la versione utilizzabile tramite le logiche semver. Occorre pertanto fornire una stringa di versione in stile npm.
 
-Vedi https://semver.org/lang/it/
+Vedi <https://semver.org/lang/it/>
 
 ##### Build targets
 
-```
+```json
 {
     [buildTargetName]: {
         mode: 'production',
@@ -73,6 +77,11 @@ Vedi https://semver.org/lang/it/
                 cmd: 'npm view "$_PACKAGE_NAME" versions --json'
             }
         },
+        beforeSteps: [{
+            name: 'myCommand',
+            cmd: 'cmd -param1 -param2 -param3',
+            cwd: '$_BUILD_DIR'
+        }]
         afterSteps: [{
             name: 'myCommand',
             cmd: 'cmd -param1 -param2 -param3',
@@ -94,21 +103,22 @@ Nel caso di **production** il menu presenta le seguenti voci:
 - Incrementa a X.Y.Z: propone la versione **patch** successiva a quella trovata in package.json. Se selezionata, scrive in automatico la nuova versione in package.json e package-lock.json
 - Build precedente a X.Y.Z, incrementa a X.Y.Z': legge, se esiste, il package.json nella directory di build e propone la versione **patch** successiva a quella trovata.
 
-In caso di **uat**, **beta** e **test** le voci presentae sono le stesse ma la versione successiva è calcolata con logica **prerelease** e **beta**. Vedi https://www.npmjs.com/package/semver, sezione increment
+In caso di **uat**, **beta** e **test** le voci presentae sono le stesse ma la versione successiva è calcolata con logica **prerelease** e **beta**. Vedi <https://www.npmjs.com/package/semver>, sezione increment
 
 **additional** rappresenta un comando shell che può essere eseguito per aggiungere una voce di menu alla lista precedente. Il comando deve mandare in output una delle seguenti informazioni:
+
 - singola stringa della versione attuale **NON** incrementata
 - singola stringa in formato json della versione attuale **NON** incrementata
 - Array json di molteplici versioni **NON** incrementate.
 
-In ogni caso il comando deve ritornaruna o piu informazioni rappresentante la versione base **NON** già incrementata, poichè l'incremento viene calcolato in automatico secondo le logiche interne. 
+In ogni caso il comando deve ritornaruna o piu informazioni rappresentante la versione base **NON** già incrementata, poichè l'incremento viene calcolato in automatico secondo le logiche interne.
 
 E' possibile specificare una serie di **variabili** che vengono sostituite nei comandi tramite una semplice string replace:
 
-```
-$_PROJECT_DIR: path assoluta del progetto da compilare
-$_PACKAGE_NAME: nome del pacchetto come trovato nel package.json del progetto da compilare
-$_BUILD_DIR: path assoluta alla cartella di build del progetto
+```js
+$_PROJECT_DIR // path assoluta del progetto da compilare
+$_PACKAGE_NAME // nome del pacchetto come trovato nel package.json del progetto da compilare
+$_BUILD_DIR // path assoluta alla cartella di build del progetto
 ```
 
 Sfruttando queste variabili, è possibile definire il comando additional come **npm view "$_PACKAGE_NAME" versions --json**, il quale verifica la versione pubblicata su repository npm e pertanto la voce di menu aggiuntiva presentata propone la versione successiva all'ultima versione presente nel repository npm.
@@ -117,13 +127,14 @@ Sfruttando queste variabili, è possibile definire il comando additional come **
 
 Ogni comando deve essere nel formato:
 
-```
+```ts
 {
-    name: string, nome del comando poposto in console,
-    cmd: string|array, comando (o array di comandi) da eseguire. E' possibile usare le variabili definite in precedenza per personalizzare il comando. Se viene passato un array di comandi, essi vengono eseguiti sequanzialmente.
-    cwd: string, path di esecuzione del comando. E' possibile usare le variabili per personalizzare il path, ad esempio inserendo **'$_BUILD_DIR'** l'esecuzione avviene nella directory di build
+    name: string // nome del comando poposto in console,
+    cmd: string|array // comando (o array di comandi) da eseguire. E' possibile usare le variabili definite in precedenza per personalizzare il comando. Se viene passato un array di comandi, essi vengono eseguiti sequanzialmente.
+    cwd: string // path di esecuzione del comando. E' possibile usare le variabili per personalizzare il path, ad esempio inserendo **'$_BUILD_DIR'** l'esecuzione avviene nella directory di build
 }
 ```
 
-**.onitbuildignore** può essere utilizzato per ignorare alcuni files dal processo di build (i quali quindi non finiranno nel pacchetto di build). Il formato è simile a **.gitignore** (Vedi https://git-scm.com/docs/gitignore)
+**beforeSteps**, come **afterSteps** ma esegue i comadi prima della build effettiva.
 
+**.onitbuildignore** può essere utilizzato per ignorare alcuni files dal processo di build (i quali quindi non finiranno nel pacchetto di build). Il formato è simile a **.gitignore** (Vedi <https://git-scm.com/docs/gitignore>)
