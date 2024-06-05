@@ -60,7 +60,11 @@ export async function assertPackageLockPotentialConflicts(onitConfigFile: OnitCo
             }
         }
         logger.log('');
-        logger.error('Potential conflicts found in package-lock.json. Press Ctrl+C to stop the serve now, otherwise it will continue in 5 seconds....');
+        const _p = path.relative(process.cwd(), packageLockJsonFilePath);
+        logger.warn(`Potential conflicts found in '${_p}'. Press Ctrl+C to stop the serve now, otherwise it will continue in 5 seconds....`);
+        logger.log('');
+        logger.warn(`You can try to fix this with 'npm install --prefer-dedupe' in path '${path.dirname(_p)}'`);
+        logger.log('');
         await new Promise(resolve => {
             setTimeout(resolve, 5000);
         });
