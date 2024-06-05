@@ -28,7 +28,10 @@ export type OnitConfigFileServe = {
     onFirstTscCompilationSuccess?: OnitConfigFileServeOnFirstTscCompilationSuccess[],
     // pm2 ecosystem config to be launched before serving
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    'pm2-dev-ecosystem'?: GenericObject
+    'pm2-dev-ecosystem'?: GenericObject,
+    // Enable or disable a preemptive check of potential conflicting @mitech packages versions.
+    // Does not affect serve, only prints warnings. Default enabled.
+    checkPackageLockPotentialConflicts?: boolean
 };
 
 export type OnitConfigFileTestTarget = OnitConfigFileServe & {
@@ -131,7 +134,8 @@ export type OnitConfigFile = {
         // test config
         test?: { [k:string]: OnitConfigFileTestTarget },
         // translate config
-        translate?: OnitConfigFileTranslate
+        translate?: OnitConfigFileTranslate,
+        
     },
     sources: string[]
     fileNameWithoutExt: string

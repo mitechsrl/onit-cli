@@ -1,29 +1,29 @@
-## Onit build
+# Onit build
 
 Permette il build del progetto e la creazione dei files destinati alla pacchettizzazione tramite npm.
 
-##### onit.config.[js|json]
+## onit.config.[js|json]
 
-```
+```js
 module.exports = {
-    link: array, gestione automatica di npm link,
+    link: [] // array, gestione automatica di npm link,
     export: {
-        webpack: Object, configurazione webpack aggiuntiva iniettata da questo componente. Vedi **Export webpack**
+        webpack: {} // Object, configurazione webpack aggiuntiva iniettata da questo componente. Vedi **Export webpack**
     },
 
-    copyFiles: {...},
+    copyFiles: {},
     
     engines: {},
 
     build:{
-        version: String, versione (in formato stile npm) del builder richiesto.      
-        targets: Object, configurazione targets di build. Deve essere definito almeno un build target. Vedi sezione **build target**
+        version: '' // String, versione (in formato stile npm) del builder richiesto.      
+        targets: {} // Object, configurazione targets di build. Deve essere definito almeno un build target. Vedi sezione **build target**
     }
 };
 
 ```
 
-##### Link
+### Link
 
 Vedi [link in ONIT-SERVE.md](./ONIT-SERVE.md)
 

@@ -1,12 +1,14 @@
 # Onit-cli
+
 Onit dev CLI utility
 
 ## Install
 
 ### From git repository
+
 You can install onit-cli directly from git. Open a terminal session and type:
 
-```
+```sh
 > git clone https://github.com/mitechsrl/onit-cli.git
 > cd onit-cli
 > npm install
@@ -16,14 +18,16 @@ You can install onit-cli directly from git. Open a terminal session and type:
 To update it, simply pull the changes from this repo.
 
 ### from npm
+
 All onit-cli releases are also puched on npm.com.
 Open a terminal session and type:
 
-```
+```sh
 > npm install -g @mitech/onit-cli
 ```
 
-## Commands 
+## Commands
+
 Here's the list of main commands. For further docs, see the command-specific page.
 
 - [onit serve](ONIT-SERVE.md), development serve command
@@ -35,8 +39,8 @@ Here's the list of main commands. For further docs, see the command-specific pag
 
 To create new commands, see [How to create a new command](CREATE-COMMAND.md)
 
-
 ## onit.config.js file
+
 Commands **serve**, **test** and **build** requires a configuration file.
 
 The tool search in the working directory the **onit.config.js** or **onit.config.json** files.
@@ -48,8 +52,8 @@ The tool will automatically merge the content of the local and non-local file wh
 For more info, [see here a complete example of config file](./ONIT-CONFIG-EXAMPLE-FILE.md)
 
 ## Common flags
-These flags can be applied to any command:
 
+These flags can be applied to any command:
 
 `-h` Add this flag to any command to show help without actually running the command.
 

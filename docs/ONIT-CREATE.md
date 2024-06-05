@@ -4,16 +4,17 @@ A helper command to create various type of artifacts.
 
 ## onit create app
 
-```
+```sh
 onit create app
 ```
+
 Create a new onit-based app by cloning the [onit-next-example-webcomponent](https://github.com/mitechsrl/onit-next-example-webcomponent) github repository.
 
 **NOTE** This command currently needs the permissions to clone such repository.
 
 ## onit create model
 
-```
+```sh
 onit create model
 ```
 
@@ -23,7 +24,7 @@ Create a new [model](https://loopback.io/doc/en/lb4/Model.html). A [inquirer-bas
 
 ## onit create service
 
-```
+```sh
 onit create service
 ```
 
@@ -33,7 +34,7 @@ Create a new [service](https://loopback.io/doc/en/lb4/Service.html).  A [inquire
 
 ## onit create relation
 
-```
+```sh
 onit create relation
 ```
 
@@ -43,7 +44,7 @@ Create a new [relation](https://loopback.io/doc/en/lb4/Relations.html) between m
 
 ## onit create repository
 
-```
+```ah
 onit create repository
 ```
 

@@ -34,6 +34,7 @@ import { tscWatchAndRun } from '../2.0.0/lib/tsc';
 import { webpackDevBuildAndWatch } from '../2.0.0/lib/webpack';
 import { getConfigFileBackendEngine, getConfigFileFrontendEngine } from '../../../../lib/onitConfigFileEngines';
 import { nextJsBuild } from '../../../build/_versions/3.0.0/lib/nextjs';
+import { assertPackageLockPotentialConflicts } from './lib/checkPackageLockPotentialConflicts';
 
 export async function start(onitConfigFile: OnitConfigFile, version:string, argv: yargs.ArgumentsCamelCase<unknown>) {
     // get the package json in the current directory
@@ -70,7 +71,14 @@ export async function start(onitConfigFile: OnitConfigFile, version:string, argv
     const backendServe = argv.t || argv.b; // t stands for 'tsc', b for 'backend'
     let launchedCount = 0;
     const exit = argv.exit;
-
+  
+    if (onitConfigFile.json?.serve?.checkPackageLockPotentialConflicts !== false) {
+        // Preemptive checks for out needs: we got burnt when npm installed different versions of the same package
+        // in different packages in npm workspaces. This check alert us this behavior does not slip under the
+        // door unnoticed.
+        // The ckeck is enabled by default. (set serve.checkPackageLockPotentialConflicts = false in onit.config.json to disable it)
+        await assertPackageLockPotentialConflicts(onitConfigFile);
+    }
     // pm2 will be launched only when node is explicitly launched on when none of the other partial serve flags are set
     const launchPm2 = !(backendServe || frontendServe); 
     if (launchPm2) {

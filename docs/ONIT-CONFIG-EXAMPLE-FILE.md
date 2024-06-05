@@ -1,22 +1,26 @@
-## Onit config example file
+# Onit config example file
 
 The onit config file must export one of the following values:
 
 - Object (see below example)
 - Sync/async function which must return an object(see below example for object properties)
+
    ```js
    module.exports = async ()=> {
     // return an object. Equal to the example below
    } 
    ```
+
 - Promise. Must resolve with an object (see below example)
+
   ```js
    module.exports = Promise.resolve({
      // object. Equal to the example below
    })
    ```
-   
-#### Example
+
+## Example
+
 ```js
 
 module.exports = {
@@ -77,6 +81,9 @@ module.exports = {
         // node main process arguments. Passed as-is to node process
         // nodeArgs: []
         
+        // prints potential @mitech packages conflicts
+        // checkPackageLockPotentialConflicts: true
+        
         // env variables for the node process to be launched
         environment: {
             DATASOURCES: {
@@ -125,23 +132,23 @@ module.exports = {
      * Test config. See ONIT-TEST.md
      */
     test: {
-		"nomeSet":{ 
-		
-			// Environent params for test onit launcher
-			"environment":{}
-			
-			// Test-specific parameters
-			"startup":"someFile.js",
-			"beforeTest":"someFile2.js"
-			"testFilesDirectories":["./src/test/cases", "../../onit-next/dist/test/cases"], // mocha test files directories 
-			"shutdown": "pathToFile.js"
-			
-			// Add any mocha-supported property. See list here: https://mochajs.org/api/mocha,
-			// These properties are passed down directly to mocha.
-			"grep":"*", // https://mochajs.org/api/mocha#grep
-			"timeout": "10s", //https://mochajs.org/api/mocha#timeout
-		}
-	},
+        "nomeSet":{ 
+            
+            // Environent params for test onit launcher
+            "environment":{}
+            
+            // Test-specific parameters
+            "startup":"someFile.js",
+            "beforeTest":"someFile2.js"
+            "testFilesDirectories":["./src/test/cases", "../../onit-next/dist/test/cases"], // mocha test files directories 
+            "shutdown": "pathToFile.js"
+            
+            // Add any mocha-supported property. See list here: https://mochajs.org/api/mocha,
+            // These properties are passed down directly to mocha.
+            "grep":"*", // https://mochajs.org/api/mocha#grep
+            "timeout": "10s", //https://mochajs.org/api/mocha#timeout
+        }
+    },
 
 
     /**

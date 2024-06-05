@@ -14,6 +14,7 @@ export declare type OnitConfigFileServe = {
     nodeArgs?: string[];
     onFirstTscCompilationSuccess?: OnitConfigFileServeOnFirstTscCompilationSuccess[];
     'pm2-dev-ecosystem'?: GenericObject;
+    checkPackageLockPotentialConflicts?: boolean;
 };
 export declare type OnitConfigFileTestTarget = OnitConfigFileServe & {
     grep?: string;

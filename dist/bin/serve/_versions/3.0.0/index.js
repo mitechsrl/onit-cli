@@ -37,7 +37,9 @@ const tsc_1 = require("../2.0.0/lib/tsc");
 const webpack_1 = require("../2.0.0/lib/webpack");
 const onitConfigFileEngines_1 = require("../../../../lib/onitConfigFileEngines");
 const nextjs_1 = require("../../../build/_versions/3.0.0/lib/nextjs");
+const checkPackageLockPotentialConflicts_1 = require("./lib/checkPackageLockPotentialConflicts");
 async function start(onitConfigFile, version, argv) {
+    var _a, _b;
     // get the package json in the current directory
     const cwdPackageJsonPath = path_1.default.join(process.cwd(), 'package.json');
     const cwdPackageJson = JSON.parse(fs_1.default.readFileSync(cwdPackageJsonPath).toString());
@@ -68,6 +70,13 @@ async function start(onitConfigFile, version, argv) {
     const backendServe = argv.t || argv.b; // t stands for 'tsc', b for 'backend'
     let launchedCount = 0;
     const exit = argv.exit;
+    if (((_b = (_a = onitConfigFile.json) === null || _a === void 0 ? void 0 : _a.serve) === null || _b === void 0 ? void 0 : _b.checkPackageLockPotentialConflicts) !== false) {
+        // Preemptive checks for out needs: we got burnt when npm installed different versions of the same package
+        // in different packages in npm workspaces. This check alert us this behavior does not slip under the
+        // door unnoticed.
+        // The ckeck is enabled by default. (set serve.checkPackageLockPotentialConflicts = false in onit.config.json to disable it)
+        await (0, checkPackageLockPotentialConflicts_1.assertPackageLockPotentialConflicts)(onitConfigFile);
+    }
     // pm2 will be launched only when node is explicitly launched on when none of the other partial serve flags are set
     const launchPm2 = !(backendServe || frontendServe);
     if (launchPm2) {

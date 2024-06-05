@@ -3,6 +3,7 @@
 Commands are automatically generated based on the directory of their config file in the **bin/** folder.
 
 Examples:
+
 - **onit build** runs the configuration at **/bin/build/commandConfig.ts**
 - **onit create app** runs the configuration at  **/bin/create/app/commandConfig.ts**
 - **onit build -p 1 -c 3 -d 4** runs the configuration at  **/bin/build/commandConfig.ts** with **argv** valorized as ```{p:1,c:3, d:4}```
@@ -22,8 +23,8 @@ const config: Command = {
 
 export default config;
 ```
-Create the **exec** file, (which is exec.ts in this case, based on the name defined in the exec property of **commandConfig.ts**)
 
+Create the **exec** file, (which is exec.ts in this case, based on the name defined in the exec property of **commandConfig.ts**)
 
 ```js
 import yargs from 'yargs';

@@ -1,4 +1,4 @@
-## Onit test
+# Onit test
 
 Run project tests
 
@@ -8,24 +8,24 @@ Il file onit.config.js definisce una nuova sezione "test" nel quale contiene la 
 
 ```js
 
- test: {
-  "nomeSet":{ 
-  
-   // Si possono inserire qui i parametri del serve, per configurare il lancio di onit.
-   "environment":{} // environment onit
-   
-   // parametri specifici del test
-   "startup":"someFile.js",
-   "beforeTest":"someFile2.js"
-   "testFilesDirectories":["./src/test/cases", "../../onit-next/dist/test/cases"], // array di stirng 
-   "shutdown":"pathToFile.js"
-   "launchOnit":true,
-   // Inserire le proprietà come voluto da mocha. Vedi lista di proprietà: https://mochajs.org/api/mocha,
-   // Vengono passate direttamente a mocha. Vedi "Proprietà specifiche mocha" per info.
-   "grep":"*", // https://mochajs.org/api/mocha#grep
-   "timeout": "10s", //https://mochajs.org/api/mocha#timeout
-  }
- }
+    test: {
+        "nomeSet":{ 
+        
+            // Si possono inserire qui i parametri del serve, per configurare il lancio di onit.
+            "environment":{} // environment onit
+            
+            // parametri specifici del test
+            "startup":"someFile.js",
+            "beforeTest":"someFile2.js"
+            "testFilesDirectories":["./src/test/cases", "../../onit-next/dist/test/cases"], // array di stirng 
+            "shutdown":"pathToFile.js"
+            "launchOnit":true,
+            // Inserire le proprietà come voluto da mocha. Vedi lista di proprietà: https://mochajs.org/api/mocha,
+            // Vengono passate direttamente a mocha. Vedi "Proprietà specifiche mocha" per info.
+            "grep":"*", // https://mochajs.org/api/mocha#grep
+            "timeout": "10s", //https://mochajs.org/api/mocha#timeout
+        }
+    }
 ```
 
 **NomeSet** definisce cosa caricare per l'esecuzione del test. In fase di avvio, onit-cli chiede quale set utilizzare sulla falsariga di onit build.
