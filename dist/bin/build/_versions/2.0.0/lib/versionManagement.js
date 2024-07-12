@@ -103,40 +103,56 @@ async function promptVersion(buildTarget, vars, cwdPackageJson) {
         });
         if (versionManagement.additional) {
             const _additional = (0, replace_1.replace)(versionManagement.additional, vars);
-            console.log('Eseguo versionManagement additional: ' + _additional.cmd);
-            let val = await (0, spawn_1.spawn)(_additional.cmd, [], {
+            console.log('Verifico versioni npm: ' + _additional.cmd);
+            const val = await (0, spawn_1.spawn)(_additional.cmd, [], {
                 shell: true,
                 print: false,
                 cwd: process.cwd()
             });
             if (val.exitCode === 0) {
-                let output = val.output.trim();
+                const output = val.output.trim();
+                let lastVersionForSelectedMode;
+                let lastVersionGlobally;
                 // we can process both a single string or an array of version strings.
                 // In case of array, get the next suitable version
                 try {
                     const _match = output.match(/(\[[^\]]+\])|(^"[0-9.]+"$)/gm);
+                    let probablyStringifiedJson;
                     if (_match && _match[0])
-                        output = _match[0];
-                    let _val = JSON.parse(output);
-                    if (Array.isArray(_val)) {
-                        _val = _val.filter(v => !!v.match(additionalMatch));
-                        _val = (0, semver_1.sort)(_val);
-                        val = _val.pop();
-                    }
-                    else {
-                        val = _val;
+                        probablyStringifiedJson = _match[0];
+                    if (!probablyStringifiedJson)
+                        throw new Error('Unable to detect version from npm repository');
+                    const versionsArray = JSON.parse(probablyStringifiedJson);
+                    if (Array.isArray(versionsArray)) {
+                        let filtered = versionsArray.filter(v => !!v.match(additionalMatch));
+                        filtered = (0, semver_1.sort)(filtered);
+                        lastVersionForSelectedMode = filtered.pop();
+                        lastVersionGlobally = (0, semver_1.sort)(versionsArray).pop();
                     }
                 }
                 catch (e) {
                     console.error(e);
                 }
                 increaseLevels.forEach(increaseLevel => {
-                    const v = (0, semver_1.inc)(output, increaseLevel[0], undefined, increaseLevel[1]);
-                    if (v) {
-                        list[0].choices.push({
-                            name: versionManagement.additional.name + ' ' + increaseLevel[0] + ' ' + v,
-                            value: v
-                        });
+                    if (lastVersionForSelectedMode) {
+                        const v = (0, semver_1.inc)(lastVersionForSelectedMode, increaseLevel[0], undefined, increaseLevel[1]);
+                        console.log(v);
+                        if (v) {
+                            list[0].choices.push({
+                                name: versionManagement.additional.name + ' ' + increaseLevel[0] + ' ' + v,
+                                value: v
+                            });
+                        }
+                    }
+                    if (lastVersionGlobally && lastVersionGlobally !== lastVersionForSelectedMode) {
+                        const v = (0, semver_1.inc)(lastVersionGlobally, increaseLevel[0], undefined, increaseLevel[1]);
+                        console.log(v);
+                        if (v) {
+                            list[0].choices.push({
+                                name: versionManagement.additional.name + ' ' + increaseLevel[0] + ' ' + v,
+                                value: v
+                            });
+                        }
                     }
                 });
             }

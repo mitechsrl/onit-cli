@@ -105,40 +105,54 @@ export async function promptVersion(buildTarget:OnitConfigFileBuildTarget, vars:
 
         if (versionManagement.additional) {
             const _additional = replace(versionManagement.additional, vars);
-            console.log('Eseguo versionManagement additional: ' + _additional.cmd);
-            let val = await spawn(_additional.cmd, [], {
+            console.log('Verifico versioni npm: ' + _additional.cmd);
+            const val = await spawn(_additional.cmd, [], {
                 shell: true,
                 print: false,
                 cwd: process.cwd()
             });
             if (val.exitCode === 0) {
-                let output = val.output.trim();
-
+                const output = val.output.trim();
+                let lastVersionForSelectedMode: string|undefined;
+                let lastVersionGlobally: string|undefined;
                 // we can process both a single string or an array of version strings.
                 // In case of array, get the next suitable version
                 try {
                     const _match = output.match(/(\[[^\]]+\])|(^"[0-9.]+"$)/gm);
-                    if (_match && _match[0]) output = _match[0];
+                    let probablyStringifiedJson: string|undefined;
+                    if (_match && _match[0]) probablyStringifiedJson = _match[0];
+                    if (!probablyStringifiedJson) throw new Error('Unable to detect version from npm repository');
+                    const versionsArray = JSON.parse(probablyStringifiedJson);
 
-                    let _val = JSON.parse(output);
-                    if (Array.isArray(_val)) {
-                        _val = _val.filter(v => !!v.match(additionalMatch));
-                        _val = sort(_val);
-                        val = _val.pop();
-                    } else {
-                        val = _val;
+                    if (Array.isArray(versionsArray)) {
+                        let filtered = versionsArray.filter(v => !!v.match(additionalMatch));
+                        filtered = sort(filtered);
+                        lastVersionForSelectedMode = filtered.pop();
+                        lastVersionGlobally = sort(versionsArray).pop();
                     }
+
                 } catch (e) {
                     console.error(e);
                 }
 
                 increaseLevels.forEach(increaseLevel => {
-                    const v = inc(output, increaseLevel[0] as ReleaseType, undefined, increaseLevel[1]);
-                    if (v) {
-                        list[0].choices.push({
-                            name: versionManagement.additional!.name + ' ' + increaseLevel[0] + ' ' + v,
-                            value: v
-                        });
+                    if (lastVersionForSelectedMode){
+                        const v = inc(lastVersionForSelectedMode, increaseLevel[0] as ReleaseType, undefined, increaseLevel[1]);
+                        if (v) {
+                            list[0].choices.push({
+                                name: versionManagement.additional!.name + ' ' + increaseLevel[0] + ' ' + v,
+                                value: v
+                            });
+                        }
+                    }
+                    if (lastVersionGlobally && lastVersionGlobally !== lastVersionForSelectedMode){
+                        const v = inc(lastVersionGlobally, increaseLevel[0] as ReleaseType, undefined, increaseLevel[1]);
+                        if (v) {
+                            list[0].choices.push({
+                                name: versionManagement.additional!.name + ' ' + increaseLevel[0] + ' ' + v,
+                                value: v
+                            });
+                        }
                     }
                 });
             }
