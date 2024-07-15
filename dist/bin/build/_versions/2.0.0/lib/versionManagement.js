@@ -136,7 +136,6 @@ async function promptVersion(buildTarget, vars, cwdPackageJson) {
                 increaseLevels.forEach(increaseLevel => {
                     if (lastVersionForSelectedMode) {
                         const v = (0, semver_1.inc)(lastVersionForSelectedMode, increaseLevel[0], undefined, increaseLevel[1]);
-                        console.log(v);
                         if (v) {
                             list[0].choices.push({
                                 name: versionManagement.additional.name + ' ' + increaseLevel[0] + ' ' + v,
@@ -146,7 +145,6 @@ async function promptVersion(buildTarget, vars, cwdPackageJson) {
                     }
                     if (lastVersionGlobally && lastVersionGlobally !== lastVersionForSelectedMode) {
                         const v = (0, semver_1.inc)(lastVersionGlobally, increaseLevel[0], undefined, increaseLevel[1]);
-                        console.log(v);
                         if (v) {
                             list[0].choices.push({
                                 name: versionManagement.additional.name + ' ' + increaseLevel[0] + ' ' + v,

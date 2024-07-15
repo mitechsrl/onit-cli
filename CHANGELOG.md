@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.3.0
+
+- Added shortcut **onit s**, same as **onit server**
+- Fixed calculation of new proposed version in **onit build** with npm check
+- Added a warning while **onit serve** on potential package conflicts (@loopback and @mitech needs to be singleton in node_modules tree)
+
 ## 3.2.1
 
 - Added build and serve complete timestamps
