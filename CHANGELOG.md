@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.3.1
+
+- Minor fixes
+
 ## 3.3.0
 
 - Added shortcut **onit s**, same as **onit server**
