@@ -62,12 +62,12 @@ async function startTest(onitConfigFile, testTarget, argv) {
         // do not recompile
         if (!doNotRebuild) {
             logger_1.logger.info('Cleaning project build...');
-            await (0, spawn_1.spawn)(npm_1.npmExecutable, ['run', 'clean']);
+            await (0, npm_1.npm)(['run', 'clean']);
             logger_1.logger.info('Building project...');
-            const buildTscResult = await (0, spawn_1.spawn)(onitCliExecutable, ['serve', '-t', '--exit']);
+            const buildTscResult = await (0, spawn_1.spawn)(onitCliExecutable, ['serve', '-t', '--exit'], { shell: true });
             if (buildTscResult.exitCode !== 0)
                 throw new types_1.StringError('Tsc build failed. Aborting test');
-            const buildFrontendResult = await (0, spawn_1.spawn)(onitCliExecutable, ['serve', '-w', '--exit']);
+            const buildFrontendResult = await (0, spawn_1.spawn)(onitCliExecutable, ['serve', '-w', '--exit'], { shell: true });
             if (buildFrontendResult.exitCode !== 0)
                 throw new types_1.StringError('Frontend build failed. Aborting test');
         }

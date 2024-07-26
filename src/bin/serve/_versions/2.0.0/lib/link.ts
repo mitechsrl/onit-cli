@@ -27,8 +27,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 import path from 'path';
 import fs from 'fs';
 import { logger } from '../../../../../lib/logger';
-import { spawn } from '../../../../../lib/spawn';
-import { npmExecutable } from '../../../../../lib/npm';
+import { npm } from '../../../../../lib/npm';
 
 /**
  * Create the link. Based on the provided target, it either uses the standard npm link or a custom one
@@ -38,7 +37,7 @@ async function createLink (configFile: string, l: OnitConfigFileLink) {
     if (!l.target) {
         // providing just the "link" property uses the standard npm link
         logger.log('Eseguo <npm link ' + l.link + '>');
-        await spawn(npmExecutable, ['link', l.link], { shell: true });
+        await npm(['link', l.link]);
     } else {
         // providing target will make this utility to create the link to the target directory
         logger.log('Creo symlink ' + l.link + ' verso ' + l.target);

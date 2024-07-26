@@ -26,10 +26,11 @@ OTHER DEALINGS IN THE SOFTWARE.
 import os from 'os';
 import { packageJson } from './packageJson';
 import updateNotifier from 'simple-update-notifier';
+import { spawn, SpawnOptions } from './spawn';
 
 // windows being windows... it wants the .cmd extension!
-export const npmExecutable = os.platform() === 'win32' ? 'npm.cmd' : 'npm';
-export const npxExecutable = os.platform() === 'win32' ? 'npx.cmd' : 'npx';
+const npmExecutable = os.platform() === 'win32' ? 'npm.cmd' : 'npm';
+const npxExecutable = os.platform() === 'win32' ? 'npx.cmd' : 'npx';
 
 /**
  * Check for newer versions and show a info in the console
@@ -38,4 +39,18 @@ export const npxExecutable = os.platform() === 'win32' ? 'npx.cmd' : 'npx';
  */
 export async function npmVersionCheck() {
     await updateNotifier({ pkg: packageJson, updateCheckInterval: 1000 * 60 * 60 * 24 });
+}
+
+/**
+ * Proxy method to spawn npm process
+ */
+export async function npm(params: string[], options?: SpawnOptions ){
+    return spawn(npmExecutable, params, Object.assign({ shell:true }, options ?? {}));
+}
+
+/**
+ * Proxy method to spawn npx process
+ */
+export async function npx(params: string[], options?: SpawnOptions ){
+    return spawn(npxExecutable, params, Object.assign({ shell:true }, options ?? {}));
 }

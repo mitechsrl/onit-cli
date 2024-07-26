@@ -24,7 +24,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 */
 
 import { logger } from '../../../../../lib/logger';
-import { npmExecutable, npxExecutable } from '../../../../../lib/npm';
+import { npm, npx } from '../../../../../lib/npm';
 import { spawn } from '../../../../../lib/spawn';
 import { GenericObject, OnitConfigFile } from '../../../../../types';
 import { copyExtraFiles } from './copyExtraFiles';
@@ -36,9 +36,9 @@ export async function runTsc(onitConfigFile: OnitConfigFile, cwdPackageJson: Gen
     // the default implementation of 'npm run build' for loopback 4 projects)
     let r = null;
     if (typeof (cwdPackageJson.scripts || {}).build === 'string') {
-        r = await spawn(npmExecutable, ['run', 'build'], { shell: true });
+        r = await npm(['run', 'build']);
     } else {
-        r = await spawn(npxExecutable, ['lb-tsc'], { shell: true });
+        r = await npx(['lb-tsc']);
     }
 
     // TODO: verificare se cambia qualcosa da powershell ad altre shells

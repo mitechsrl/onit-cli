@@ -31,7 +31,6 @@ OTHER DEALINGS IN THE SOFTWARE.
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 const logger_1 = require("../../../../../lib/logger");
-const spawn_1 = require("../../../../../lib/spawn");
 const npm_1 = require("../../../../../lib/npm");
 /**
  * Create the link. Based on the provided target, it either uses the standard npm link or a custom one
@@ -41,7 +40,7 @@ async function createLink(configFile, l) {
     if (!l.target) {
         // providing just the "link" property uses the standard npm link
         logger_1.logger.log('Eseguo <npm link ' + l.link + '>');
-        await (0, spawn_1.spawn)(npm_1.npmExecutable, ['link', l.link], { shell: true });
+        await (0, npm_1.npm)(['link', l.link]);
     }
     else {
         // providing target will make this utility to create the link to the target directory

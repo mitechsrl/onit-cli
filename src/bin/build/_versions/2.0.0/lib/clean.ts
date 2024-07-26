@@ -28,7 +28,7 @@ import { GenericObject, OnitConfigFile } from '../../../../../types';
 import fse from 'fs-extra';
 import fs from 'fs';
 import { spawn } from '../../../../../lib/spawn';
-import { npmExecutable } from '../../../../../lib/npm';
+import { npm } from '../../../../../lib/npm';
 
 /**
  * Ensure path does not exist
@@ -65,8 +65,7 @@ export async function runClean(onitConfigFile: OnitConfigFile, cwdPackageJson: G
 
     // if defined, launch the clean script
     if ((cwdPackageJson.scripts || {}).clean) {
-        await spawn(npmExecutable, ['run', 'clean'], {
-            shell: true,
+        await npm(['run', 'clean'], {
             cwd: process.cwd()
         });
     }

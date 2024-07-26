@@ -27,13 +27,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.npmVersionCheck = exports.npxExecutable = exports.npmExecutable = void 0;
+exports.npx = exports.npm = exports.npmVersionCheck = void 0;
 const os_1 = __importDefault(require("os"));
 const packageJson_1 = require("./packageJson");
 const simple_update_notifier_1 = __importDefault(require("simple-update-notifier"));
+const spawn_1 = require("./spawn");
 // windows being windows... it wants the .cmd extension!
-exports.npmExecutable = os_1.default.platform() === 'win32' ? 'npm.cmd' : 'npm';
-exports.npxExecutable = os_1.default.platform() === 'win32' ? 'npx.cmd' : 'npx';
+const npmExecutable = os_1.default.platform() === 'win32' ? 'npm.cmd' : 'npm';
+const npxExecutable = os_1.default.platform() === 'win32' ? 'npx.cmd' : 'npx';
 /**
  * Check for newer versions and show a info in the console
  * This is just for a reminder, doesn't do anything else.
@@ -43,4 +44,18 @@ async function npmVersionCheck() {
     await (0, simple_update_notifier_1.default)({ pkg: packageJson_1.packageJson, updateCheckInterval: 1000 * 60 * 60 * 24 });
 }
 exports.npmVersionCheck = npmVersionCheck;
+/**
+ * Proxy method to spawn npm process
+ */
+async function npm(params, options) {
+    return (0, spawn_1.spawn)(npmExecutable, params, Object.assign({ shell: true }, options !== null && options !== void 0 ? options : {}));
+}
+exports.npm = npm;
+/**
+ * Proxy method to spawn npm process
+ */
+async function npx(params, options) {
+    return (0, spawn_1.spawn)(npxExecutable, params, Object.assign({ shell: true }, options !== null && options !== void 0 ? options : {}));
+}
+exports.npx = npx;
 //# sourceMappingURL=npm.js.map

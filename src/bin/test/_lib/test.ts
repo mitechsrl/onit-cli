@@ -29,7 +29,7 @@ import { logger } from '../../../lib/logger';
 import { requireMochaFromProcessCwd } from './requireMochaFromProcessCwd';
 import { onitProcessLauncher } from './onitProcessLauncher';
 import { spawn } from '../../../lib/spawn';
-import { npmExecutable } from '../../../lib/npm';
+import { npm } from '../../../lib/npm';
 import { checkFiles } from './checkFiles';
 import { buildEnvironment } from '../../serve/_versions/2.0.0/lib/spawnNodeProcess';
 import { resolveTestFilesDirectories } from './resolveTestFilesDirectories';
@@ -66,11 +66,11 @@ export async function startTest(
 
         if (!doNotRebuild) {
             logger.info('Cleaning project build...');
-            await spawn(npmExecutable, ['run', 'clean']);
+            await npm(['run', 'clean']);
             logger.info('Building project...');
-            const buildTscResult = await spawn(onitCliExecutable, ['serve', '-t', '--exit']);
+            const buildTscResult = await spawn(onitCliExecutable, ['serve', '-t', '--exit'], { shell:true });
             if (buildTscResult.exitCode !== 0) throw new StringError('Tsc build failed. Aborting test');
-            const buildFrontendResult = await spawn(onitCliExecutable, ['serve', '-w', '--exit']);
+            const buildFrontendResult = await spawn(onitCliExecutable, ['serve', '-w', '--exit'], { shell:true });
             if (buildFrontendResult.exitCode !== 0) throw new StringError('Frontend build failed. Aborting test');
         }
 

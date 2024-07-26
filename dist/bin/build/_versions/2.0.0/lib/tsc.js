@@ -27,7 +27,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.runTsc = void 0;
 const logger_1 = require("../../../../../lib/logger");
 const npm_1 = require("../../../../../lib/npm");
-const spawn_1 = require("../../../../../lib/spawn");
 const copyExtraFiles_1 = require("./copyExtraFiles");
 async function runTsc(onitConfigFile, cwdPackageJson) {
     logger_1.logger.log('[TSC] Starting tsc build...');
@@ -35,10 +34,10 @@ async function runTsc(onitConfigFile, cwdPackageJson) {
     // the default implementation of 'npm run build' for loopback 4 projects)
     let r = null;
     if (typeof (cwdPackageJson.scripts || {}).build === 'string') {
-        r = await (0, spawn_1.spawn)(npm_1.npmExecutable, ['run', 'build'], { shell: true });
+        r = await (0, npm_1.npm)(['run', 'build']);
     }
     else {
-        r = await (0, spawn_1.spawn)(npm_1.npxExecutable, ['lb-tsc'], { shell: true });
+        r = await (0, npm_1.npx)(['lb-tsc']);
     }
     // TODO: verificare se cambia qualcosa da powershell ad altre shells
     if (r.exitCode !== 0) {
