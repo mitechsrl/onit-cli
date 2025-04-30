@@ -31,7 +31,7 @@ exports.nextJsBuild = void 0;
 const child_process_1 = require("child_process");
 const resolveNextBinImportPath_1 = require("./resolveNextBinImportPath");
 const path_1 = __importDefault(require("path"));
-async function nextJsBuild(onitConfigFile, cwdPackageJson, buildMode, //'prduction'|'development',
+async function nextJsBuild(onitConfigFile, cwdPackageJson, buildMode, //'production'|'development',
 env, // Values to add to env when spawning cli 
 argv) {
     // we just automatize the "next build" command. Checking for binary to be launched (will throw eventually)

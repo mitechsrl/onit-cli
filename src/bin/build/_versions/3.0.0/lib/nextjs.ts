@@ -32,7 +32,7 @@ import path from 'path';
 export async function nextJsBuild (
     onitConfigFile: OnitConfigFile,
     cwdPackageJson: GenericObject,
-    buildMode: string,  //'prduction'|'development',
+    buildMode: string,  //'production'|'development',
     env?: GenericObject, // Values to add to env when spawning cli 
     argv?: yargs.ArgumentsCamelCase<unknown>) {
 

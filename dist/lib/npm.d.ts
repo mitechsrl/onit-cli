@@ -10,6 +10,6 @@ export declare function npmVersionCheck(): Promise<void>;
  */
 export declare function npm(params: string[], options?: SpawnOptions): Promise<import("./spawn").SpawnResult>;
 /**
- * Proxy method to spawn npm process
+ * Proxy method to spawn npx process
  */
 export declare function npx(params: string[], options?: SpawnOptions): Promise<import("./spawn").SpawnResult>;

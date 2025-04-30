@@ -6,8 +6,7 @@ import { <%=repositoryBaseClass %> } from './<%=repositoryBaseFile %>';
 <% } -%>
 import { OnitMixin } from '<%= importPath %>/types';
 import { OnitDefaultRepository } from '<%= importPath %>/repositories/onit-base.repository';
-import { applyRepositoryMixins } from '<%= importPath %>/lib/mixins/applyRepositoryMixin';
-import { getArtifactExtensions } from '<%= importPath %>/lib/mixins/artifactExtensions';<% 
+import { applyRepositoryMixins } from '<%= importPath %>/lib/mixins/applyRepositoryMixin';<% 
 mixins.forEach(m => { %>
 import { <%= m.mixinName %> } from '<%= m.filename %>';<%
 }) %>
@@ -33,9 +32,7 @@ class Base extends OnitDefaultRepository<
 
 // Mixin list definition. you sholud keep this mixin list equal to the one of <%= className %> model
 const mixins: OnitMixin[] = [
-    <%= mixins.map(m => m.mixinName).join(',\n    ') %>,
-    // get the artifact extensions registered while loading extension modules
-    ...getArtifactExtensions('repository', <%= classNameCapitalRepoName %>_REPOSITORY_NAME)
+    <%= mixins.map(m => m.mixinName).join(',\n    ') %>
 ];
 
 export class <%= className %>Repository

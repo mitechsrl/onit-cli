@@ -52,7 +52,7 @@ async function npm(params, options) {
 }
 exports.npm = npm;
 /**
- * Proxy method to spawn npm process
+ * Proxy method to spawn npx process
  */
 async function npx(params, options) {
     return (0, spawn_1.spawn)(npxExecutable, params, Object.assign({ shell: true }, options !== null && options !== void 0 ? options : {}));
