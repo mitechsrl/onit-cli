@@ -13,18 +13,23 @@ This package provide the **onit** cli command, a developer tool for onit-based p
 <hr>
 
 ## Documentation
+
 For install and commands documentation, [see main docs](./docs/MAIN.md)
 
 ## Getting started
+
 See [getting started documentation page](./docs/GETTING-STARTED.md) for more info
 
 ## Changelog
+
 See [CHANGELOG.md](CHANGELOG.md) for more info
 
 ## V2 cli
+
 For V2 cli, see **V2** branch.
 
 ## License
+
 [MIT](./LICENSE)
 <br>
 <hr>
@@ -34,4 +39,3 @@ For V2 cli, see **V2** branch.
 [![logo-mitech](docs/mitech.png)](https://www.mitechsrl.it/)
 
 </div>
-
