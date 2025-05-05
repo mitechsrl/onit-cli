@@ -2,4 +2,4 @@
 
 Requires:
 
-- NextJS v14
+- NextJS v13

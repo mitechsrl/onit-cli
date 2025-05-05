@@ -123,3 +123,17 @@ Esempio di launch.json per vscode
 }
 
 ```
+
+## Versioni
+
+### 2.X
+
+TODO
+
+### 3.X
+
+Vedi [V3 README](..\\src\\bin\\serve\\_versions\\3.0.0\\README.md)
+
+### 4.X
+
+Vedi [V4 README](..\\src\\bin\\serve\\_versions\\4.0.0\\README.md)
