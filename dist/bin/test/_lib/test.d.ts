@@ -3,8 +3,8 @@ import yargs from 'yargs';
 /**
  * Test starter method
  *
- * @param onitConfigFile onitconfig file
+ * @param onitConfigFile The config file content
  * @param testTarget Test config
- * @param argv  cli params
+ * @param argv yargs arguments
  */
 export declare function startTest(onitConfigFile: OnitConfigFile, testTarget: OnitConfigFileTestTarget, argv: yargs.ArgumentsCamelCase<unknown>): Promise<number>;

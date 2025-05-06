@@ -1,7 +1,7 @@
 import { CommandExecFunction } from '../../../types';
 /**
  *
- * @param argv
+ * @param argv yargs arguments
  * @returns
  */
 declare const exec: CommandExecFunction;

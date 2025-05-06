@@ -32,7 +32,7 @@ import { GenericObject } from '../../../../../types';
 /**
  * 
  * @param webpackConfig 
- * @param argv 
+ * @param argv yargs arguments
  * @returns 
  */
 export async function webpackWatcher(webpackConfig: GenericObject, argv: yargs.ArgumentsCamelCase<unknown>): Promise<void>{

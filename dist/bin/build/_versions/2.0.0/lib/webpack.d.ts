@@ -3,7 +3,7 @@ import { GenericObject, OnitConfigFile } from '../../../../../types';
  * Webpack builder runner
  *
  * @param distFeTargetDir
- * @param onitConfigFile
+ * @param onitConfigFile The config file content
  * @param buildMode
  * @param injectBuildOptions
  * @returns

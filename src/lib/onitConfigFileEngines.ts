@@ -13,7 +13,7 @@ function checkObject(_obj: GenericObject){
 /**
  * Get the frontend engine config. 
  * AS default, returns  { 'onit-webpack':true };
- * @param onitConfigFile 
+ * @param onitConfigFile The config file content
  * @returns 
  */
 export function getConfigFileFrontendEngine(onitConfigFile: OnitConfigFile): OnitConfigFileEngineFrontend {
@@ -31,7 +31,7 @@ export function getConfigFileFrontendEngine(onitConfigFile: OnitConfigFile): Oni
 /**
  * Get the backend engine config. 
  * AS default, returns  { 'lb4':true };
- * @param onitConfigFile 
+ * @param onitConfigFile The config file content
  * @returns 
  */
 export function getConfigFileBackendEngine(onitConfigFile: OnitConfigFile): OnitConfigFileEngineBackend{

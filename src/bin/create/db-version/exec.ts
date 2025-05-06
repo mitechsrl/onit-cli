@@ -33,7 +33,7 @@ import { confirm } from '../../../lib/confirm';
 
 /**
  * 
- * @param argv 
+ * @param argv yargs arguments
  * @returns 
  */
 const exec: CommandExecFunction = async (argv: yargs.ArgumentsCamelCase<unknown>) => {

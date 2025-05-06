@@ -57,7 +57,7 @@ async function createLink (configFile: string, l: OnitConfigFileLink) {
 /**
  * Process onitConfigFile.json.link and create local links. This method is a proxy to npm link.
  * 
- * @param onitConfigFile
+ * @param onitConfigFile The config file content
  * @returns 
  */
 export async function processOnitConfigFileLinks (onitConfigFile: OnitConfigFile) {

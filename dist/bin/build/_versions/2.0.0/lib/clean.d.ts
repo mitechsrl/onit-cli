@@ -2,7 +2,7 @@ import { GenericObject, OnitConfigFile } from '../../../../../types';
 /**
  * Clean the build directory
  *
- * @param onitConfigFile
+ * @param onitConfigFile The config file content
  * @param cwdPackageJson
  * @returns
  */

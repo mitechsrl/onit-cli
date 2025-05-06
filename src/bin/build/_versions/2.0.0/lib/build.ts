@@ -34,7 +34,7 @@ import { runWebpack } from './webpack';
  * 
  * @param cwdPackageJson Package.json at rocess.cwd path 
  * @param buildTarget Build target config
- * @param onitConfigFile Full onit config file
+ * @param onitConfigFile The config file content
  * 
  */
 export async function runBuild(cwdPackageJson: GenericObject, buildTarget:OnitConfigFileBuildTarget, onitConfigFile:OnitConfigFile) {

@@ -1,7 +1,7 @@
 import { OnitConfigFile } from '../../../../types';
 import yargs from 'yargs';
 /**
- * Exportin
+ *
  * @param onitConfigFile The config file content
  * @param argv yargs arguments
  * @returns

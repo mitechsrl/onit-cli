@@ -7,7 +7,7 @@ import { logger } from '../../../../../lib/logger';
  * Prints potential conflicts by checking if "@mitech/..."" packages are installed in different versions
  * in the package-lock.json
  * 
- * @param onitConfigFile 
+ * @param onitConfigFile The config file content
  */
 export async function assertPackageLockPotentialConflicts(onitConfigFile: OnitConfigFile){
 

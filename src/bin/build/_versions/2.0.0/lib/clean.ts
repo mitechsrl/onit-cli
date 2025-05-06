@@ -56,7 +56,7 @@ function removeFiles(files:string[]){
 /**
  * Clean the build directory
  * 
- * @param onitConfigFile 
+ * @param onitConfigFile The config file content
  * @param cwdPackageJson 
  * @returns 
  */

@@ -111,7 +111,7 @@ export async function pm2stop() {
 /**
  * Launch apps from pm2-dev-ecosystem config.
  * 
- * @param onitConfigFile 
+ * @param onitConfigFile The config file content
  * @returns The number of app launched
  */
 export async function pm2start(onitConfigFile: OnitConfigFile): Promise<number> {

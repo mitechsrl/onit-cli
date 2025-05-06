@@ -195,7 +195,7 @@ function createTranslatorInstance(serviceConfig: GenericObject){
  * Process a single labels file
  * 
  * @param file 
- * @param onitConfigFile 
+ * @param onitConfigFile The config file content
  * @param translator 
  * @param languageCodes 
  * @returns 
