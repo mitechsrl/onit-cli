@@ -16,6 +16,7 @@ exports.cli = yargs_1.default.scriptName('onit')
     .option('verbose', { describe: 'Enable verbose log', type: 'boolean' })
     .option('nerd', { hidden: true })
     .option('log-to-file', { describe: 'Save output to log file', type: 'boolean' })
+    .option('experimental-network-inspection', { describe: 'Same as node --experimental-network-inspection', type: 'boolean' })
     .version(false)
     .command('$0', '', (yargs) => {
     yargs.option('v', { alias: 'version', describe: 'Show version', type: 'boolean' });
