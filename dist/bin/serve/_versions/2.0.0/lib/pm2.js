@@ -113,7 +113,7 @@ exports.pm2stop = pm2stop;
 /**
  * Launch apps from pm2-dev-ecosystem config.
  *
- * @param onitConfigFile
+ * @param onitConfigFile The config file content
  * @returns The number of app launched
  */
 async function pm2start(onitConfigFile) {

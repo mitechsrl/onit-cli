@@ -36,8 +36,8 @@ const extraStepRuner_1 = require("./lib/extraStepRuner");
 const build_1 = require("./lib/build");
 /**
  * Exportin
- * @param onitConfigFile
- * @param argv
+ * @param onitConfigFile The config file content
+ * @param argv yargs arguments
  * @returns
  */
 async function build(onitConfigFile, argv) {

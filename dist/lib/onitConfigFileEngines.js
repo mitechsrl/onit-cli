@@ -14,7 +14,7 @@ function checkObject(_obj) {
 /**
  * Get the frontend engine config.
  * AS default, returns  { 'onit-webpack':true };
- * @param onitConfigFile
+ * @param onitConfigFile The config file content
  * @returns
  */
 function getConfigFileFrontendEngine(onitConfigFile) {
@@ -32,7 +32,7 @@ exports.getConfigFileFrontendEngine = getConfigFileFrontendEngine;
 /**
  * Get the backend engine config.
  * AS default, returns  { 'lb4':true };
- * @param onitConfigFile
+ * @param onitConfigFile The config file content
  * @returns
  */
 function getConfigFileBackendEngine(onitConfigFile) {

@@ -35,7 +35,7 @@ const logger_1 = require("../../../lib/logger");
 const confirm_1 = require("../../../lib/confirm");
 /**
  *
- * @param argv
+ * @param argv yargs arguments
  * @returns
  */
 const exec = async (argv) => {

@@ -30,8 +30,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const index_1 = __importDefault(require("../3.0.0/index"));
 /**
  *
- * @param onitConfigFile
- * @param argv
+ * @param onitConfigFile The config file content
+ * @param argv yargs arguments
  * @returns
  */
 async function build(onitConfigFile, argv) {

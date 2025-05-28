@@ -34,7 +34,7 @@ const logger_1 = require("../../../../../lib/logger");
 /**
  *
  * @param webpackConfig
- * @param argv
+ * @param argv yargs arguments
  * @returns
  */
 async function webpackWatcher(webpackConfig, argv) {

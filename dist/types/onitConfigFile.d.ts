@@ -54,6 +54,7 @@ export declare type OnitConfigFileBuildTarget = {
 };
 export declare type OnitConfigFileBuild = {
     version?: string;
+    environment?: GenericObject;
     targets?: {
         [k: string]: OnitConfigFileBuildTarget;
     };

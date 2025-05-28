@@ -38,11 +38,11 @@ const nextjs_1 = require("./nextjs");
  *
  * @param cwdPackageJson Package.json at rocess.cwd path
  * @param buildTarget Build target config
- * @param onitConfigFile Full onit config file
+ * @param onitConfigFile The config file content
  *
  */
 async function runBuild(cwdPackageJson, buildTarget, onitConfigFile) {
-    var _a;
+    var _a, _b, _c;
     // select build mode
     let buildMode = '';
     if (['production', 'uat'].includes((_a = buildTarget.mode) !== null && _a !== void 0 ? _a : '')) {
@@ -78,7 +78,7 @@ async function runBuild(cwdPackageJson, buildTarget, onitConfigFile) {
         switch (key) {
             case 'nextjs': {
                 //launch nextjs build
-                await (0, nextjs_1.nextJsBuild)(onitConfigFile, cwdPackageJson, buildMode);
+                await (0, nextjs_1.nextJsBuild)(onitConfigFile, cwdPackageJson, buildMode, (_c = (_b = onitConfigFile.json.build) === null || _b === void 0 ? void 0 : _b.environment) !== null && _c !== void 0 ? _c : {});
                 break;
             }
             case 'onit-webpack': {

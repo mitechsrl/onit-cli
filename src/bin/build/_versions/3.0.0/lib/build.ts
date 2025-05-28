@@ -87,7 +87,12 @@ export async function runBuild(
         switch(key){
         case 'nextjs': {
             //launch nextjs build
-            await nextJsBuild(onitConfigFile, cwdPackageJson, buildMode);
+            await nextJsBuild(
+                onitConfigFile, 
+                cwdPackageJson, 
+                buildMode,
+                onitConfigFile.json.build?.environment ?? {},
+            );
             break;
         }
         case 'onit-webpack': {

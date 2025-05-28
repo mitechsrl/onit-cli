@@ -11,7 +11,7 @@ const logger_1 = require("../../../../../lib/logger");
  * Prints potential conflicts by checking if "@mitech/..."" packages are installed in different versions
  * in the package-lock.json
  *
- * @param onitConfigFile
+ * @param onitConfigFile The config file content
  */
 async function assertPackageLockPotentialConflicts(onitConfigFile) {
     var _a;

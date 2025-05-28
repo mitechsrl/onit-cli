@@ -40,7 +40,7 @@ const webpack_config_1 = require("../configFiles/webpack.config");
  * Webpack builder runner
  *
  * @param distFeTargetDir
- * @param onitConfigFile
+ * @param onitConfigFile The config file content
  * @param buildMode
  * @param injectBuildOptions
  * @returns

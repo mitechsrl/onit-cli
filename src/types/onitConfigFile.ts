@@ -83,6 +83,8 @@ export type OnitConfigFileBuildTarget = {
 export type OnitConfigFileBuild = {
     // serve version. Optional, if omited <parent>.version is checked 
     version?:string,
+    // key-value items to be injected in process.env
+    environment?: GenericObject,
     targets?: { [k:string]:OnitConfigFileBuildTarget }
 };
 

@@ -116,8 +116,7 @@ export async function start(onitConfigFile: OnitConfigFile, version:string, argv
                                 onitConfigFile, 
                                 cwdPackageJson, 
                                 'production', 
-                                onitConfigFile.json.serve?.environment ?? {
-                                }, 
+                                onitConfigFile.json.serve?.environment ?? {}, 
                                 argv);
                         });
                     }

@@ -16,6 +16,7 @@ module.exports = {
     engines: {},
 
     build:{
+        environment: {} // Env variables to be attached to the build process
         version: '' // String, versione (in formato stile npm) del builder richiesto.      
         targets: {} // Object, configurazione targets di build. Deve essere definito almeno un build target. Vedi sezione **build target**
     }

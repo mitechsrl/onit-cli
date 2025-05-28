@@ -34,7 +34,7 @@ const webpack_1 = require("./webpack");
  *
  * @param cwdPackageJson Package.json at rocess.cwd path
  * @param buildTarget Build target config
- * @param onitConfigFile Full onit config file
+ * @param onitConfigFile The config file content
  *
  */
 async function runBuild(cwdPackageJson, buildTarget, onitConfigFile) {

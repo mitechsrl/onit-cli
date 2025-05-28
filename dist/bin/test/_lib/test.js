@@ -44,9 +44,9 @@ const onitCliExecutable = os_1.default.platform() === 'win32' ? 'onit.cmd' : 'on
 /**
  * Test starter method
  *
- * @param onitConfigFile onitconfig file
+ * @param onitConfigFile The config file content
  * @param testTarget Test config
- * @param argv  cli params
+ * @param argv yargs arguments
  */
 async function startTest(onitConfigFile, testTarget, argv) {
     try {
