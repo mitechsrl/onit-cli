@@ -7,4 +7,6 @@ export declare const cli: yargs.Argv<{
     nerd: unknown;
 } & {
     "log-to-file": boolean | undefined;
+} & {
+    "experimental-network-inspection": boolean | undefined;
 }>;
