@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.4.0
+
+- Added build and serve V4
+- Various bugfixes
+
 ## 3.3.1
 
 - Minor fixes
