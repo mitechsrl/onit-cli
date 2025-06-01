@@ -24,10 +24,6 @@ See [getting started documentation page](./docs/GETTING-STARTED.md) for more inf
 
 See [CHANGELOG.md](CHANGELOG.md) for more info
 
-## V2 cli
-
-For V2 cli, see **V2** branch.
-
 ## License
 
 [MIT](./LICENSE)
