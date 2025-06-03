@@ -59,6 +59,8 @@ export async function extraStepRunner(step: OnitConfigFileBuildExtraStep, vars: 
 
             if (result.exitCode !== 0) {
                 throw new Error('Command failed. Exit code: ' + result.exitCode);
+            }else {
+                logger.log(':white_check_mark: Command <' + cmd + '> completed successfully! (exit code: ' + result.exitCode + ')');
             }
         }
     }
