@@ -46,11 +46,6 @@
         ]
     },
     {
-        "cmd": "doc",
-        "file": "bin/doc/commandConfig.js",
-        "children": []
-    },
-    {
         "cmd": "labels",
         "file": "bin/labels/commandConfig.js",
         "children": [

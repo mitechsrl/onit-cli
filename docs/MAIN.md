@@ -31,7 +31,6 @@ Open a terminal session and type:
 Here's the list of main commands. For further docs, see the command-specific page.
 
 - [onit serve](ONIT-SERVE.md), development serve command
-- [onit doc](ONIT-DOC.md), documentation generation utility
 - [onit build](ONIT-BUILD.md), app build utility
 - [onit test](ONIT-TEST.md), automated test utility
 - [onit labels](ONIT-LABELS.md), labels management utility
