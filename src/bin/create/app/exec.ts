@@ -42,7 +42,7 @@ import { replaceInFile } from './_lib/replaceInFile';
 const nameMatch = /^(?:@[a-z0-9-*~][a-z0-9-*._~]*\/)?([a-z0-9-~][a-z0-9-._~]*)$/g;
 
 function stringToComponentClassName(appName: string) {
-    let componentClassName = upperFirst(camelCase(appName.replace(nameMatch, '$1'))) ;
+    let componentClassName: string = upperFirst(camelCase(appName.replace(nameMatch, '$1'))) ;
     if (!componentClassName.match(/^([Oo]nit)(.*)$/)){
         componentClassName = 'Onit'+upperFirst(componentClassName);
     }

@@ -96,7 +96,7 @@ export async function webpackWatcher(webpackConfig: GenericObject, argv: yargs.A
             hadErrorBoot = false;
             booting = true;
             // create a compiler based on the config
-            return webpack(webpackConfig).watch({
+            return webpack(webpackConfig)!.watch({
                 aggregateTimeout: 700,
                 ignored: ['files/**/*.js', 'node_modules/**']
             }, watcherCallback);
