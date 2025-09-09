@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.5.1
+
+- Various bugfixes
+
+## 3.5.0
+
+- Various updates
+
 ## 3.4.0
 
 - Added build and serve V4
